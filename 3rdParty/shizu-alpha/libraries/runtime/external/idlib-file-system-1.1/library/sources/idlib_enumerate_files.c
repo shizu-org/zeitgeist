@@ -24,36 +24,36 @@
 #include "idlib_errors.h"
 
 #if IDLIB_OPERATING_SYSTEM_WINDOWS == IDLIB_OPERATING_SYSTEM
-	
-	#define IDLIB_DIRECTORY_SEPARATOR "\\"
+  
+  #define IDLIB_DIRECTORY_SEPARATOR "\\"
 
 #elif IDLIB_OPERATING_SYSTEM_LINUX == IDLIB_OPERATING_SYSTEM
 
-	#define IDLIB_DIRECTORY_SEPARATOR "/"
+  #define IDLIB_DIRECTORY_SEPARATOR "/"
 
 #else
 
-	#error("operating system not (yet) supported")
+  #error("operating system not (yet) supported")
 
 #endif
 
 #if IDLIB_OPERATING_SYSTEM_WINDOWS == IDLIB_OPERATING_SYSTEM
 
-	#define WIN32_LEAN_AND_MEAN
-	#include <Windows.h>
-	#include <strsafe.h>
-	#include <tchar.h>
+  #define WIN32_LEAN_AND_MEAN
+  #include <Windows.h>
+  #include <strsafe.h>
+  #include <tchar.h>
 
 #elif IDLIB_OPERATING_SYSTEM_LINUX == IDLIB_OPERATING_SYSTEM
-	
-	#include <sys/types.h>
-	#include <dirent.h>
-	// strcmp
-	#include <string.h>
+  
+  #include <sys/types.h>
+  #include <dirent.h>
+  // strcmp
+  #include <string.h>
 
 #else
 
-	#error("operating system not (yet) supported")
+  #error("operating system not (yet) supported")
 
 #endif
 
@@ -61,95 +61,95 @@ int
 idlib_enumerate_files
   (
     char const* path_name,
-		void* context,
+    void* context,
     idlib_enumerate_files_callback* callback,
-		bool regular_files,
-		bool directory_files
+    bool regular_files,
+    bool directory_files
   )
 {
   if (!path_name || !callback) {
     return IDLIB_ARGUMENT_INVALID;
   }
 #if IDLIB_OPERATING_SYSTEM_WINDOWS == IDLIB_OPERATING_SYSTEM
-	WIN32_FIND_DATA ffd;
-	TCHAR szDir[MAX_PATH];
-	StringCchCopy(szDir, MAX_PATH, path_name);
-	StringCchCat(szDir, MAX_PATH, TEXT(IDLIB_DIRECTORY_SEPARATOR "*"));
-	HANDLE hFind = INVALID_HANDLE_VALUE;
-	hFind = FindFirstFile(szDir, &ffd);
-	if (INVALID_HANDLE_VALUE == hFind) {
-		return IDLIB_UNKNOWN_ERROR;
-	}
-	do {
-		if (!strcmp(ffd.cFileName, ".") || !strcmp(ffd.cFileName, "..")) {
-			continue;
-		}
-		if (((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && directory_files) || ((ffd.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) && regular_files)) {
-			if (!callback(context, ffd.cFileName, strlen(ffd.cFileName))) {
-				FindClose(hFind);
-				hFind = INVALID_HANDLE_VALUE;
-				return IDLIB_ABORTED;
-			}
-		}
-	} while (FindNextFile(hFind, &ffd) != 0);
-	FindClose(hFind);
-	hFind = INVALID_HANDLE_VALUE;
+  WIN32_FIND_DATA ffd;
+  TCHAR szDir[MAX_PATH];
+  StringCchCopy(szDir, MAX_PATH, path_name);
+  StringCchCat(szDir, MAX_PATH, TEXT(IDLIB_DIRECTORY_SEPARATOR "*"));
+  HANDLE hFind = INVALID_HANDLE_VALUE;
+  hFind = FindFirstFile(szDir, &ffd);
+  if (INVALID_HANDLE_VALUE == hFind) {
+    return IDLIB_UNKNOWN_ERROR;
+  }
+  do {
+    if (!strcmp(ffd.cFileName, ".") || !strcmp(ffd.cFileName, "..")) {
+      continue;
+    }
+    if (((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && directory_files) || ((ffd.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) && regular_files)) {
+      if (!callback(context, ffd.cFileName, strlen(ffd.cFileName))) {
+        FindClose(hFind);
+        hFind = INVALID_HANDLE_VALUE;
+        return IDLIB_ABORTED;
+      }
+    }
+  } while (FindNextFile(hFind, &ffd) != 0);
+  FindClose(hFind);
+  hFind = INVALID_HANDLE_VALUE;
 #elif IDLIB_OPERATING_SYSTEM_LINUX == IDLIB_OPERATING_SYSTEM
-	DIR* dir;
-	struct dirent* ent;
-	dir = opendir(path_name);
-	if (!dir) {
-		return IDLIB_UNKNOWN_ERROR;
-	}
-	while ((ent = readdir(dir)) != NULL) {
-	#if 0
-		fprintf(stdout, "%s (", ent->d_name);
-		switch (ent->d_type) {
-			case DT_BLK:
-				fprintf(stdout, "DB_BLK");
-				break;
-			case DT_CHR:
-				fprintf(stdout, "DT_CHR");
-				break;
-			case DT_DIR:
-				fprintf(stdout, "DT_DIR");
-				break;
-			case DT_FIFO:
-				fprintf(stdout, "DT_FIFO");
-				break;
-			case DT_LNK:
-				fprintf(stdout, "DT_LNK");
-				break;
-			case DT_REG:
-				fprintf(stdout, "DT_REG");
-				break;
-			case DT_SOCK:
-				fprintf(stdout, "DT_SOCK");
-				break;
-			case DT_UNKNOWN:
-				fprintf(stdout, "DT_UNKNOWN");
-				break;
-			default:
-				fprintf(stdout, "<unknown>");
-				break;
-		};
-		fprintf(stdout, ")\n");
-	#endif
-		if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
-			continue;
-		}
-		if ((ent->d_type == DT_DIR && directory_files)&& (ent->d_type == DT_REG && regular_files)) {
-			if (!callback(context, ent->d_name, strlen(ent->d_name))) {
-				closedir(dir);
-				dir = NULL;
-				return IDLIB_ABORTED;
-			}
-		}
-	}
-	closedir(dir);
-	dir = NULL;
+  DIR* dir;
+  struct dirent* ent;
+  dir = opendir(path_name);
+  if (!dir) {
+    return IDLIB_UNKNOWN_ERROR;
+  }
+  while ((ent = readdir(dir)) != NULL) {
+  #if 0
+    fprintf(stdout, "%s (", ent->d_name);
+    switch (ent->d_type) {
+      case DT_BLK:
+        fprintf(stdout, "DB_BLK");
+        break;
+      case DT_CHR:
+        fprintf(stdout, "DT_CHR");
+        break;
+      case DT_DIR:
+        fprintf(stdout, "DT_DIR");
+        break;
+      case DT_FIFO:
+        fprintf(stdout, "DT_FIFO");
+        break;
+      case DT_LNK:
+        fprintf(stdout, "DT_LNK");
+        break;
+      case DT_REG:
+        fprintf(stdout, "DT_REG");
+        break;
+      case DT_SOCK:
+        fprintf(stdout, "DT_SOCK");
+        break;
+      case DT_UNKNOWN:
+        fprintf(stdout, "DT_UNKNOWN");
+        break;
+      default:
+        fprintf(stdout, "<unknown>");
+        break;
+    };
+    fprintf(stdout, ")\n");
+  #endif
+    if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
+      continue;
+    }
+    if ((ent->d_type == DT_DIR && directory_files) || (ent->d_type == DT_REG && regular_files)) {
+      if (!callback(context, ent->d_name, strlen(ent->d_name))) {
+        closedir(dir);
+        dir = NULL;
+        return IDLIB_ABORTED;
+      }
+    }
+  }
+  closedir(dir);
+  dir = NULL;
 #else
-	#error("operating system not (yet) supported")
+  #error("operating system not (yet) supported")
 #endif
   return IDLIB_SUCCESS;
 }

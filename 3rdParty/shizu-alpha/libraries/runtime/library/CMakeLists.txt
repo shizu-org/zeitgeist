@@ -101,3 +101,9 @@ end_library()
 source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${${name}.configuration_files})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${${name}.header_files})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${${name}.source_files})
+
+# We must define _GNU_SOURCE under Linux.
+if (${${name}.operating_system_id} EQUAL ${${name}.operating_system_id_linux})
+  target_compile_definitions(${name} PUBLIC _GNU_SOURCE)
+endif()
+

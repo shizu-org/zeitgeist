@@ -24,6 +24,7 @@
 
 
 
+#define _GNU_SOURCE
 
 // setjmp, jmp_buf, longjmp
 #include <setjmp.h>
@@ -38,6 +39,9 @@
 #include "Shizu/Runtime/Type.h"
 
 
+#if !defined(Shizu_Configuration_OperatingSystem)
+  #error("illicit configuration")
+#endif
 
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -53,7 +57,15 @@
 
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
 
+  // NULL
+  #include <stddef.h>
+
+  // dlopen, dlclose, dlsym, dladdr
+  #define _GNU_SOURCE
   #include <dlfcn.h>
+
+  // fprintf, stderr
+  #include <stdio.h>
 
   #define Shizu_OperatingSystem_DllExtension ".so"
   #define Shizu_OperatingSystem_DirectorySeparator "/"
@@ -69,21 +81,19 @@
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
 
-  static inline Shizu_OperatingSystem_DllHandle
+  Shizu_OperatingSystem_DllHandle
   Shizu_OperatingSystem_loadDll
     (
       char const* path
-    )
-  { return LoadLibrary(path); }
+    );
 
 #elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
 
-  static inline Shizu_OperatingSystem_DllHandle
+  Shizu_OperatingSystem_DllHandle
   Shizu_OperatingSystem_loadDll
     (
       char const* path
-    )
-  { return dlopen(path); }
+    );
 
 #else
 
@@ -152,7 +162,7 @@
 
 
 
-#if Shizu_Configuration_Compiler_Msvc == Shizu_Configuration_Compiler
+#if Shizu_Configuration_CompilerC_Msvc == Shizu_Configuration_CompilerC
 
   #define Shizu_staticAssert(expression, message) \
     static_assert(expression, message);
@@ -160,7 +170,7 @@
 #else
 
   #define Shizu_staticAssert(expression, message) \
-    static_assert(expression, message);
+    _Static_assert(expression, message);
 
 #endif
 

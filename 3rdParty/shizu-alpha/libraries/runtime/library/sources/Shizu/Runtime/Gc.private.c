@@ -22,6 +22,7 @@
 #define SHIZU_RUNTIME_PRIVATE (1)
 #include "Shizu/Runtime/Gc.private.h"
 
+#include "Shizu/Runtime/State.h"
 #include "Shizu/Runtime/Locks.private.h"
 #include "Shizu/Runtime/Stack.private.h"
 #include "Shizu/Runtime/Type.private.h"

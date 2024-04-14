@@ -22,6 +22,7 @@
 #define SHIZU_RUNTIME_PRIVATE (1)
 #include "Shizu/Runtime/State.h"
 
+#include "Shizu/Runtime/Configure.h"
 #include "Shizu/Runtime/Gc.private.h"
 #include "Shizu/Runtime/Locks.private.h"
 #include "Shizu/Runtime/Stack.private.h"
@@ -39,6 +40,37 @@
 
 // strcmp
 #include <string.h>
+
+#if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
+
+  Shizu_OperatingSystem_DllHandle
+  Shizu_OperatingSystem_loadDll
+    (
+      char const* path
+    )
+  { return LoadLibrary(path); }
+
+#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
+
+  Shizu_OperatingSystem_DllHandle
+  Shizu_OperatingSystem_loadDll
+    (
+      char const* path
+    )
+  {
+    void* p = dlopen(path, RTLD_NOW);
+    if (!p) {
+      fprintf(stderr, "%s:%d: unable to load dl `%s`: reason `%s`\n", __FILE__, __LINE__, path, dlerror());
+      return NULL;
+    }
+    return p;
+  }
+
+#else
+
+  #error("operating system not (yet) supported")
+
+#endif
 
 typedef struct NamedStorageNode NamedStorageNode;
 
@@ -1033,6 +1065,8 @@ Shizu_State_getNamedMemory
   )
 { return NamedStorageService_get(&state->namedStorageService, name, p); }
 
+#include "Shizu/Runtime/Configure.h"
+
 Shizu_Dll*
 Shizu_State_getOrLoadDll
   (
@@ -1058,6 +1092,13 @@ Shizu_State_getOrLoadDll
     return NULL;
   }
   char* pathName1 = NULL;
+
+#if !defined(Shizu_Configuration_OperatingSystem)
+
+  #error("operating system not defined")
+
+#endif
+
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   {
     CHAR temporary[_MAX_PATH];
@@ -1074,7 +1115,7 @@ Shizu_State_getOrLoadDll
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
   {
     Dl_info info;
-    if (!dladdr(p, &info)) {
+    if (!dladdr(getDlName, &info)) {
       free(name1);
       name1 = NULL;
       Shizu_OperatingSystem_unloadDll(handle);
@@ -1159,9 +1200,24 @@ Shizu_State_getDlByAdr
     void *p
   )
 {
-  HMODULE hModule = NULL;
-  GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, p, &hModule);
-  char const* (*getDlName)(Shizu_State*) = Shizu_OperatingSystem_getDllSymbol(hModule, "Shizu_getDlName");
+#if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
+  HMODULE handle = NULL;
+  GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, p, &handle);
+#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
+  void* handle = NULL;
+  {
+    Dl_info info;
+    if (!dladdr(p, &info)) {
+      Shizu_OperatingSystem_unloadDll(handle);
+      handle = Shizu_OperatingSystem_DllHandle_Invalid;
+      return NULL;
+    }
+  }
+#else
+  #error("operating system not (yet) supported")
+#endif
+  
+  char const* (*getDlName)(Shizu_State*) = Shizu_OperatingSystem_getDllSymbol(handle, "Shizu_getDlName");
   if (!getDlName) {
     return NULL;
   }

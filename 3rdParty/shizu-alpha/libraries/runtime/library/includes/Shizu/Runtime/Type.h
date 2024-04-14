@@ -30,6 +30,12 @@ typedef struct Shizu_Object Shizu_Object;
 typedef struct Shizu_Type Shizu_Type;
 typedef struct Shizu_TypeDescriptor Shizu_TypeDescriptor;
 
+#if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
+  #define Shizu_DlExport() __declspec(dllexport)
+#else
+  #define Shizu_DlExport()
+#endif
+
 /// @since 1.0
 /// The type of an "onStaticInitialize" callback function.
 typedef void (Shizu_OnStaticInitializeCallback)(Shizu_State* state);
@@ -83,7 +89,7 @@ Shizu_State_createType
 #define Shizu_declareDlType(Name) \
   typedef struct Name Name; \
 \
-  __declspec(dllexport) Shizu_Type* \
+  Shizu_DlExport() Shizu_Type* \
   Name##_getType \
     ( \
       Shizu_State* state \
@@ -118,7 +124,7 @@ Shizu_State_createType
     ) \
   {/*Intentionally empty.*/} \
   \
-  __declspec(dllexport) Shizu_Type* \
+  Shizu_DlExport() Shizu_Type* \
   Name##_getType \
     ( \
       Shizu_State* state \
