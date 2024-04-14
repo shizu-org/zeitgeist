@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "idlib_file_system.h"
+#include "idlib/file_system.h"
 #include "Zeitgeist/Rendition.h"
 
 typedef struct LoadRenditionsContext {

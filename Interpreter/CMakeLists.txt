@@ -17,4 +17,3 @@ if (${${name}.operating_system_id} EQUAL ${${name}.operating_system_id_linux})
   target_link_libraries(${name} dl)
   target_compile_definitions(${name} PUBLIC _GNU_SOURCE)
 endif()
-
