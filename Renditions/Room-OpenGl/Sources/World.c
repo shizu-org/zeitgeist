@@ -7,6 +7,12 @@
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+Zeitgeist_ObjectType const g_Player_Type = {
+	.name = "Player",
+	.parentType = &g_Zeitgeist_Object_Type,
+	.destruct = NULL,
+};
+
 static void
 Player_visit
 	(
@@ -15,10 +21,10 @@ Player_visit
 	)
 {
 	if (self->position) {
-		Zeitgeist_Gc_visitForeignObject(state, (Zeitgeist_ForeignObject*)self->position);
+		Zeitgeist_Gc_visitObject(state, (Zeitgeist_Object*)self->position);
 	}
 	if (self->positionSpeed) {
-		Zeitgeist_Gc_visitForeignObject(state, (Zeitgeist_ForeignObject*)self->positionSpeed);
+		Zeitgeist_Gc_visitObject(state, (Zeitgeist_Object*)self->positionSpeed);
 	}
 }
 
@@ -28,7 +34,7 @@ Player_create
 		Zeitgeist_State* state
 	)
 {
-	Player* self = Zeitgeist_allocateForeignObject(state, sizeof(Player), NULL, NULL);
+	Player* self = Zeitgeist_allocateObject(state, sizeof(Player), NULL, NULL);
 	self->position = Vector3R32_create(state, 0.f, 0.f, 0.f);
 	self->positionSpeed = Vector3R32_create(state, 0.f, 0.f, 0.f);
 	self->rotationY = 0.f;
@@ -41,7 +47,7 @@ Player_create
 	self->turnLeftDown = false ;
 	self->turnRightDown = false;
 
-	((Zeitgeist_ForeignObject*)self)->visit = (void(*)(Zeitgeist_State*, Zeitgeist_ForeignObject*)) & Player_visit;
+	((Zeitgeist_Object*)self)->visit = (void(*)(Zeitgeist_State*, Zeitgeist_Object*)) & Player_visit;
 	return self;
 }
 
@@ -134,6 +140,29 @@ Player_update
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 static void
+StaticGeometryGl_destruct
+	(
+		Zeitgeist_State* state,
+		StaticGeometryGl* self
+	);
+
+Zeitgeist_ObjectType const g_StaticGeometryGl_Type = {
+	.name = "StaticGeometryGl",
+	.parentType = &g_Zeitgeist_Object_Type,
+	.destruct = (void(*)(Zeitgeist_State*,Zeitgeist_Object*))&StaticGeometryGl_destruct,
+	.visit = NULL,
+};
+
+static void
+StaticGeometryGl_destruct
+	(
+		Zeitgeist_State* state,
+		StaticGeometryGl* self
+	)
+{ StaticGeometryGl_unmaterialize(state, self); }
+
+
+static void
 StaticGeometryGl_finalize
 	(
 		Zeitgeist_State* state,
@@ -150,6 +179,10 @@ StaticGeometryGl_unmaterialize
 		StaticGeometryGl* self
 	)
 {
+	if (self->colorTextureId) {
+		glDeleteTextures(1, &self->colorTextureId);
+		self->colorTextureId = 0;
+	}
 	if (self->vertexArrayId) {
 		glDeleteVertexArrays(1, &self->vertexArrayId);
 		self->vertexArrayId = 0;
@@ -166,7 +199,7 @@ StaticGeometryGl_create
 		Zeitgeist_State* state
 	)
 {
-	StaticGeometryGl* self = Zeitgeist_allocateForeignObject(state, sizeof(StaticGeometryGl), NULL, NULL);
+	StaticGeometryGl* self = Zeitgeist_allocateObject(state, sizeof(StaticGeometryGl), NULL, NULL);
 
 	self->numberOfVertices = 0;
 	self->bufferId = 0;
@@ -185,8 +218,17 @@ StaticGeometryGl_create
 		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
 		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
 	}
+	glGenTextures(1, &self->colorTextureId);
+	if (glGetError()) {
+		glDeleteVertexArrays(1, &self->vertexArrayId);
+		self->vertexArrayId = 0;
+		glDeleteBuffers(1, &self->bufferId);
+		self->bufferId = 0;
+		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
+		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+	}
 
-	((Zeitgeist_ForeignObject*)self)->finalize = (void(*)(Zeitgeist_State*, Zeitgeist_ForeignObject*)) & StaticGeometryGl_finalize;
+	((Zeitgeist_Object*)self)->finalize = (void(*)(Zeitgeist_State*, Zeitgeist_Object*)) & StaticGeometryGl_finalize;
 	return self;
 }
 
@@ -310,6 +352,7 @@ StaticGeometryGl_setDataNorthWall
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 height
 	)
@@ -317,15 +360,17 @@ StaticGeometryGl_setDataNorthWall
 	idlib_color_3_f32 ambientColor;
 	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
 	struct VERTEX vertices[] = {
-		{.position = { -0.5f,  0.5f, -1.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor },
-		{.position = { -0.5f, -0.5f, -1.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f,  0.5f, -1.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, -0.5f, -1.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor },
+		{.position = { -0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor, },
+		{.position = {  0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor, },
+		{.position = {  0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
 		vertices[i].position.e[1] *= height;
 		vertices[i].position.e[0] *= breadth;
+
+		idlib_vector_3_f32_add(&vertices[i].position, &vertices[i].position, &translation->v);
 	}
 
 	idlib_vector_3_f32 n;
@@ -335,10 +380,6 @@ StaticGeometryGl_setDataNorthWall
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
 	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = NORTH_WALL;
-	self->left = -1;
-	self->right = +1;
-	self->bottom = -1;
-	self->top = +1;
 }
 
 void
@@ -346,6 +387,7 @@ StaticGeometryGl_setDataSouthWall
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 height
 	)
@@ -353,15 +395,17 @@ StaticGeometryGl_setDataSouthWall
 	idlib_color_3_f32 ambientColor;
 	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
 	struct VERTEX vertices[] = {
-		{.position = {  0.5f,  0.5f, +1.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, -0.5f, +1.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
-		{.position = { -0.5f,  0.5f, +1.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
-		{.position = { -0.5f, -0.5f, +1.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
+		{.position = {  0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
+		{.position = {  0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
 		vertices[i].position.e[1] *= height;
 		vertices[i].position.e[0] *= breadth;
+
+		idlib_vector_3_f32_add(&vertices[i].position, &vertices[i].position, &translation->v);
 	}
 
 	idlib_vector_3_f32 n;
@@ -371,10 +415,6 @@ StaticGeometryGl_setDataSouthWall
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
 	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = SOUTH_WALL;
-	self->left = -1;
-	self->right = +1;
-	self->bottom = -1;
-	self->top = +1;
 }
 
 void
@@ -382,6 +422,7 @@ StaticGeometryGl_setDataEastWall
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 height
 	)
@@ -389,15 +430,17 @@ StaticGeometryGl_setDataEastWall
 	idlib_color_3_f32 ambientColor;
 	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
 	struct VERTEX vertices[] = {
-		{.position = { +1.f,  0.5f, -0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { +1.f, -0.5f, -0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { +1.f,  0.5f, +0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { +1.f, -0.5f, +0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { 0.f,  0.5f, -0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { 0.f, -0.5f, -0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { 0.f,  0.5f, +0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { 0.f, -0.5f, +0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
 		vertices[i].position.e[1] *= height;
 		vertices[i].position.e[2] *= breadth;
+
+		idlib_vector_3_f32_add(&vertices[i].position, &vertices[i].position, &translation->v);
 	}
 
 	idlib_vector_3_f32 n;
@@ -407,10 +450,6 @@ StaticGeometryGl_setDataEastWall
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
 	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = EAST_WALL;
-	self->left = -1;
-	self->right = +1;
-	self->bottom = -1;
-	self->top = +1;
 }
 
 void
@@ -418,6 +457,7 @@ StaticGeometryGl_setDataWestWall
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 height
 	)
@@ -425,15 +465,17 @@ StaticGeometryGl_setDataWestWall
 	idlib_color_3_f32 ambientColor;
 	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
 	struct VERTEX vertices[] = {
-		{.position = { -1.f,  0.5f, +0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor },
-		{.position = { -1.f, -0.5f, +0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { -1.f,  0.5f, -0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { -1.f, -0.5f, -0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { 0.f,  0.5f, +0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor },
+		{.position = { 0.f, -0.5f, +0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { 0.f,  0.5f, -0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { 0.f, -0.5f, -0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
 		vertices[i].position.e[1] *= height;
 		vertices[i].position.e[2] *= breadth;
+
+		idlib_vector_3_f32_add(&vertices[i].position, &vertices[i].position, &translation->v);
 	}
 
 	idlib_vector_3_f32 n;
@@ -443,10 +485,6 @@ StaticGeometryGl_setDataWestWall
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
 	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = WEST_WALL;
-	self->left = -1;
-	self->right = +1;
-	self->bottom = -1;
-	self->top = +1;
 }
 
 void
@@ -454,6 +492,7 @@ StaticGeometryGl_setDataFloor
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 length
 	)
@@ -461,15 +500,17 @@ StaticGeometryGl_setDataFloor
 	idlib_color_3_f32 ambientColor;
 	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
 	struct VERTEX vertices[] = {
-		{.position = { -0.5f, -1.f, -0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { -0.5f, -1.f,  0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, -1.f, -0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, -1.f,  0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f, 0.f, -0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f, 0.f,  0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = {  0.5f, 0.f, -0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = {  0.5f, 0.f,  0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
 		vertices[i].position.e[0] *= breadth;
 		vertices[i].position.e[2] *= length;
+
+		idlib_vector_3_f32_add(&vertices[i].position, &vertices[i].position, &translation->v);
 	}
 
 	idlib_vector_3_f32 n;
@@ -479,10 +520,6 @@ StaticGeometryGl_setDataFloor
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
 	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = FLOOR;
-	self->left = -1;
-	self->right = +1;
-	self->bottom = -1;
-	self->top = +1;
 }
 
 void
@@ -490,6 +527,7 @@ StaticGeometryGl_setDataCeiling
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 length
 	)
@@ -497,15 +535,17 @@ StaticGeometryGl_setDataCeiling
 	idlib_color_3_f32 ambientColor;
 	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
 	struct VERTEX vertices[] = {
-		{.position = { -0.5f, +1.f,  0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { -0.5f, +1.f, -0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, +1.f,  0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, +1.f, -0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f, 0.f,  0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f, 0.f, -0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = {  0.5f, 0.f,  0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = {  0.5f, 0.f, -0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
 		vertices[i].position.e[0] *= breadth;
 		vertices[i].position.e[2] *= length;
+
+		idlib_vector_3_f32_add(&vertices[i].position, &vertices[i].position, &translation->v);
 	}
 
 	idlib_vector_3_f32 n;
@@ -515,10 +555,6 @@ StaticGeometryGl_setDataCeiling
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
 	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = CEILING;
-	self->left = -1;
-	self->right = +1;
-	self->bottom = -1;
-	self->top = +1;
 }
 
 static void
@@ -529,10 +565,10 @@ World_visit
 	)
 {
 	if (self->geometries) {
-		Zeitgeist_Gc_visitForeignObject(state, (Zeitgeist_ForeignObject*)self->geometries);
+		Zeitgeist_Gc_visitObject(state, (Zeitgeist_Object*)self->geometries);
 	}
 	if (self->player) {
-		Zeitgeist_Gc_visitForeignObject(state, (Zeitgeist_ForeignObject*)self->player);
+		Zeitgeist_Gc_visitObject(state, (Zeitgeist_Object*)self->player);
 	}
 }
 
@@ -542,41 +578,48 @@ World_create
 		Zeitgeist_State* state
 	)
 {
-	World* self = Zeitgeist_allocateForeignObject(state, sizeof(World), NULL, NULL);
+	World* self = Zeitgeist_allocateObject(state, sizeof(World), NULL, NULL);
 	self->player = NULL;
 	self->geometries = NULL;
 
 	self->geometries = Zeitgeist_List_create(state);
 	
 	StaticGeometryGl* geometry = NULL;
-	
-	geometry = StaticGeometryGl_create(state);
-	StaticGeometryGl_setDataSouthWall(state, geometry, 2.f, 2.f);
-	Zeitgeist_List_appendForeignObject(state, self->geometries, (Zeitgeist_ForeignObject*)geometry);
+
+	// Extend along the x-axis in metres.
+	static const Zeitgeist_Real32 breadth = 5.f;
+	// Extend along the z-axis in metres.
+	static const Zeitgeist_Real32 length = 5.f;
+	// Extend along the y-axis in metres.
+	static const Zeitgeist_Real32 height = 4.f;
 
 	geometry = StaticGeometryGl_create(state);
-	StaticGeometryGl_setDataFloor(state, geometry, 2.f, 2.f);
-	Zeitgeist_List_appendForeignObject(state, self->geometries, (Zeitgeist_ForeignObject*)geometry);
+	StaticGeometryGl_setDataFloor(state, geometry, Vector3R32_create(state, 0.f, -height / 2.f, 0.f), breadth, length);
+	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
 
 	geometry = StaticGeometryGl_create(state);
-	StaticGeometryGl_setDataCeiling(state, geometry, 2.f, 2.f);
-	Zeitgeist_List_appendForeignObject(state, self->geometries, (Zeitgeist_ForeignObject*)geometry);
+	StaticGeometryGl_setDataCeiling(state, geometry, Vector3R32_create(state, 0.f, +height / 2.f, 0.f), breadth, length);
+	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
 
 	geometry = StaticGeometryGl_create(state);
-	StaticGeometryGl_setDataEastWall(state, geometry, 2.f, 2.f);
-	Zeitgeist_List_appendForeignObject(state, self->geometries, (Zeitgeist_ForeignObject*)geometry);
+	StaticGeometryGl_setDataWestWall(state, geometry, Vector3R32_create(state, -breadth / 2.f, 0.f, 0.f), length, height);
+	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
 
 	geometry = StaticGeometryGl_create(state);
-	StaticGeometryGl_setDataWestWall(state, geometry, 2.f, 2.f);
-	Zeitgeist_List_appendForeignObject(state, self->geometries, (Zeitgeist_ForeignObject*)geometry);
+	StaticGeometryGl_setDataNorthWall(state, geometry, Vector3R32_create(state, 0.f, 0.f, -length / 2.f), breadth, height);
+	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
 
 	geometry = StaticGeometryGl_create(state);
-	StaticGeometryGl_setDataNorthWall(state, geometry, 2.f, 2.f);
-	Zeitgeist_List_appendForeignObject(state, self->geometries, (Zeitgeist_ForeignObject*)geometry);
+	StaticGeometryGl_setDataEastWall(state, geometry, Vector3R32_create(state, +breadth / 2.f, 0.f, 0.f), length, height);
+	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
+
+	geometry = StaticGeometryGl_create(state);
+	StaticGeometryGl_setDataSouthWall(state, geometry, Vector3R32_create(state, 0.f, 0.f, +length / 2.f), breadth, height);
+	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
 
 	self->player = Player_create(state);
 
-	((Zeitgeist_ForeignObject*)self)->visit = (void(*)(Zeitgeist_State*, Zeitgeist_ForeignObject*)) & World_visit;
+	((Zeitgeist_Object*)self)->visit = (void(*)(Zeitgeist_State*, Zeitgeist_Object*)) & World_visit;
 	return self;
 }
 

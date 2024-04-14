@@ -9,13 +9,13 @@
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+Zeitgeist_ObjectType_Declare(Player)
+
 /**
  * @brief The state of the player.
  */
-typedef struct Player Player;
-
 struct Player {
-	Zeitgeist_ForeignObject parent;
+	Zeitgeist_Object parent;
 	/**
 	 * @brief A position vector indicating the position of the player in world coordinates.
 	 * @remarks The default position is (0,0,0).
@@ -85,90 +85,128 @@ Player_update
 
 /**
  * @since 0.2
- * Indicates the geometry of the south wall (6 o'clock) of a room.
- * The south wall has the normal (0,0,-1).
+ * Indicates the geometry of the west side (9 o'clock) of a box.
+ * The west side has the normal (-1,0,0).
  */
-#define SOUTH_WALL (1)
+#define BOX_WEST_SIDE (1)
 
 /**
  * @since 0.2
- * Indicates the geometry of the east wall (3 o'clock) of a room.
- * The east wall has the the normal (-1,0,0).
+ * Indicates the geometry of the north side (12 o'clock) of a room.
+ * The north side has the normal (0,0,-1).
  */
-#define EAST_WALL (2)
+#define BOX_NORTH_SIDE (2)
 
 /**
  * @since 0.2
- * Indicates the geometry of the north wall (12 o'clock) of a room.
- * The north wall has the normal (0,0,+1).
+ * Indicates the geometry of the east side (3 o'clock) of a box.
+ * The east side has the the normal (+1,0,0).
  */
-#define NORTH_WALL (3)
+#define BOX_EAST_SIDE (3)
+
+/**
+ * @since 0.2
+ * Indicates the geometry of the south side (6 o'clock) of a box.
+ * The south side has the normal (0,0,+1).
+ */
+#define BOX_SOUTH_SIDE (4)
 
 /**
  * @since 0.2
  * Indicates the geometry of the west wall (9 o'clock) of a room.
  * The west wall has the normal (+1,0,0).
  */
-#define WEST_WALL (4)
+#define WEST_WALL (5)
+
+/**
+ * @since 0.2
+ * Indicates the geometry of the north wall (12 o'clock) of a room.
+ * The north wall has the normal (0,0,+1).
+ */
+#define NORTH_WALL (6)
+
+/**
+ * @since 0.2
+ * Indicates the geometry of the east wall (3 o'clock) of a room.
+ * The east wall has the the normal (-1,0,0).
+ */
+#define EAST_WALL (7)
+
+/**
+ * @since 0.2
+ * Indicates the geometry of the south wall (6 o'clock) of a room.
+ * The south wall has the normal (0,0,-1).
+ */
+#define SOUTH_WALL (8)
 
 /**
  * @since 2.0
  * Indicates the geometry of the floor of a room.
  * The floor has the normal (0,+1,0).
  */
-#define FLOOR (5)
+#define FLOOR (9)
 
 /**
  * @since 2.0
  * Indicates geometry of the ceiling of a room.
  * The ceiling has the normal (0,-1,0).
  */
-#define CEILING (6)
+#define CEILING (10)
 
 /**
  * @since 0.1
  * @brief
  * The retained mode representation of a part of a building's geometry.
  * A StaticGeometryGl object represents one of the following:
- * - a floor
- * - a ceiling
- * - a west, north, east, or south walls
+ * - the top, bottom, west, north, east, or south side of a box
+ * - a floor of a room
+ * - a ceiling of a room
+ * - a west, north, east, or south walls of a room
  */
-typedef struct StaticGeometryGl StaticGeometryGl;
+Zeitgeist_ObjectType_Declare(StaticGeometryGl)
 
+/**
+ * @since 0.1
+ * @brief
+ * The retained mode representation of a part of a building's geometry.
+ * A StaticGeometryGl object represents one of the following:
+ * - the top, bottom, west, north, east, or south side of a box
+ * - a floor of a room
+ * - a ceiling of a room
+ * - a west, north, east, or south walls of a room
+ */
 struct StaticGeometryGl {
-	Zeitgeist_ForeignObject parent;
+	Zeitgeist_Object parent;
+
+	/**
+	 * @brief The OpenGL ID of the color texture.
+	 */
+	GLuint colorTextureId;
 	
-	/// @brief The OpenGL ID of the vertex buffer.
+	/**
+	 * @brief The OpenGL ID of the vertex buffer.
+	 */
 	GLuint bufferId;
 	
-	/// @brief The OpenGL ID of the vertex array.
+	/**
+	 * @brief The OpenGL ID of the vertex array.
+	 */
 	GLuint vertexArrayId;
 	
-	/// @brief The number of vertices of this wall.
+	/** 
+   * @brief The number of vertices of this wall.
+	 */
 	size_t numberOfVertices;
 	
-	/// @brief The number of Bytes of this wall.
+	/** 
+   * @brief The number of Bytes of this wall.
+	 */
 	size_t numberOfBytes;
 	
-	/// @brief Either FLOOR or CEILING, WEST_WALL, NORTH_WALL, EAST_WALL, or SOUT_WALL.
+	/** 
+	 * @brief Either FLOOR or CEILING, WEST_WALL, NORTH_WALL, EAST_WALL, or SOUT_WALL.
+	 */
 	uint8_t flags;
-
-	/// @brief The coordinate of the bottom side of the wall in the plane of the wall
-	/// using a coordinate system of x going right, y going up, negative z going into.
-	Zeitgeist_Real32 bottom;
-	
-	/// @brief The coordinate of the top side of the wall in the plane of the wall
-	/// using a coordinate system of x going right, y going up, negative z going into.
-	Zeitgeist_Real32 top;
-
-	/// @brief The coordinate of the left side of the wall in the plane of the wall.
-	/// using a coordinate system of x going right, y going up, negative z going into.
-	Zeitgeist_Real32 left;
-
-	/// @brief The coordinate of the right side of the wall in the plane of the wall
-	/// using a coordinate system of x going right, y going up, negative z going into.
-	Zeitgeist_Real32 right;
 
 };
 
@@ -200,6 +238,8 @@ StaticGeometryGl_setData
 /**
  * @brief Set the vertex data for the geometry of the north wall (12 o'clock).
  * The north wall has the normal (0,0,+1).
+ * @param translation The translation of the wall along the axes.
+ * Initially, the wall is centered on the origin.
  * @param breadth The extend along the x-axis. Must be positive.
  * @param height The extend along the y-axis. Must be positive.
  */
@@ -208,6 +248,7 @@ StaticGeometryGl_setDataNorthWall
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 height
 	);
@@ -215,6 +256,8 @@ StaticGeometryGl_setDataNorthWall
 /**
  * @brief Set the vertex data for the geometry of the south wall (6 o'clock).
  * The south wall has the normal (0,0,-1).
+ * @param translation The translation of the wall along the axes.
+ * Initially, the wall is centered on the origin.
  * @param breadth The extend along the x-axis. Must be positive.
  * @param height The extend along the y-axis. Must be positive.
  */
@@ -223,6 +266,7 @@ StaticGeometryGl_setDataSouthWall
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 height
 	);
@@ -230,6 +274,8 @@ StaticGeometryGl_setDataSouthWall
 /**
  * @brief Set the vertex data for the geometry of the east wall (3 o'clock).
  * The east wall has the normal (-1,0,0).
+ * @param translation The translation of the wall along the axes.
+ * Initially, the wall is centered on the origin.
  * @param breadth The extend along the z-axis. Must be positive.
  * @param height The extend along the y-axis. Must be positive.
  */
@@ -238,6 +284,7 @@ StaticGeometryGl_setDataEastWall
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 height
 	);
@@ -245,6 +292,8 @@ StaticGeometryGl_setDataEastWall
 /**
  * @brief Set the vertex data for the geometry of the west wall (9 o'clock).
  * The west wall has the normal (+1,0,0).
+ * @param translation The translation of the wall along the axes.
+ * Initially, the wall is centered on the origin.
  * @param breadth The extend along the z-axis. Must be positive.
  * @param height The extend along the y-axis. Must be positive.
  */
@@ -253,6 +302,7 @@ StaticGeometryGl_setDataWestWall
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 height
 	);
@@ -260,6 +310,8 @@ StaticGeometryGl_setDataWestWall
 /**
  * @brief Set the vertex data for the geometry of the floor.
  * The floor has the normal (0,+1,0).
+ * @param translation The translation of the wall along the axes.
+ * Initially, the wall is centered on the origin.
  * @param breadth The breadth (the extend along the x-axis). Must be positive.
  * @param length The length (the extend along the z-axis). Must be positive.
  */
@@ -268,6 +320,7 @@ StaticGeometryGl_setDataFloor
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 length
 	);
@@ -275,6 +328,8 @@ StaticGeometryGl_setDataFloor
 /**
  * @brief Set the vertex data for the geometry of the ceiling.
  * The ceiling has the normal (0,+1,0).
+ * @param translation The translation of the wall along the axes.
+ * Initially, the wall is centered on the origin.
  * @param breadth The breadth (the extend along the x-axis). Must be positive.
  * @param length The length (the extend along the z-axis). Must be positive.
  */
@@ -283,6 +338,7 @@ StaticGeometryGl_setDataCeiling
 	(
 		Zeitgeist_State* state,
 		StaticGeometryGl* self,
+		Vector3R32* translation,
 		Zeitgeist_Real32 breadth,
 		Zeitgeist_Real32 length
 	);
@@ -295,10 +351,10 @@ StaticGeometryGl_create
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-typedef struct World World;
+Zeitgeist_ObjectType_Declare(World)
 
 struct World {
-	Zeitgeist_ForeignObject _parent;
+	Zeitgeist_Object _parent;
 	/// @brief Pointer to the list of StaticGeometryGl objects.
 	Zeitgeist_List* geometries;
 	/// @brief Information on the player.

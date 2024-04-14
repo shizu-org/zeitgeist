@@ -220,7 +220,7 @@ Zeitgeist_Rendition_update
 	Zeitgeist_Value sizeValue = Zeitgeist_List_getSize(state, g_world->geometries);
 	for (Zeitgeist_Integer i = 0, n = Zeitgeist_Value_getInteger(&sizeValue); i < n; ++i) {
 		Zeitgeist_Value elementValue = Zeitgeist_List_getValue(state, g_world->geometries, i);
-		StaticGeometryGl *element = (StaticGeometryGl*)Zeitgeist_Value_getForeignObject(&elementValue);
+		StaticGeometryGl *element = (StaticGeometryGl*)Zeitgeist_Value_getObject(&elementValue);
 		glBindVertexArray(element->vertexArrayId);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, element->numberOfVertices);
 	}
@@ -248,12 +248,12 @@ onKeyboardKeyMessage
 		fprintf(stderr, "%s:%d: invalid number of arguments\n", __FILE__, __LINE__);
 		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
 	}
-	if (!Zeitgeist_Stack_isForeignObject(state, 1)) {
+	if (!Zeitgeist_Stack_isObject(state, 1)) {
 		fprintf(stderr, "%s:%d: invalid argument type\n", __FILE__, __LINE__);
 		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
 	}
 	fprintf(stdout, "%s:%d: keyboard key message received\n", __FILE__, __LINE__);
-	KeyboardKeyMessage* message = (KeyboardKeyMessage*)Zeitgeist_Stack_getForeignObject(state, 1);
+	KeyboardKeyMessage* message = (KeyboardKeyMessage*)Zeitgeist_Stack_getObject(state, 1);
 	if (KeyboardKey_Escape == KeyboardKeyMessage_getKey(state, message)) {
 		if (KeyboardKey_Action_Released == KeyboardKeyMessage_getAction(state, message)) {
 			Zeitgeist_UpstreamRequest* request = Zeitgeist_UpstreamRequest_createExitProcessRequest(state);
@@ -336,7 +336,7 @@ Zeitgeist_Rendition_unload
 	Zeitgeist_Value sizeValue = Zeitgeist_List_getSize(state, g_world->geometries);
 	for (Zeitgeist_Integer i = 0, n = Zeitgeist_Value_getInteger(&sizeValue); i < n; ++i) {
 		Zeitgeist_Value elementValue = Zeitgeist_List_getValue(state, g_world->geometries, i);
-		StaticGeometryGl* element = (StaticGeometryGl*)Zeitgeist_Value_getForeignObject(&elementValue);
+		StaticGeometryGl* element = (StaticGeometryGl*)Zeitgeist_Value_getObject(&elementValue);
 		StaticGeometryGl_unmaterialize(state, element);
 	}
 	Zeitgeist_unlock(state, (Zeitgeist_Gc_Object*)g_world);
