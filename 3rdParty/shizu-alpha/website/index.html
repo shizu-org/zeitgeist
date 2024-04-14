@@ -10,24 +10,66 @@
     <link rel="icon" href="/favicons/favicon-96x96.svg" sizes="96x96"><!-- 96×96 -->
     <link rel="icon" href="/favicons/favicon-512x512.svg" sizes="512x512"><!-- 512×512 -->
     <style>
+    
+    :root {
+      --color-black: rgb(1,1,1);
+      --color-white: rgb(254,254,254);
+      --color-periwinkle-gray: #c3cde8;
+      --color-light-green: rgb(144, 238, 144);
+    }
+    
+    .logo-font {
+      font-size: 14vmin; 
+    }
+    
+    .news-font {
+      font-size: 2vmin;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 2.25vmin;
+    }
+    
+    .contact-font {
+       font-size: 2vmin;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 2.25vmin;   
+    }
+    
+    .row {
+      flex-direction: row;
+    }
 
     body {
-    	width: 100%;
-      	height: 100%;
-      	display: flex;
+      width: 100%;
+      height: 100%;
+      display: flex;
       
-      	margin: 0;
-      	padding: 0;
+      margin: 0;
+      padding: 0;
       
-   		overflow: hidden;
-  		position: absolute;
+      overflow: hidden;
+      position: absolute;
       
-      	font-size: 14vmin;
+      font-size: 14vmin;
       
-      	flex-direction: row; /*main axis is left to right/right to left*/
-    	justify-content: center; /*centers items on the line (the x-axis by default)*/
-  		align-items: center; /*centers items on the cross-axis (y by default)*/
+      flex-direction: column; /*main axis is top to bottom/bottom to top*/
+      justify-content: center; /*centers items on the line (the y-axis by default)*/
+      align-items: center; /*centers items on the cross-axis (x by default)*/
+      
+      background-color: var(--color-white);
     }
+    
+    header.shadow-bottom
+    {}
+    
+    footer.shadow-top
+    {}
+    
+    header.border-bottom
+    {}
+    
+    footer.border-top
+    {}
+      
       
     body > div {
       display: flex;
@@ -36,18 +78,76 @@
       align-items: center; /*centers items on the cross-axis (y by default)*/ 
     }
       
-    .shizu.hyperlink {
+    .visible-hyperlink {
+      /*cursor: default;*/
+      text-decoration: none;
+      font-weight: 120%;
+      color: rgb(0, 168, 107);
+    }
+    
+    .hidden-hyperlink {
       cursor: default;
       text-decoration: none;
-      color: black;
+      color: var(--color-black);
+    }
+    
+    header {
+      min-height: 2vmin;
+      flex-grow: 0;
+      width: 100%;
+      
+      background-color: var(--color-white);
+    }
+    
+    main {
+      margin-left: 2vmin;
+      margin-right: 2vmin;
+      flex-grow: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    footer {
+      min-height: 2vmin;
+      flex-grow: 0;
+      
+      padding-left: 2vw;
+      padding-right: 2vw;
+      width: calc(100vw - 2vw - 2vw);
+      
+      background-color: var(--color-white);
     }
 
     </style>
   </head>
   <body>
-    <div>
-    	<div><a class="shizu hyperlink" href="https://en.wiktionary.org/wiki/%E9%9D%99">静</a></div>
-    	<div>Shizu.org</div>
+    <header class="shadow-bottom">
+    </header>
+    <main>
+      <div style="margin-bottom: 1vmin; display: flex">
+        <div><a class="hidden-hyperlink" href="https://en.wiktionary.org/wiki/%E9%9D%99">静</a></div>
+        <div class="logo-font">shizu.org</div>
+      </div>
+      <div style="margin-top: 1vmin;">
+          <div class="news-font">
+          Apr 11, 2024: <a class="visible-hyperlink" href="https://github.com/michaelheilmann/idlib-file-system/releases/tag/1.1">IdLib File System Version 1.1</a> released!
+          </div>
+          <div class="news-font">
+          Apr 02, 2024: <a class="visible-hyperlink" href="https://github.com/michaelheilmann/idlib-file-system/releases/tag/1.0">IdLib File System Version 1.0</a> released!
+          </div>
+          <div class="news-font">
+          Mar 27, 2024: <a class="visible-hyperlink" href="https://github.com/michaelheilmann/idlib-math/releases/tag/1.4">IdLib Math Version 1.4</a> released!
+          </div>
     </div>
+    </main>
+    <footer class="shadow-top" style="padding-left: 8vw; padding-right: 8vw;">
+      <div style="display: flex; flex-direction: row">
+        <div class="contact-font"><a class="visible-hyperlink" href="https://github.com/michaelheilmann/shizu.git">GitHub</a></div>
+        <div style="margin-left: 2vmin" class="contact-font"><a class="visible-hyperlink" href="mailto:michael.heilmann@shizu.org">E-Mail: michael.heilmann@shizu.org</a></div>
+      </div>
+    </footer>
   </body>
 </html>

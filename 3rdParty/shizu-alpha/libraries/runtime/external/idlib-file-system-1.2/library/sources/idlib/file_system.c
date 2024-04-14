@@ -1,5 +1,5 @@
 /*
-  Shizu Runtime
+  IdLib File System
   Copyright (C) 2024 Michael Heilmann. All rights reserved.
 
   This software is provided 'as-is', without any express or implied
@@ -19,31 +19,38 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(SHIZU_RUNTIME_CONFIGURE_H_INCLUDED)
-#define SHIZU_RUNTIME_CONFIGURE_H_INCLUDED
+#include "idlib/file_system.h"
+
+#include "idlib/file_system/file_handle.h"
+
+// malloc, free
+#include <malloc.h>
+
+// SIZE_MAX
+#include <stdlib.h>
+
+#if IDLIB_OPERATING_SYSTEM_WINDOWS == IDLIB_OPERATING_SYSTEM
+
+  #define WIN32_LEAN_AND_MEAN
+  #include <Windows.h>
+
+#elif IDLIB_OPERATING_SYSTEM_LINUX == IDLIB_OPERATING_SYSTEM || IDLIB_OPERATING_SYSTEM_CYGWIN == IDLIB_OPERATING_SYSTEM
+
+  // For errno.
+  #include <errno.h>
+
+  // For open.
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+
+  // For close.
+  #include <unistd.h>
+
+#else
+
+  #error("operating system not (yet) supported")
+
+#endif
 
 
-
-#define Shizu_Configuration_InstructionSetArchitecture_X64 (1)
-#define Shizu_Configuration_InstructionSetArchitecture_X86 (2)
-
-#define Shizu_Configuration_InstructionSetArchitecture @Shizu_Configuration_InstructionSetArchitecture@
-
-
-
-#define Shizu_Configuration_OperatingSystem_Windows (1)
-#define Shizu_Configuration_OperatingSystem_Linux (2)
-#define Shizu_Configuration_OperatingSystem_Cygwin (3)
-
-#define Shizu_Configuration_OperatingSystem @Shizu_Configuration_OperatingSystem@
-
-
-
-#define Shizu_Configuration_CompilerC_Msvc (1)
-#define Shizu_Configuration_CompilerC_Gcc (2)
-
-#define Shizu_Configuration_CompilerC @Shizu_Configuration_CompilerC@
-
-
-
-#endif // SHIZU_RUNTIME_CONFIGURE_H_INCLUDED

@@ -35,3 +35,5 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/Shizu/Server/Console/Configu
 list(APPEND ${name}.sources includes/Shizu/Server/Console/Configure.h)
 
 end_executable()
+
+target_link_libraries(${name} Shizu.Runtime idlib-process)

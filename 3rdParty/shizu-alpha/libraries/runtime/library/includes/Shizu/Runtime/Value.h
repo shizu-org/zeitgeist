@@ -119,29 +119,9 @@ typedef struct Shizu_Value Shizu_Value;
 
 #define Shizu_Value_Tag_Integer32 (3)
 
-#if 0
-
-#define Shizu_Value_Tag_List (4)
-
-#define Shizu_Value_Tag_Map (5)
-
-#endif
-
 #define Shizu_Value_Tag_Object (6)
 
-#if 0
-
-#define Shizu_Value_Tag_String (7)
-
-#endif
-
 #define Shizu_Value_Tag_Void (8)
-
-#if 0
-
-#define Shizu_Value_Tag_WeakReference (9)
-
-#endif
 
 struct Shizu_Value {
   uint8_t tag;
@@ -253,48 +233,6 @@ Shizu_Value_setInteger32
     Shizu_Integer32 integer32Value
   );
 
-#if 0
-
-Shizu_Reference(Shizu_List)
-Shizu_Value_getList
-  (
-    Shizu_Value const* self
-  );
-
-bool
-Shizu_Value_isList
-  (
-    Shizu_Value const* self
-  );
-
-void
-Shizu_Value_setList
-  (
-    Shizu_Value* self,
-    Shizu_Reference(Shizu_List) listValue
-  );
-
-Shizu_Reference(Shizu_Map)
-Shizu_Value_getMap
-  (
-    Shizu_Value const* self
-  );
-
-bool
-Shizu_Value_isMap
-  (
-    Shizu_Value const* self
-  );
-
-void
-Shizu_Value_setMap
-  (
-    Shizu_Value* self,
-    Shizu_Reference(Shizu_Map) mapValue
-  );
-
-#endif
-
 Shizu_Reference(Shizu_Object)
 Shizu_Value_getObject
   (
@@ -314,29 +252,6 @@ Shizu_Value_setObject
     Shizu_Reference(Shizu_Object) objectValue
   );
 
-#if 0
-
-Shizu_Reference(Shizu_String)
-Shizu_Value_getString
-  (
-    Shizu_Value const* self
-  );
-
-bool
-Shizu_Value_isString
-  (
-    Shizu_Value const* self
-  );
-
-void
-Shizu_Value_setString
-  (
-    Shizu_Value* self,
-    Shizu_Reference(Shizu_String) stringValue
-  );
-
-#endif
-
 Shizu_Void
 Shizu_Value_getVoid
   (
@@ -355,30 +270,6 @@ Shizu_Value_setVoid
     Shizu_Value* self,
     Shizu_Void voidValue
   );
-
-#if 0
-
-Shizu_Reference(Shizu_WeakReference)
-Shizu_Value_getWeakReference
-  (
-    Shizu_Value const* self
-  );
-
-bool
-Shizu_Value_isWeakReference
-  (
-    Shizu_Value const* self
-  );
-
-void
-Shizu_Value_setWeakReference
-  (
-    Shizu_Value* self,
-    Shizu_Reference(Shizu_WeakReference) weakReferenceValue
-  );
-
-#endif
-
 
 
 

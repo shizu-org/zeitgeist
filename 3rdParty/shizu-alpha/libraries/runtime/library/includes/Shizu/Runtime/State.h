@@ -55,7 +55,7 @@
   typedef HMODULE Shizu_OperatingSystem_DllHandle;
   #define Shizu_OperatingSystem_DllHandle_Invalid (NULL)
 
-#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
+#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
 
   // NULL
   #include <stddef.h>
@@ -87,7 +87,7 @@
       char const* path
     );
 
-#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
+#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
 
   Shizu_OperatingSystem_DllHandle
   Shizu_OperatingSystem_loadDll
@@ -114,7 +114,7 @@
     }
   }
 
-#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
+#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
 
   static inline void
   Shizu_OperatingSystem_unloadDll
@@ -143,7 +143,7 @@
     )
   { return GetProcAddress(libraryHandle, symbolName); }
 
-#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
+#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
 
   static inline void*
   Shizu_OperatingSystem_getDllSymbol
@@ -199,13 +199,7 @@ typedef struct Shizu_Stack Shizu_Stack;
 
 
 
-
-typedef struct Shizu_JumpTarget Shizu_JumpTarget;
-
-struct Shizu_JumpTarget {
-  Shizu_JumpTarget* previous;
-  jmp_buf environment;
-};
+#include "Shizu/Runtime/JumpTarget.h"
 
 int
 Shizu_State_create

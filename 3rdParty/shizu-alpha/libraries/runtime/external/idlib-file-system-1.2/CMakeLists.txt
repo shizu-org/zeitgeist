@@ -1,6 +1,6 @@
 #
-# Shizu
-# Copyright (C) 2023-2024 Michael Heilmann. All rights reserved.
+# IdLib File System
+# Copyright (C) 2018-2024 Michael Heilmann. All rights reserved.
 #
 # This software is provided 'as-is', without any express or implied
 # warranty.  In no event will the authors be held liable for any damages
@@ -19,6 +19,17 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #
 
-add_subdirectory(external/idlib-file-system-1.2)
+cmake_minimum_required(VERSION 3.20)
+
+project(idlib-file-system LANGUAGES C)
+
+set(idlib-file-system.idlib-process-directory "${CMAKE_CURRENT_SOURCE_DIR}/external/idlib-process-1.0")
+
+add_subdirectory(${idlib-file-system.idlib-process-directory})
 add_subdirectory(library)
-add_subdirectory(test)
+
+enable_testing()
+add_subdirectory(test/mock)
+add_subdirectory(test/get_file_type)
+add_subdirectory(test/get_file_contents)
+add_subdirectory(test/set_file_contents)

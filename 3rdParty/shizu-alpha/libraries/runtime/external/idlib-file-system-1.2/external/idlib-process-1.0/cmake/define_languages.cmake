@@ -1,6 +1,6 @@
 #
-# Shizu
-# Copyright (C) 2023-2024 Michael Heilmann. All rights reserved.
+# IdLib Process
+# Copyright (C) 2018-2024 Michael Heilmann. All rights reserved.
 #
 # This software is provided 'as-is', without any express or implied
 # warranty.  In no event will the authors be held liable for any damages
@@ -19,6 +19,19 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #
 
-add_subdirectory(external/idlib-file-system-1.2)
-add_subdirectory(library)
-add_subdirectory(test)
+# Macro to define an enumeration of languages.
+#
+# The enumeration constants ${target}.language_(unknown|c|cpp|masm) are defined.
+# Each constant is a string of an unique name identifying a language.
+#
+# @param target The target.
+macro(define_languages target)
+  # Unknown language.
+  set(${target}.language_unknown "<unknown language>")
+  # The "C" language.
+  set(${target}.language_c "C")
+  # The "C++" language.
+  set(${target}.language_cpp "CPP")
+  # The "MASM" language.
+  set(${target}.language_masm "MASM")
+endmacro()

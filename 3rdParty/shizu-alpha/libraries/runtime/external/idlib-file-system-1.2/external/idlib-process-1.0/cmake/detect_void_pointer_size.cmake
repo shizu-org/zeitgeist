@@ -1,6 +1,6 @@
 #
-# Shizu
-# Copyright (C) 2023-2024 Michael Heilmann. All rights reserved.
+# IdLib Process
+# Copyright (C) 2018-2024 Michael Heilmann. All rights reserved.
 #
 # This software is provided 'as-is', without any express or implied
 # warranty.  In no event will the authors be held liable for any damages
@@ -19,6 +19,8 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #
 
-add_subdirectory(external/idlib-file-system-1.2)
-add_subdirectory(library)
-add_subdirectory(test)
+# Macro to define ${target}.sizeof_void_pointer.
+# @param target The target.
+macro(idlib_detect_void_pointer_size target)
+  set(${target}.sizeof_void_pointer ${CMAKE_SIZEOF_VOID_P})
+endmacro()

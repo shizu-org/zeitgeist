@@ -167,32 +167,6 @@ Shizu_List_appendObject
 	Shizu_List_appendValue(state, list, &value);
 }
 
-#if 0
-
-/**
- * @since 0.1
- * @brief Append a Shizu_String* value to a Shizu_List object.
- * @param list A pointer to the Shizu_List object to append to.
- * @param element The Shizu_String* value to append.
- * @undefined state does not point to a Shizu_State object.
- * @undefined list does not point to a Shizu_List object.
- * @undefined element is not a Shizu_String* value.
- */
-static inline void
-Shizu_List_appendString
-	(
-		Shizu_State* state,
-		Shizu_List* list,
-		Shizu_String* element
-	)
-{
-	Shizu_Value value;
-	Shizu_Value_setString(&value, element);
-	Shizu_List_appendValue(state, list, &value);
-}
-
-#endif
-
 /**
  * @since 0.1
  * @brief Append a Shizu_Void object to a Shizu_List object.

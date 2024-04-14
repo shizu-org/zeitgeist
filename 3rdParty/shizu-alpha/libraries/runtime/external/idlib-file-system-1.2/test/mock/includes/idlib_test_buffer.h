@@ -1,5 +1,5 @@
 /*
-  Shizu Runtime
+  IdLib FileSystem
   Copyright (C) 2024 Michael Heilmann. All rights reserved.
 
   This software is provided 'as-is', without any express or implied
@@ -19,31 +19,48 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(SHIZU_RUNTIME_CONFIGURE_H_INCLUDED)
-#define SHIZU_RUNTIME_CONFIGURE_H_INCLUDED
+#if !defined(IDLIB_TEST_UTILITIES_BUFFER_H_INCLUDED)
+#define IDLIB_TEST_UTILITIES_BUFFER_H_INCLUDED
 
+#include "idlib/file_system.h"
 
+typedef struct idlib_test_utilities_buffer {
+  int result;
+  void* elements;
+  size_t size, capacity;
+} idlib_test_utilities_buffer;
 
-#define Shizu_Configuration_InstructionSetArchitecture_X64 (1)
-#define Shizu_Configuration_InstructionSetArchitecture_X86 (2)
+int
+idlib_test_utilities_buffer_initialize
+  (
+    idlib_test_utilities_buffer* self
+  );
 
-#define Shizu_Configuration_InstructionSetArchitecture @Shizu_Configuration_InstructionSetArchitecture@
+int
+idlib_test_utilities_buffer_uninitialize
+  (
+    idlib_test_utilities_buffer* self
+  );
 
+int
+idlib_test_utilities_buffer_grow
+  (
+    idlib_test_utilities_buffer* self,
+    size_t n
+  );
 
+int
+idlib_test_utilities_buffer_append
+  (
+    idlib_test_utilities_buffer* self,
+    void const* p,
+    size_t n
+  );
 
-#define Shizu_Configuration_OperatingSystem_Windows (1)
-#define Shizu_Configuration_OperatingSystem_Linux (2)
-#define Shizu_Configuration_OperatingSystem_Cygwin (3)
+int
+idlib_test_utilities_buffer_clear
+  (
+    idlib_test_utilities_buffer* self
+  );
 
-#define Shizu_Configuration_OperatingSystem @Shizu_Configuration_OperatingSystem@
-
-
-
-#define Shizu_Configuration_CompilerC_Msvc (1)
-#define Shizu_Configuration_CompilerC_Gcc (2)
-
-#define Shizu_Configuration_CompilerC @Shizu_Configuration_CompilerC@
-
-
-
-#endif // SHIZU_RUNTIME_CONFIGURE_H_INCLUDED
+#endif // IDLIB_TEST_UTILITIES_BUFFER_H_INCLUDED

@@ -22,6 +22,7 @@
 #define SHIZU_RUNTIME_PRIVATE (1)
 #include "Shizu/Runtime/State.h"
 
+#include "Shizu/Runtime/State1.h"
 #include "Shizu/Runtime/Configure.h"
 #include "Shizu/Runtime/Gc.private.h"
 #include "Shizu/Runtime/Locks.private.h"
@@ -50,7 +51,7 @@
     )
   { return LoadLibrary(path); }
 
-#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
+#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
 
   Shizu_OperatingSystem_DllHandle
   Shizu_OperatingSystem_loadDll
@@ -117,7 +118,7 @@ NamedStorageService_allocate
   )
 {
   NamedStorageNode* node = NULL;
-  
+
   node = self->nodes;
   while (node) {
     if (!strcmp(node->name, name)) {
@@ -125,7 +126,7 @@ NamedStorageService_allocate
     }
     node = node->next;
   }
-  
+
   node = malloc(sizeof(NamedStorageNode));
   if (!node) {
     return 1;
@@ -509,42 +510,6 @@ Shizu_Value_setVoid
   self->tag = Shizu_Value_Tag_Void;
 }
 
-#if 0
-
-Shizu_Reference(Shizu_WeakReference)
-Shizu_Value_getWeakReference
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(Shizu_Value_isWeakReference(self));
-  return self->weakReferenceValue;
-}
-
-bool
-Shizu_Value_isWeakReference
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  return Shizu_Value_Tag_WeakReference == self->tag;
-}
-
-void
-Shizu_Value_setWeakReference
-  (
-    Shizu_Value* self,
-    Shizu_Reference(Shizu_WeakReference) weakReferenceValue
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  self->weakReferenceValue = weakReferenceValue;
-  self->tag = Shizu_Value_Tag_WeakReference;
-}
-
-#endif
-
 struct Shizu_Dll {
   Shizu_Dll* next;
   int referenceCount;
@@ -555,14 +520,13 @@ struct Shizu_Dll {
   Shizu_OperatingSystem_DllHandle handle;
 };
 
+#include "idlib/process.h"
+
 struct Shizu_State {
   int referenceCount;
-  // TODO:
-  // error, processExitRequested, jumpTargets, storageService, and dlls can form Shizu_State0 object as they all together are usable without the rest of the state.
-  int error;
-  bool processExitRequested;
+  Shizu_State1* state1;
+  idlib_process* process;
   NamedStorageService namedStorageService;
-  Shizu_JumpTarget* jumpTargets;
   Shizu_Dll* dlls;
   Shizu_Gc* gc;
   Shizu_Locks* locks;
@@ -576,6 +540,8 @@ struct Shizu_State {
 
 static Shizu_State* g_singleton = NULL;
 
+#define NAME "Shizu.State.Singleton"
+
 int
 Shizu_State_create
   (
@@ -586,12 +552,32 @@ Shizu_State_create
     return 1;
   }
   if (!g_singleton) {
+    idlib_process* process = NULL;
+    if (idlib_acquire_process(&process)) {
+      return 1;
+    }
+
     Shizu_State* self = malloc(sizeof(Shizu_State));
     if (!self) {
+      idlib_relinquish_process(process);
+      process = NULL;
+      return 1;
+    }
+    self->process = process;
+    if (Shizu_State1_acquire(&self->state1)) {
+      free(self);
+      self = NULL;
+      idlib_relinquish_process(process);
+      process = NULL;
       return 1;
     }
     if (NamedStorageService_initialize(&self->namedStorageService)) {
+      Shizu_State1_relinquish(self->state1);
+      self->state1 = NULL;
       free(self);
+      self = NULL;
+      idlib_relinquish_process(process);
+      process = NULL;
       return 1;
     }
     self->gc = NULL;
@@ -599,9 +585,6 @@ Shizu_State_create
     self->stack = NULL;
     self->dlls = NULL;
 
-    self->processExitRequested = false;
-    self->error = 0;
-    self->jumpTargets = NULL;
     Shizu_JumpTarget jumpTarget;
     //
     Shizu_State_pushJumpTarget(self, &jumpTarget);
@@ -611,8 +594,12 @@ Shizu_State_create
     } else {
       Shizu_State_popJumpTarget(self);
       NamedStorageService_uninitialize(&self->namedStorageService);
+      Shizu_State1_relinquish(self->state1);
+      self->state1 = NULL;
       free(self);
       self = NULL;
+      idlib_relinquish_process(process);
+      process = NULL;
       return 1;
     }
     //
@@ -625,8 +612,12 @@ Shizu_State_create
       Shizu_Gc_shutdown(self, self->gc);
       self->gc = NULL;
       NamedStorageService_uninitialize(&self->namedStorageService);
+      Shizu_State1_relinquish(self->state1);
+      self->state1 = NULL;
       free(self);
       self = NULL;
+      idlib_relinquish_process(process);
+      process = NULL;
       return 1;
     }
     //
@@ -641,8 +632,12 @@ Shizu_State_create
       Shizu_Gc_shutdown(self, self->gc);
       self->gc = NULL;
       NamedStorageService_uninitialize(&self->namedStorageService);
+      Shizu_State1_relinquish(self->state1);
+      self->state1 = NULL;
       free(self);
       self = NULL;
+      idlib_relinquish_process(process);
+      process = NULL;
       return 1;
     }
     //
@@ -659,11 +654,32 @@ Shizu_State_create
       Shizu_Gc_shutdown(self, self->gc);
       self->gc = NULL;
       NamedStorageService_uninitialize(&self->namedStorageService);
+      Shizu_State1_relinquish(self->state1);
+      self->state1 = NULL;
       free(self);
       self = NULL;
+      idlib_relinquish_process(process);
+      process = NULL;
       return 1;
     }
     self->referenceCount = 0;
+    if (idlib_add_global(process, NAME, strlen(NAME), self)) {
+      Shizu_Types_uninitialize(self);
+      Shizu_Stack_shutdown(self, self->stack);
+      self->stack = NULL;
+      Shizu_Locks_shutdown(self, self->locks);
+      self->locks = NULL;
+      Shizu_Gc_shutdown(self, self->gc);
+      self->gc = NULL;
+      NamedStorageService_uninitialize(&self->namedStorageService);
+      Shizu_State1_relinquish(self->state1);
+      self->state1 = NULL;
+      free(self);
+      self = NULL;
+      idlib_relinquish_process(process);
+      process = NULL;
+      return 1;
+    }
     g_singleton = self;
   }
   g_singleton->referenceCount++;
@@ -738,7 +754,7 @@ Shizu_Types_initialize
   (
     Shizu_State* self
   )
-{ 
+{
   self->types.elements = malloc(sizeof(Shizu_Type) * 8);
   if (!self->types.elements) {
     Shizu_State_setError(self, 1);
@@ -793,6 +809,10 @@ Shizu_State_destroy
   }
   if (0 == --self->referenceCount) {
     Shizu_Gc_run(self);
+    idlib_process* process = self->process;
+    self->process = NULL;
+    idlib_remove_global(process, NAME, strlen(NAME));
+    idlib_relinquish_process(process);
     Shizu_Stack_shutdown(self, self->stack);
     self->stack = NULL;
     Shizu_Locks_shutdown(self, self->locks);
@@ -810,6 +830,8 @@ Shizu_State_destroy
       free(dll);
     }
     NamedStorageService_uninitialize(&self->namedStorageService);
+    Shizu_State1_relinquish(self->state1);
+    self->state1 = NULL;
     g_singleton = NULL;
     free(self);
   }
@@ -823,9 +845,8 @@ Shizu_State_pushJumpTarget
     Shizu_JumpTarget* jumpTarget
   )
 {
-  Shizu_debugAssert(NULL != jumpTarget);
-  jumpTarget->previous = self->jumpTargets;
-  self->jumpTargets = jumpTarget;
+  Shizu_debugAssert(NULL != self);
+  Shizu_State1_pushJumpTarget(self->state1, jumpTarget);
 }
 
 void
@@ -834,7 +855,18 @@ Shizu_State_popJumpTarget
     Shizu_State* self
   )
 {
-  self->jumpTargets = self->jumpTargets->previous;
+  Shizu_debugAssert(NULL != self);
+  Shizu_State1_popJumpTarget(self->state1);
+}
+
+Shizu_NoReturn() void
+Shizu_State_jump
+  (
+    Shizu_State* self
+  )
+{
+  Shizu_debugAssert(NULL != self);
+  Shizu_State1_jump(self->state1);
 }
 
 void
@@ -844,7 +876,8 @@ Shizu_State_setError
     int error
   )
 {
-  self->error = error;
+  Shizu_debugAssert(NULL != self);
+  Shizu_State1_setError(self->state1, error);
 }
 
 int
@@ -852,33 +885,31 @@ Shizu_State_getError
   (
     Shizu_State* self
   )
-{ return self->error; }
-
-Shizu_NoReturn() void
-Shizu_State_jump
-  (
-    Shizu_State* self
-  )
 {
   Shizu_debugAssert(NULL != self);
-  Shizu_debugAssert(NULL != self->jumpTargets);
-  longjmp(self->jumpTargets->environment, -1);
+  return Shizu_State1_getError(self->state1);
 }
 
 void
 Shizu_State_setProcessExitRequested
   (
-    Shizu_State* state,
+    Shizu_State* self,
     bool processExitRequested
   )
-{ state->processExitRequested = processExitRequested; }
+{
+  Shizu_debugAssert(NULL != self);
+  Shizu_State1_setProcessExitRequested(self->state1, processExitRequested);
+}
 
 bool
 Shizu_State_getProcessExitRequested
-  ( 
-    Shizu_State* state
+  (
+    Shizu_State* self
   )
-{ return state->processExitRequested; }
+{
+  Shizu_debugAssert(NULL != self);
+  return Shizu_State1_getProcessExitRequested(self->state1);
+}
 
 Shizu_Type*
 Shizu_State_getTypeByName
@@ -1065,8 +1096,6 @@ Shizu_State_getNamedMemory
   )
 { return NamedStorageService_get(&state->namedStorageService, name, p); }
 
-#include "Shizu/Runtime/Configure.h"
-
 Shizu_Dll*
 Shizu_State_getOrLoadDll
   (
@@ -1100,6 +1129,7 @@ Shizu_State_getOrLoadDll
 #endif
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
+
   {
     CHAR temporary[_MAX_PATH];
     GetModuleFileName(handle, temporary, _MAX_PATH);
@@ -1112,7 +1142,9 @@ Shizu_State_getOrLoadDll
       return NULL;
     }
   }
-#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
+
+#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
+
   {
     Dl_info info;
     if (!dladdr(getDlName, &info)) {
@@ -1131,6 +1163,7 @@ Shizu_State_getOrLoadDll
       return NULL;
     }
   }
+
 #else
 
   #error("operating system not (yet) supported")
@@ -1200,10 +1233,14 @@ Shizu_State_getDlByAdr
     void *p
   )
 {
+
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
+
   HMODULE handle = NULL;
   GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, p, &handle);
-#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
+
+#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
+
   void* handle = NULL;
   {
     Dl_info info;
@@ -1213,10 +1250,13 @@ Shizu_State_getDlByAdr
       return NULL;
     }
   }
+
 #else
+
   #error("operating system not (yet) supported")
+
 #endif
-  
+
   char const* (*getDlName)(Shizu_State*) = Shizu_OperatingSystem_getDllSymbol(handle, "Shizu_getDlName");
   if (!getDlName) {
     return NULL;
