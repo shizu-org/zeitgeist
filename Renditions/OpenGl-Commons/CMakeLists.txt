@@ -38,6 +38,11 @@ list(APPEND ${name}.header_files Sources/KeyboardKeyMessage.h)
 list(APPEND ${name}.source_files Sources/RenderBuffer.c)
 list(APPEND ${name}.header_files Sources/RenderBuffer.h)
 
+list(APPEND ${name}.source_files Sources/Visuals/Program.c)
+list(APPEND ${name}.header_files Sources/Visuals/Program.h)
+list(APPEND ${name}.source_files Sources/Visuals/Object.c)
+list(APPEND ${name}.header_files Sources/Visuals/Object.h)
+
 end_library()
 
 source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${${name}.configuration_files})

@@ -139,6 +139,7 @@ onRendition
     Shizu_String* loadedRenditionName = Zeitgeist_Rendition_getName(state, loadedRendition);
     if (Shizu_String_isEqualTo(state, renditionName, loadedRenditionName)) {
       onRendition1(state, loadedRendition);
+      return;
     }
   }
 }

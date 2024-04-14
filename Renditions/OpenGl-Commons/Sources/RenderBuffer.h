@@ -32,6 +32,8 @@ typedef struct RenderBuffer {
   GLuint depthStencilTextureId;
 } RenderBuffer;
 
+#define RenderBuffer_Initializer() { .width = 800, .height = 600, .frameBufferId = 0, .colorTextureId = 0, .depthStencilTextureId = 0 }
+
 // width = 800, height = 600 is typical.
 static inline int
 RenderBuffer_initialize
@@ -115,15 +117,21 @@ RenderBuffer_uninitialize
   )
 {
   //
-  glDeleteTextures(1, &self->depthStencilTextureId);
-  self->depthStencilTextureId = 0;
+  if (self->depthStencilTextureId) {
+    glDeleteTextures(1, &self->depthStencilTextureId);
+    self->depthStencilTextureId = 0;
+  }
   //
-  glDeleteTextures(1, &self->colorTextureId);
-  self->colorTextureId = 0;
+  if (self->colorTextureId) {
+    glDeleteTextures(1, &self->colorTextureId);
+    self->colorTextureId = 0;
+  }
   //
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glDeleteFramebuffers(1, &self->frameBufferId);
-  self->frameBufferId = 0;
+  if (self->frameBufferId) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &self->frameBufferId);
+    self->frameBufferId = 0;
+  }
   //
   return 0;
 }
@@ -172,6 +180,15 @@ RenderBuffer_resize
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTextureId, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthStencilTextureId, 0);
     if (glGetError()) {
+      glDeleteTextures(1, &self->depthStencilTextureId);
+      self->depthStencilTextureId = 0;
+      glDeleteTextures(1, &self->colorTextureId);
+      self->colorTextureId = 0;
+      return 1;
+    }
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+      fprintf(stderr, "%s:%d: frame buffer incomplete\n", __FILE__, __LINE__);
       glDeleteTextures(1, &self->depthStencilTextureId);
       self->depthStencilTextureId = 0;
       glDeleteTextures(1, &self->colorTextureId);

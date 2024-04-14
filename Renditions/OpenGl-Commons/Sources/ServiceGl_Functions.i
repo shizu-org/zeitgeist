@@ -33,6 +33,7 @@ Define(PFNGLGENFRAMEBUFFERSPROC, glGenFramebuffers)
 Define(PFNGLDELETEFRAMEBUFFERSPROC, glDeleteFramebuffers)
 Define(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)
 Define(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D)
+Define(PFNGLCHECKFRAMEBUFFERSTATUSPROC, glCheckFramebufferStatus)
 
 // vertex arrays
 Define(PFNGLGENVERTEXARRAYSPROC, glGenVertexArrays)

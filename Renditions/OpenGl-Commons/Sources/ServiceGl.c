@@ -30,6 +30,15 @@
 #include "ServiceGl_Functions.i"
 #undef Define
 
+/**
+ * @brief A list of weak references to Visuals.Object values.
+ * Before this Visuals.Service shuts down, it notifies all these objects to release their resources.
+ */
+static Shizu_List* g_objects = NULL;
+
+/**
+ * @brief A list of Shizu_CxxFunction values.
+ */
 static Shizu_List* g_keyboardKeyListeners = NULL;
 
 static Shizu_Integer32 g_referenceCount = 0;
@@ -80,6 +89,10 @@ ServiceGl_shutdown
   )
 {
   if (0 == --g_referenceCount) {
+    if (g_objects) {
+      Shizu_Object_unlock(state, (Shizu_Object*)g_objects);
+      g_objects = NULL;
+    }
     if (g_keyboardKeyListeners) {
       Shizu_Object_unlock(state, (Shizu_Object*)g_keyboardKeyListeners);
       g_keyboardKeyListeners = NULL;
@@ -234,6 +247,32 @@ ServiceGl_linkProgram
   }
   return program;
 }
+
+void
+SeviceGl_registerVisualsObject
+  (
+    Shizu_State* state,
+    Visuals_Object* object
+  )
+{
+  if (!g_objects) {
+    g_objects = Shizu_List_create(state);
+    Shizu_JumpTarget jumpTarget;
+    Shizu_State_pushJumpTarget(state, &jumpTarget);
+    if (!setjmp(jumpTarget.environment)) {
+      Shizu_Object_lock(state, (Shizu_Object*)g_objects);
+      Shizu_State_popJumpTarget(state);
+    } else {
+      Shizu_State_popJumpTarget(state);
+      g_objects = NULL;
+      Shizu_State_jump(state);
+    }   
+  }
+  Shizu_Value temporary;
+  Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)object));
+  Shizu_List_appendValue(state, g_objects, &temporary);
+}
+
 
 void
 ServiceGl_emitKeyboardKeyMessage

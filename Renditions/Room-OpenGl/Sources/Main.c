@@ -113,7 +113,9 @@ static const GLchar* g_fragmentShader =
   "}\n"
   ;
 
-static GLuint g_programId = 0;
+#include "Visuals/Program.h"
+
+static Zeitgeist_Visuals_GlProgram* g_program = NULL;
 static World* g_world = NULL;
 
 static void
@@ -190,12 +192,12 @@ Zeitgeist_Rendition_update
   glViewport(0, 0, viewportWidth, viewportHeight);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glUseProgram(g_programId);
+  glUseProgram(g_program->programId);
 
   //
   Matrix4R32* world = NULL;
   world = Matrix4R32_createScale(state, Vector3R32_create(state, 0.75f, 0.75f, 1.f));
-  bindMatrix4Uniform(state, g_programId, "world", world);
+  bindMatrix4Uniform(state, g_program->programId, "world", world);
   // (viewRotateY^-1 * viewTranslate^-1)
   // is equivalent to
   // (viewTranslate * viewRotateY)^-1
@@ -208,22 +210,22 @@ Zeitgeist_Rendition_update
   viewRotateY = Matrix4R32_createRotateY(state, -g_world->player->rotationY);
   Matrix4R32* view = NULL;
   view = Matrix4R32_multiply(state, viewRotateY, viewTranslate);
-  bindMatrix4Uniform(state, g_programId, "view", view);
+  bindMatrix4Uniform(state, g_program->programId, "view", view);
   
   //
   Matrix4R32* projection = NULL;
   //projection = Matrix4R32_createOrthographic(state, -1.f, +1.f, -1.f, +1.f, -100.f, +100.f);
   projection = Matrix4R32_createPerspective(state, 90.f, viewportHeight > 0.f ? viewportWidth / viewportHeight : 16.f/9.f, 0.1f, 100.f);
-  bindMatrix4Uniform(state, g_programId, "projection", projection);
+  bindMatrix4Uniform(state, g_program->programId, "projection", projection);
   
   // The color (255, 204, 51) is the websafe color "sunglow".
-  bindVector3Uniform(state, g_programId, "meshColor", Vector3R32_create(state, 1.0f, 0.8f, 0.2f));
+  bindVector3Uniform(state, g_program->programId, "meshColor", Vector3R32_create(state, 1.0f, 0.8f, 0.2f));
 
-  bindIntegerUniform(state, g_programId, "inputFragmentColorType", 1);
+  bindIntegerUniform(state, g_program->programId, "inputFragmentColorType", 1);
 
-  bindVector3Uniform(state, g_programId, "ambientLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
-  bindVector3Uniform(state, g_programId, "diffuseLightDirection", Vector3R32_create(state, 1.f, 1.f, 1.f));
-  bindVector3Uniform(state, g_programId, "diffuseLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
+  bindVector3Uniform(state, g_program->programId, "ambientLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
+  bindVector3Uniform(state, g_program->programId, "diffuseLightDirection", Vector3R32_create(state, 1.f, 1.f, 1.f));
+  bindVector3Uniform(state, g_program->programId, "diffuseLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
 
   Shizu_Value sizeValue = Shizu_List_getSize(state, g_world->geometries);
   for (Shizu_Integer32 i = 0, n = Shizu_Value_getInteger32(&sizeValue); i < n; ++i) {
@@ -241,9 +243,10 @@ Zeitgeist_Rendition_update
 
 static void
 onKeyboardKeyMessage
-(
-  Shizu_State* state
-) {
+  (
+    Shizu_State* state
+  )
+{
   if (Shizu_Stack_getSize(state) < 2) {
     fprintf(stderr, "%s:%d: too few arguments\n", __FILE__, __LINE__);
     Shizu_State_setError(state, 1);
@@ -278,6 +281,29 @@ onKeyboardKeyMessage
   Shizu_Stack_pop(state);
 }
 
+static void
+loadPrograms
+  (
+    Shizu_State* state
+  )
+{
+  g_program = Zeitgeist_Visuals_GlProgram_create(state, Shizu_String_create(state, g_vertexShader, strlen(g_vertexShader)),
+                                                        Shizu_String_create(state, g_fragmentShader, strlen(g_fragmentShader)));
+  Shizu_Object_lock(state, (Shizu_Object*)g_program);
+  Zeitgeist_Visuals_GlProgram_materialize(state, g_program);
+}
+
+static void
+unloadPrograms
+  (
+    Shizu_State* state
+  )
+{
+  Zeitgeist_Visuals_GlProgram_unmaterialize(state, g_program);
+  Shizu_Object_unlock(state, (Shizu_Object*)g_program);
+  g_program = NULL;
+}
+
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_load
   (
@@ -291,13 +317,7 @@ Zeitgeist_Rendition_load
   Shizu_Value_setCxxFunction(&temporary, &onKeyboardKeyMessage);
   ServiceGl_addKeyboardKeyCallback(state, &temporary);
 
-  GLuint vertexShaderId, fragmentShaderId;
-  
-  vertexShaderId = ServiceGl_compileShader(state, GL_VERTEX_SHADER, g_vertexShader);
-  fragmentShaderId = ServiceGl_compileShader(state, GL_FRAGMENT_SHADER, g_fragmentShader);
-  g_programId = ServiceGl_linkProgram(state, vertexShaderId, fragmentShaderId);
-  glDeleteShader(fragmentShaderId);
-  glDeleteShader(vertexShaderId);
+  loadPrograms(state);
 
   Shizu_JumpTarget jumpTarget;
   //
@@ -307,8 +327,8 @@ Zeitgeist_Rendition_load
     Shizu_State_popJumpTarget(state);
   } else {
     Shizu_State_popJumpTarget(state);
-    glDeleteProgram(g_programId);
-    g_programId = 0;
+    Zeitgeist_Visuals_GlProgram_unmaterialize(state, g_program);
+    g_program = NULL;
     Shizu_State_jump(state);
   }
   //
@@ -319,8 +339,8 @@ Zeitgeist_Rendition_load
   } else {
     Shizu_State_popJumpTarget(state);
     g_world = NULL;
-    glDeleteProgram(g_programId);
-    g_programId = 0;
+    Zeitgeist_Visuals_GlProgram_unmaterialize(state, g_program);
+    g_program = NULL;
     Shizu_State_jump(state);
   }
 
@@ -353,7 +373,6 @@ Zeitgeist_Rendition_unload
   }
   Shizu_Object_unlock(state, (Shizu_Object*)g_world);
   g_world = NULL;
-  glDeleteProgram(g_programId);
-  g_programId = 0;
+  unloadPrograms(state);
   ServiceGl_shutdown(state);
 }

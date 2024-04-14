@@ -5,6 +5,9 @@
 
 #include "Zeitgeist.h"
 
+/* Forward declaration. */
+typedef struct Visuals_Object Visuals_Object;
+
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   #define WIN32_LEAN_AND_MEAN
   #include <Windows.h>
@@ -99,6 +102,14 @@ ServiceGl_linkProgram
     GLuint frag
   );
 
+void
+SeviceGl_registerVisualsObject
+  (
+    Shizu_State* state,
+    Visuals_Object* object
+  );
+
+/* Forward declaration. */
 typedef struct KeyboardKeyMessage KeyboardKeyMessage;
 
 /**
