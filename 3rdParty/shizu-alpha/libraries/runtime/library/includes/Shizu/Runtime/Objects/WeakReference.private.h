@@ -27,8 +27,6 @@
 #endif
 #include "Shizu/Runtime/Objects/WeakReference.h"
 #include "Shizu/Runtime/Gc.private.h"
-
-extern Shizu_TypeDescriptor const Shizu_WeakReference_Type;
   
 /// @since 1.0
 /// @internal

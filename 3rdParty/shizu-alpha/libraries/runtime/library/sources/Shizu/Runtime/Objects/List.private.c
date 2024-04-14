@@ -57,7 +57,7 @@ Shizu_List_finalize
     Shizu_List* self
   );
 
-Shizu_TypeDescriptor const Shizu_List_Type = {
+static Shizu_TypeDescriptor const Shizu_List_Type = {
 	.staticInitialize = &Shizu_List_staticInitialize,
 	.staticFinalize = &Shizu_List_staticFinalize,
 	.staticVisit = NULL,

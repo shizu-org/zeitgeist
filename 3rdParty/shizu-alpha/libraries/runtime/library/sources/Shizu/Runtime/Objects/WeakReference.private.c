@@ -58,7 +58,7 @@ hashPointer
     void* p
   );
 
-Shizu_TypeDescriptor const Shizu_WeakReference_Type = {
+static Shizu_TypeDescriptor const Shizu_WeakReference_Type = {
   .staticInitialize = (Shizu_OnStaticInitializeCallback*) & Shizu_WeakReference_staticInitialize,
   .staticFinalize = (Shizu_OnStaticFinalizeCallback*) & Shizu_WeakReference_staticUninitialize,
   .staticVisit = NULL,

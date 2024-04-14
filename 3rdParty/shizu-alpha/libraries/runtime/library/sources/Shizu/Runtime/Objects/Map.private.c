@@ -57,7 +57,7 @@ Shizu_Map_finalize
     Shizu_Map* self
   );
 
-Shizu_TypeDescriptor const Shizu_Map_Type = {
+static Shizu_TypeDescriptor const Shizu_Map_Type = {
   .staticInitialize = &Shizu_Map_staticInitialize,
   .staticFinalize = &Shizu_Map_staticFinalize,
   .staticVisit = NULL,

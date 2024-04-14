@@ -54,9 +54,6 @@ Shizu_Gc_shutdown
     Shizu_Gc* gc
   );
 
-/// The "Shize.Object" type descriptor.
-extern Shizu_TypeDescriptor const Shizu_Object_Type;
-
 /// @since 1.0
 /// @brief Color a Shizu_Object value black.
 /// @param object A pointer to the Shizu_Object value.

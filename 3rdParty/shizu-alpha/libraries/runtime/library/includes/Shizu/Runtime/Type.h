@@ -24,7 +24,7 @@
 
 #include "Shizu/Runtime/Configure.h"
 
-typedef struct Shizu_Dll Shizu_Dll;
+typedef struct Shizu_Dl Shizu_Dl;
 typedef struct Shizu_State Shizu_State;
 typedef struct Shizu_Object Shizu_Object;
 typedef struct Shizu_Type Shizu_Type;
@@ -81,19 +81,10 @@ Shizu_State_createType
     Shizu_State* self,
     char const* name,
     Shizu_Type* parentType,
-    Shizu_Dll* dll,
+    Shizu_Dl* dl,
     Shizu_OnTypeDestroyedCallback* typeDestroyed,
     Shizu_TypeDescriptor const* descriptor
   );
-
-#define Shizu_declareDlType(Name) \
-  typedef struct Name Name; \
-\
-  Shizu_DlExport() Shizu_Type* \
-  Name##_getType \
-    ( \
-      Shizu_State* state \
-    );
 
 #define Shizu_declareType(Name) \
   typedef struct Name Name; \
@@ -104,49 +95,9 @@ Shizu_State_createType
       Shizu_State* state \
     );
 
-#define Shizu_defineDlType(Name, ParentName) \
-  static void \
-  Name##_typeDestroyed \
-    ( \
-      Shizu_State* state \
-    ); \
-  \
-  Shizu_Type* \
-  Name##_getType \
-    ( \
-      Shizu_State* state \
-    ); \
-  \
-  static void \
-  Name##_typeDestroyed \
-    ( \
-      Shizu_State* state \
-    ) \
-  {/*Intentionally empty.*/} \
-  \
-  Shizu_DlExport() Shizu_Type* \
-  Name##_getType \
-    ( \
-      Shizu_State* state \
-    ) \
-  { \
-    Shizu_Type* type = Shizu_State_getTypeByName(state, #Name); \
-    if (!type) { \
-      Shizu_Dll* dll = Shizu_State_getDlByAdr(state, &Name##_getType); \
-      type = Shizu_State_createType(state, #Name, ParentName##_getType(state), dll, &Name##_typeDestroyed, &Name##_Type); \
-    } \
-    return type; \
-  }
-
-// Under Windows, when we are loading DLLs at runtime then both the
-// executable and the DLL link to the same static library have
-// different instances of this variable.
-// 
-// This is why we cannot rely on g_type to detect if a type is registered or not:
-// - if g_type is null:
-//  - invoke "getTypeByName" to obtain the type if it exists already
-//  - register and obtain the type if it does not exist
-//  - register an "on type destroyed" callback for the variable
+// The DL a type is created by must not be unloaded as long as the type exists.
+// For a type T defined in a DL we store in T.dl a reference to the DL in the type object.
+// If T is defined in the  executable we store in T.dl the null reference.
 #define Shizu_defineType(Name, ParentName) \
   static void \
   Name##_typeDestroyed \
@@ -175,7 +126,8 @@ Shizu_State_createType
   { \
     Shizu_Type* type = Shizu_State_getTypeByName(state, #Name); \
     if (!type) { \
-      type = Shizu_State_createType(state, #Name, ParentName##_getType(state), NULL, &Name##_typeDestroyed, &Name##_Type); \
+      Shizu_Dl* dl = Shizu_State_getDlByAdr(state, &Name##_getType); \
+      type = Shizu_State_createType(state, #Name, ParentName##_getType(state), dl, &Name##_typeDestroyed, &Name##_Type); \
     } \
     return type; \
   }

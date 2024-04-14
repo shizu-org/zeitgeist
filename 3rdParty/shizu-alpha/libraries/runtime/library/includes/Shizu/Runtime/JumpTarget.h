@@ -2,6 +2,8 @@
 #if !defined(SHIZU_RUNTIME_JUMPTARGET_H_INCLUDED)
 #define SHIZU_RUNTIME_JUMPTARGET_H_INCLUDED
 
+#include "Shizu/Runtime/Configure.h"
+
 #define _GNU_SOURCE
 
 #include <setjmp.h>

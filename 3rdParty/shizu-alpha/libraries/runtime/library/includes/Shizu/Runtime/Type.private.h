@@ -53,8 +53,8 @@ struct Shizu_Type {
     Shizu_Type** elements;
     size_t capacity;
   } children;
-  // A pointer to the DLL from which the type originates from or the null pointer.
-  Shizu_Dll* dll;
+  // A pointer to the DL from which the type originates from or the null pointer.
+  Shizu_Dl* dl;
 };
 
 void

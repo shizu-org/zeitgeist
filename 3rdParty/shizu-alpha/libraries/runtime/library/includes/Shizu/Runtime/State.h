@@ -34,134 +34,42 @@
 
 //
 #include "Shizu/Runtime/Configure.h"
-
-//
 #include "Shizu/Runtime/Type.h"
-
-
-#if !defined(Shizu_Configuration_OperatingSystem)
-  #error("illicit configuration")
-#endif
-
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
 
-  #define WIN32_LEAN_AND_MEAN
-  #include <Windows.h>
-
-  #define Shizu_OperatingSystem_DllExtension ".dll"
+  #define Shizu_OperatingSystem_DlExtension ".dll"
   #define Shizu_OperatingSystem_DirectorySeparator "\\"
-
-  typedef HMODULE Shizu_OperatingSystem_DllHandle;
-  #define Shizu_OperatingSystem_DllHandle_Invalid (NULL)
 
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
 
   // NULL
   #include <stddef.h>
 
-  // dlopen, dlclose, dlsym, dladdr
-  #define _GNU_SOURCE
-  #include <dlfcn.h>
-
-  // fprintf, stderr
-  #include <stdio.h>
-
-  #define Shizu_OperatingSystem_DllExtension ".so"
+  #define Shizu_OperatingSystem_DlExtension ".so"
   #define Shizu_OperatingSystem_DirectorySeparator "/"
 
-  typedef void* Shizu_OperatingSystem_DllHandle;
-  #define Shizu_OperatingSystem_DllHandle_Invalid (NULL)
-
 #else
 
   #error("operating system not (yet) supported")
 
 #endif
 
-#if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-
-  Shizu_OperatingSystem_DllHandle
-  Shizu_OperatingSystem_loadDll
-    (
-      char const* path
-    );
-
-#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
-
-  Shizu_OperatingSystem_DllHandle
-  Shizu_OperatingSystem_loadDll
-    (
-      char const* path
-    );
-
+/** 
+ * @since 1.0
+ * Function annotation indicating a function will not return normally.
+ * The function will either terminate the program (cf. exit)or perform a jump (cf. longjmp).
+ */
+#if Shizu_Configuration_CompilerC_Msvc == Shizu_Configuration_CompilerC
+  #define Shizu_NoReturn() __declspec(noreturn)
 #else
-
-  #error("operating system not (yet) supported")
-
+  #define Shizu_NoReturn()
 #endif
 
-#if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-
-  static inline void
-  Shizu_OperatingSystem_unloadDll
-    (
-      Shizu_OperatingSystem_DllHandle handle
-    )
-  {
-    if (Shizu_OperatingSystem_DllHandle_Invalid != handle) {
-      FreeModule(handle);
-    }
-  }
-
-#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
-
-  static inline void
-  Shizu_OperatingSystem_unloadDll
-    (
-      Shizu_OperatingSystem_DllHandle handle
-    )
-  {
-    if (Shizu_OperatingSystem_DllHandle_Invalid != handle) {
-      dlclose(handle);
-    }
-  }
-
-#else
-
-  #error("operating system not (yet) supported")
-
-#endif
-
-#if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-
-  static inline void*
-  Shizu_OperatingSystem_getDllSymbol
-    (
-      Shizu_OperatingSystem_DllHandle libraryHandle,
-      char const* symbolName
-    )
-  { return GetProcAddress(libraryHandle, symbolName); }
-
-#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
-
-  static inline void*
-  Shizu_OperatingSystem_getDllSymbol
-    (
-      Shizu_OperatingSystem_DllHandle libraryHandle,
-      char const* symbolName
-    )
-  { return dlsym(libraryHandle, symbolName); }
-
-#else
-
-  #error("operating system not (yet) supported")
-
-#endif
-
-
-
-
+/** 
+ * @since 1.0
+ * Macro aliasing `static_assert`/`_Static_assert`.
+ */
 #if Shizu_Configuration_CompilerC_Msvc == Shizu_Configuration_CompilerC
 
   #define Shizu_staticAssert(expression, message) \
@@ -239,12 +147,6 @@ Shizu_State_getError
     Shizu_State* self
   );
 
-#if Shizu_Configuration_CompilerC_Msvc == Shizu_Configuration_CompilerC
-  #define Shizu_NoReturn() __declspec(noreturn)
-#else
-  #define Shizu_NoReturn()
-#endif
-
 Shizu_NoReturn() void
 Shizu_State_jump
   (
@@ -319,50 +221,50 @@ Shizu_State_getNamedMemory
     void** p
   );
 
-typedef struct Shizu_Dll Shizu_Dll;
+typedef struct Shizu_Dl Shizu_Dl;
 
-Shizu_Dll*
-Shizu_State_getOrLoadDll
+Shizu_Dl*
+Shizu_State_getOrLoadDl
   (
     Shizu_State* state,
     char const* pathName,
     bool loadDll
   );
 
-Shizu_Dll*
+Shizu_Dl*
 Shizu_State_getDlByName
   (
     Shizu_State* state,
     char const* name
   );
 
-Shizu_Dll*
+Shizu_Dl*
 Shizu_State_getDlByAdr
-(
-  Shizu_State* state,
-  void* p
-);
-
-void
-Shizu_Dll_ref
   (
     Shizu_State* state,
-    Shizu_Dll* dll
+    void* p
   );
 
 void
-Shizu_Dll_unref
+Shizu_Dl_ref
   (
     Shizu_State* state,
-    Shizu_Dll* dll
+    Shizu_Dl* dl
+  );
+
+void
+Shizu_Dl_unref
+  (
+    Shizu_State* state,
+    Shizu_Dl* dl
   );
 
 void*
-Shizu_Dll_getSymbol
+Shizu_Dl_getSymbol
   (
     Shizu_State* state,
-    Shizu_Dll* dll,
-    char const* symbolName
+    Shizu_Dl* dl,
+    char const* name
   );
 
 #endif // SHIZU_RUNTIME_STATE_H_INCLUDED

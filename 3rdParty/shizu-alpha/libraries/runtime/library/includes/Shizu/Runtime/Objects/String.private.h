@@ -28,8 +28,6 @@
 #include "Shizu/Runtime/Objects/String.h"
 #include "Shizu/Runtime/Gc.private.h"
 
-extern Shizu_TypeDescriptor const Shizu_String_Type;
-
 struct Shizu_String {
   Shizu_Object _parent;
   Shizu_String* next;

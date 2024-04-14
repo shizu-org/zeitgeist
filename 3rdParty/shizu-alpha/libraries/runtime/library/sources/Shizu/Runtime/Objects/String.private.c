@@ -44,7 +44,7 @@ Shizu_String_finalize
     Shizu_String* self
   );
 
-Shizu_TypeDescriptor const Shizu_String_Type = {
+static Shizu_TypeDescriptor const Shizu_String_Type = {
   .staticInitialize = NULL,
   .staticFinalize = NULL,
   .staticVisit = NULL,

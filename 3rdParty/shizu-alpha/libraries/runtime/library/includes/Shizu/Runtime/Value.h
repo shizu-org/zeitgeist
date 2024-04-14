@@ -130,30 +130,8 @@ struct Shizu_Value {
     Shizu_Reference(Shizu_CxxFunction) cxxFunctionValue;
     Shizu_Float32 float32Value;
     Shizu_Integer32 integer32Value;
-
-  #if 0
-
-    Shizu_List* listValue;
-    Shizu_Map* mapValue;
-
-  #endif
-
     Shizu_Object* objectValue;
-
-  #if 0
-
-    Shizu_String* stringValue;
-
-  #endif
-
     Shizu_Void voidValue;
-
-  #if 0
-
-    Shizu_WeakReference* weakReferenceValue;
-
-  #endif
-
   };
 };
 

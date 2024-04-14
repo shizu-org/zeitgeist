@@ -28,8 +28,6 @@
 #include "Shizu/Runtime/Objects/List.h"
 #include "Shizu/Runtime/Gc.private.h"
 
-extern Shizu_TypeDescriptor const Shizu_List_Type;
-
 struct Shizu_List {
   Shizu_Object _parent;
  	/** For being added to the "gray" list during the "mark" phase of the garbage collector. */

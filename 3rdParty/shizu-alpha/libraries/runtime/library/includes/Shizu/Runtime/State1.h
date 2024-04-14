@@ -27,6 +27,64 @@
 // bool
 #include <stdbool.h>
 
+#if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
+
+  #define WIN32_LEAN_AND_MEAN
+  #include <Windows.h>
+
+  typedef HMODULE Shizu_OperatingSystem_DlHandle;
+  #define Shizu_OperatingSystem_DlHandle_Invalid (NULL)
+
+#elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem || Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
+
+  // NULL
+  #include <stddef.h>
+
+  // dlopen, dlclose, dlsym, dladdr
+  #define _GNU_SOURCE
+  #include <dlfcn.h>
+
+  // fprintf, stderr
+  #include <stdio.h>
+
+  typedef void* Shizu_OperatingSystem_DlHandle;
+  #define Shizu_OperatingSystem_DlHandle_Invalid (NULL)
+
+#else
+
+  #error("operating system not (yet) supported")
+
+#endif
+
+#if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem || \
+    Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem   || \
+    Shizu_Configuration_OperatingSystem_Cygwin == Shizu_Configuration_OperatingSystem
+
+  Shizu_OperatingSystem_DlHandle
+  Shizu_OperatingSystem_loadDl
+    (
+      char const* path
+    );
+
+  void
+  Shizu_OperatingSystem_unloadDl
+    (
+      Shizu_OperatingSystem_DlHandle handle
+    );
+
+  void*
+  Shizu_OperatingSystem_getDlSymbol
+    (
+      Shizu_OperatingSystem_DlHandle dlHandle,
+      char const* symbolName
+    );
+
+#else
+
+  #error("operating system not (yet) supported")
+
+#endif
+
 /**
  * @since 1.0
  * The tier 1 state.
@@ -163,6 +221,98 @@ bool
 Shizu_State1_getProcessExitRequested
   (
     Shizu_State1* state
+  );
+
+/**
+ * @since 1.0
+ * The type of a dynamic library (DL).
+ */
+typedef struct Shizu_Dl Shizu_Dl;
+
+/**
+ * @since 1.0
+ * @brief Get or load a DL.
+ * @param state A pointer to the tier 1 state.
+ * @param path The path to the DL (a C string).
+ * @param load If @a true the DL is loaded if it is not loaded yet.
+ * @return The DL on success if it exists. The null pointer oterwise.
+ */
+Shizu_Dl*
+Shizu_State1_getOrLoadDl
+  (
+    Shizu_State1* state,
+    char const* path,
+    bool load
+  );
+
+/**
+ * @since 1.0
+ * @brief Get a DL by its name.
+ * @param state A pointer to the tier 1 state.
+ * @param name The name of the DL (as C string).
+ * @return A pointer to the DL if a DL with the given name exists. The null pointer otherwise.
+ */
+Shizu_Dl*
+Shizu_State1_getDlByName
+  (
+    Shizu_State1* state,
+    char const* name
+  );
+
+/**
+ * @since 1.0
+ * @brief Get the DL which is defining a object.
+ * @param state A pointer to the tier 1 state.
+ * @param p The address of the object.
+ * @return A pointer to the DL if a DL defining the object exists. the null pointer otherwise.
+ */
+Shizu_Dl*
+Shizu_State1_getDlByAdr
+  (
+    Shizu_State1* state,
+    void* p
+  );
+
+/**
+ * @since 1.0
+ * @brief Acquire a reference to a DL.
+ * @param state A pointer to the tier 1 state.
+ * @param dl A pointer to the DL.
+ */
+void
+Shizu_State1_refDl
+  (
+    Shizu_State1* state,
+    Shizu_Dl* dl
+  );
+
+/**
+ * @since 1.0
+ * @brief Relinquish a reference to a DL.
+ * @param state A pinter to the tier 1 state.
+ * @param dl A pointer to the DL.
+ */
+void
+Shizu_State1_unrefDl
+  (
+    Shizu_State1* state,
+    Shizu_Dl* dl
+  );
+
+/**
+ * @since 1.0
+ * @brief Load a symbol from a DL.
+ * @param state A pointer to the tier 1 state.
+ * @param dl A pointer to the DL.
+ * @param name The name of the symbol (a C string).
+ * @return A pointer to the symbol if it was found. The null pointer otherwise.
+ */
+void*
+Shizu_State1_getDlSymbol
+  (
+    Shizu_State1* state,
+    Shizu_Dl* dl,
+    char const* name
   );
 
 #endif // SHIZU_STATE1_H_INCLUDED

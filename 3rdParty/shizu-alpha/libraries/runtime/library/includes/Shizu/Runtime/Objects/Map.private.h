@@ -28,8 +28,6 @@
 #include "Shizu/Runtime/Objects/Map.h"
 #include "Shizu/Runtime/Gc.private.h"
 
-extern Shizu_TypeDescriptor const Shizu_Map_Type;
-
 /**
  * @since 0.1
  * @brief A node of a map.
