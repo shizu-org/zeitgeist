@@ -831,12 +831,6 @@ Shizu_State_destroy
   }
   if (0 == --self->referenceCount) {
     Shizu_Gc_run(self);
-  #if 0
-    idlib_process* process = self->process;
-    self->process = NULL;
-    idlib_remove_global(process, NAME, strlen(NAME));
-    idlib_relinquish_process(process);
-  #endif
     Shizu_Stack_shutdown(self, self->stack);
     self->stack = NULL;
     Shizu_Locks_shutdown(self, self->locks);
