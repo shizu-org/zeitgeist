@@ -18,11 +18,13 @@
 #define KeyboardKey_S (10)
 #define KeyboardKey_D (11)
 
-typedef struct KeyboardKeyMessage {
-	Zeitgeist_ForeignObject _parent;
+Zeitgeist_ObjectType_Declare(KeyboardKeyMessage)
+
+struct KeyboardKeyMessage {
+	Zeitgeist_Object _parent;
 	Zeitgeist_Integer action;
 	Zeitgeist_Integer key;
-} KeyboardKeyMessage;
+};
 
 KeyboardKeyMessage*
 KeyboardKeyMessage_create

@@ -5,10 +5,12 @@
 #include "idlib-math.h"
 typedef struct Vector3R32 Vector3R32;
 
-typedef struct Matrix4R32 {
-	Zeitgeist_ForeignObject _parent;
-	idlib_matrix_4x4_f32 m;
-} Matrix4R32;
+Zeitgeist_ObjectType_Declare(Matrix4R32)
+
+struct Matrix4R32 {
+  Zeitgeist_Object _parent;
+  idlib_matrix_4x4_f32 m;
+};
 
 Matrix4R32*
 Matrix4R32_createIdentity

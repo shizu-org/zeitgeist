@@ -4,8 +4,10 @@
 #include "Zeitgeist.h"
 #include "idlib-math.h"
 
+Zeitgeist_ObjectType_Declare(Vector3R32)
+
 typedef struct Vector3R32 {
-	Zeitgeist_ForeignObject _parent;
+	Zeitgeist_Object _parent;
 	idlib_vector_3_f32 v;
 } Vector3R32;
 

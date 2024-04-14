@@ -1,5 +1,11 @@
 #include "KeyboardKeyMessage.h"
 
+Zeitgeist_ObjectType const g_KeyboardKeyMessage_Type = {
+	.name = "KeyboardKeyMessage",
+	.parentType = &g_Zeitgeist_Object_Type,
+	.destruct = NULL,
+};
+
 KeyboardKeyMessage*
 KeyboardKeyMessage_create
 	(
@@ -8,7 +14,7 @@ KeyboardKeyMessage_create
 		Zeitgeist_Integer key
 	)
 {
-	KeyboardKeyMessage* self = Zeitgeist_allocateForeignObject(state, sizeof(KeyboardKeyMessage), NULL, NULL);
+	KeyboardKeyMessage* self = Zeitgeist_allocateObject(state, sizeof(KeyboardKeyMessage), NULL, NULL);
 
 	self->action = action;
 	self->key = key;

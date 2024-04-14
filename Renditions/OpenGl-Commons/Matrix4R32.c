@@ -2,14 +2,21 @@
 
 #include "Vector3R32.h"
 
+Zeitgeist_ObjectType const g_Matrix4R32_Type = {
+	.name = "Matrix4R32",
+	.parentType = &g_Zeitgeist_Object_Type,
+	.destruct = NULL,
+};
+
 Matrix4R32*
 Matrix4R32_createIdentity
 	(
 		Zeitgeist_State* state
 	)
 {
-	Matrix4R32* self = Zeitgeist_allocateForeignObject(state, sizeof(Matrix4R32), NULL, NULL);
+	Matrix4R32* self = Zeitgeist_allocateObject(state, sizeof(Matrix4R32), NULL, NULL);
 	idlib_matrix_4x4_f32_set_identity(&self->m);
+	((Zeitgeist_Object*)self)->type = &g_Matrix4R32_Type;
 	return self;
 }
 
@@ -20,7 +27,7 @@ Matrix4R32_createTranslate
 		Vector3R32* translate
 	)
 {
-	Matrix4R32* self = Zeitgeist_allocateForeignObject(state, sizeof(Matrix4R32), NULL, NULL);
+	Matrix4R32* self = Zeitgeist_allocateObject(state, sizeof(Matrix4R32), NULL, NULL);
 	idlib_matrix_4x4_f32_set_translate(&self->m, &translate->v);
 	return self;
 }
@@ -32,7 +39,7 @@ Matrix4R32_createRotateY
 		Zeitgeist_Real32 degrees
 	)
 {
-	Matrix4R32* self = Zeitgeist_allocateForeignObject(state, sizeof(Matrix4R32), NULL, NULL);
+	Matrix4R32* self = Zeitgeist_allocateObject(state, sizeof(Matrix4R32), NULL, NULL);
 	idlib_matrix_4x4_f32_set_rotation_y(&self->m, degrees);
 	return self;
 }
@@ -47,7 +54,7 @@ Matrix4R32_createPerspective
 		Zeitgeist_Real32 far
 	)
 {
-	Matrix4R32* self = Zeitgeist_allocateForeignObject(state, sizeof(Matrix4R32), NULL, NULL);
+	Matrix4R32* self = Zeitgeist_allocateObject(state, sizeof(Matrix4R32), NULL, NULL);
 	idlib_matrix_4x4_f32_set_perspective(&self->m, fieldOfViewY, aspectRatio, near, far);
 	return self;
 }
@@ -64,7 +71,7 @@ Matrix4R32_createOrthographic
 		Zeitgeist_Real32 far
 	)
 {
-	Matrix4R32* self = Zeitgeist_allocateForeignObject(state, sizeof(Matrix4R32), NULL, NULL);
+	Matrix4R32* self = Zeitgeist_allocateObject(state, sizeof(Matrix4R32), NULL, NULL);
 	idlib_matrix_4x4_f32_set_orthographic(&self->m, left, right, bottom, top, near, far);
 	return self;
 }
@@ -78,7 +85,7 @@ Matrix4R32_createLookAt
 		Vector3R32* up
 	)
 {
-	Matrix4R32* self = Zeitgeist_allocateForeignObject(state, sizeof(Matrix4R32), NULL, NULL);
+	Matrix4R32* self = Zeitgeist_allocateObject(state, sizeof(Matrix4R32), NULL, NULL);
 	idlib_matrix_4x4_f32_set_look_at(&self->m, &source->v, &target->v, &up->v);
 	return self;
 }
@@ -90,7 +97,7 @@ Matrix4R32_createScale
 		Vector3R32* scale
 	)
 {
-	Matrix4R32* self = Zeitgeist_allocateForeignObject(state, sizeof(Matrix4R32), NULL, NULL);
+	Matrix4R32* self = Zeitgeist_allocateObject(state, sizeof(Matrix4R32), NULL, NULL);
 	idlib_matrix_4x4_f32_set_scale(&self->m, &scale->v);
 	return self;
 }
@@ -102,7 +109,7 @@ Matrix4R32_negate
 		Matrix4R32* matrix
 	)
 {
-	Matrix4R32* self = Zeitgeist_allocateForeignObject(state, sizeof(Matrix4R32), NULL, NULL);
+	Matrix4R32* self = Zeitgeist_allocateObject(state, sizeof(Matrix4R32), NULL, NULL);
 	idlib_matrix_4x4_f32_negate(&self->m, &matrix->m);
 	return self;
 }
@@ -115,7 +122,7 @@ Matrix4R32_multiply
 		Matrix4R32* operand2
 	)
 {
-	Matrix4R32* self = Zeitgeist_allocateForeignObject(state, sizeof(Matrix4R32), NULL, NULL);
+	Matrix4R32* self = Zeitgeist_allocateObject(state, sizeof(Matrix4R32), NULL, NULL);
 	idlib_matrix_4x4_f32_multiply(&self->m, &operand1->m, &operand2->m);
 	return self;
 }
