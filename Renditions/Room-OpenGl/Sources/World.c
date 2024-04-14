@@ -6,13 +6,6 @@
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-Shizu_defineDlType(Player, Shizu_Object);
-extern char const*
-Shizu_getDlName
-	(
-		Shizu_State* state
-	);
-
 static void
 Player_visit
 	(
@@ -20,13 +13,15 @@ Player_visit
 		Player* self
 	);
 
-Shizu_TypeDescriptor const Player_Type = {
+static Shizu_TypeDescriptor const Player_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,
 	.staticVisit = NULL,
 	.finalize = NULL,
 	.visit = (Shizu_OnVisitCallback*) & Player_visit,
 };
+
+Shizu_defineType(Player, Shizu_Object);
 
 static void
 Player_visit
@@ -161,15 +156,15 @@ StaticGeometryGl_finalize
 		StaticGeometryGl* self
 	);
 
-Shizu_defineDlType(StaticGeometryGl, Shizu_Object);
-
-Shizu_TypeDescriptor const StaticGeometryGl_Type = {
+static Shizu_TypeDescriptor const StaticGeometryGl_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,
 	.staticVisit = NULL,
 	.finalize = (Shizu_OnFinalizeCallback*)&StaticGeometryGl_finalize,
 	.visit = NULL,
 };
+
+Shizu_defineType(StaticGeometryGl, Shizu_Object);
 
 static void
 StaticGeometryGl_finalize
@@ -576,15 +571,15 @@ World_visit
 		World* self
 	);
 
-Shizu_defineDlType(World, Shizu_Object);
-
-Shizu_TypeDescriptor const World_Type = {
+static Shizu_TypeDescriptor const World_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,
 	.staticVisit = NULL,
 	.finalize = NULL,
 	.visit = (Shizu_OnVisitCallback*)&World_visit,
 };
+
+Shizu_defineType(World, Shizu_Object);
 
 static void
 World_visit

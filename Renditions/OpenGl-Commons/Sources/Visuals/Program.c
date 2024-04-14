@@ -15,7 +15,7 @@ Zeitgeist_Visuals_Program_visit
   }
 }
 
-Shizu_TypeDescriptor const Zeitgeist_Visuals_Program_Type = {
+static Shizu_TypeDescriptor const Zeitgeist_Visuals_Program_Type = {
   .staticInitialize = NULL,
   .staticFinalize = NULL,
   .staticVisit = NULL,
@@ -23,7 +23,7 @@ Shizu_TypeDescriptor const Zeitgeist_Visuals_Program_Type = {
   .visit = (Shizu_OnVisitCallback*)&Zeitgeist_Visuals_Program_visit,
 };
 
-Shizu_defineDlType(Zeitgeist_Visuals_Program, Visuals_Object);
+Shizu_defineType(Zeitgeist_Visuals_Program, Visuals_Object);
 
 void
 Zeitgeist_Visuals_Program_construct
@@ -41,7 +41,7 @@ Zeitgeist_Visuals_Program_construct
   ((Shizu_Object*)self)->type = type;
 }
 
-Shizu_TypeDescriptor const Zeitgeist_Visuals_GlProgram_Type = {
+static Shizu_TypeDescriptor const Zeitgeist_Visuals_GlProgram_Type = {
   .staticInitialize = NULL,
   .staticFinalize = NULL,
   .staticVisit = NULL,
@@ -49,7 +49,7 @@ Shizu_TypeDescriptor const Zeitgeist_Visuals_GlProgram_Type = {
   .visit = NULL,
 };
 
-Shizu_defineDlType(Zeitgeist_Visuals_GlProgram, Zeitgeist_Visuals_Program);
+Shizu_defineType(Zeitgeist_Visuals_GlProgram, Zeitgeist_Visuals_Program);
 
 void
 Zeitgeist_Visuals_GlProgram_construct

@@ -4,7 +4,6 @@
 #include "Zeitgeist.h"
 #include "idlib-math.h"
 
-extern Shizu_TypeDescriptor const Vector3R32_Type;
 Shizu_declareType(Vector3R32)
 
 typedef struct Vector3R32 {

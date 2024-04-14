@@ -7,8 +7,7 @@
  * @since 1.0
  * A program consists of a vertex program and a fragment program.
  */
-extern Shizu_TypeDescriptor const Zeitgeist_Visuals_Program_Type;
-Shizu_declareDlType(Zeitgeist_Visuals_Program);
+Shizu_declareType(Zeitgeist_Visuals_Program);
 struct Zeitgeist_Visuals_Program {
   Visuals_Object _parent;
   Shizu_String* vertexProgramSource;
@@ -24,8 +23,7 @@ Zeitgeist_Visuals_Program_construct
     Shizu_String* fragmentSource
   );
 
-extern Shizu_TypeDescriptor const Zeitgeist_Visuals_GlProgram_Type;
-Shizu_declareDlType(Zeitgeist_Visuals_GlProgram);
+Shizu_declareType(Zeitgeist_Visuals_GlProgram);
 struct Zeitgeist_Visuals_GlProgram {
   Zeitgeist_Visuals_Program _parent;
   GLuint vertexProgramId;

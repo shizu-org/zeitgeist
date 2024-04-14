@@ -5,7 +5,6 @@
 #include "idlib-math.h"
 typedef struct Vector3R32 Vector3R32;
 
-extern Shizu_TypeDescriptor const Matrix4R32_Type;
 Shizu_declareType(Matrix4R32)
 
 struct Matrix4R32 {

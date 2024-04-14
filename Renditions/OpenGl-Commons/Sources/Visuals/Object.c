@@ -8,7 +8,7 @@ Shizu_TypeDescriptor const Visuals_Object_Type = {
   .visit = NULL,
 };
 
-Shizu_defineDlType(Visuals_Object, Shizu_Object);
+Shizu_defineType(Visuals_Object, Shizu_Object);
 
 void
 Visuals_Object_construct

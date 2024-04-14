@@ -7,15 +7,15 @@
 // malloc, free
 #include <malloc.h>
 
-Shizu_defineType(Zeitgeist_UpstreamRequest, Shizu_Object);
-
-Shizu_TypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
+static Shizu_TypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
   .staticInitialize = NULL,
   .staticFinalize = NULL,
   .staticVisit = NULL,
   .finalize = NULL,
   .visit = NULL,
 };
+
+Shizu_defineType(Zeitgeist_UpstreamRequest, Shizu_Object);
 
 Zeitgeist_UpstreamRequest*
 Zeitgeist_UpstreamRequest_createExitProcessRequest

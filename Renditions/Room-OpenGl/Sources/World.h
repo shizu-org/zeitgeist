@@ -9,8 +9,7 @@
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-extern Shizu_TypeDescriptor const Player_Type;
-Shizu_declareDlType(Player);
+Shizu_declareType(Player);
 
 /**
  * @brief The state of the player.
@@ -164,8 +163,7 @@ Player_update
  * - a ceiling of a room
  * - a west, north, east, or south walls of a room
  */
-extern Shizu_TypeDescriptor const StaticGeometryGl_Type;
-Shizu_declareDlType(StaticGeometryGl)
+Shizu_declareType(StaticGeometryGl)
 
 /**
  * @since 0.1
@@ -353,8 +351,7 @@ StaticGeometryGl_create
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-extern Shizu_TypeDescriptor const World_Type;
-Shizu_declareDlType(World)
+Shizu_declareType(World)
 
 struct World {
 	Shizu_Object _parent;

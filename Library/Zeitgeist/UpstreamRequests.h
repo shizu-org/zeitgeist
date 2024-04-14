@@ -10,7 +10,6 @@
  * @brief An upstream request is send from an Rendition to Zeitgeist.
  * The only upstream
  */
-extern Shizu_TypeDescriptor const Zeitgeist_UpstreamRequest_Type;
 Shizu_declareType(Zeitgeist_UpstreamRequest);
 
 /**

@@ -18,7 +18,6 @@
 #define KeyboardKey_S (10)
 #define KeyboardKey_D (11)
 
-extern Shizu_TypeDescriptor const KeyboardKeyMessage_Type;
 Shizu_declareType(KeyboardKeyMessage)
 
 struct KeyboardKeyMessage {

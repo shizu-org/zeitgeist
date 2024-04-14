@@ -3,8 +3,7 @@
 
 #include "ServiceGl.h"
 
-extern Shizu_TypeDescriptor const Visuals_Object_Type;
-Shizu_declareDlType(Visuals_Object);
+Shizu_declareType(Visuals_Object);
 struct Visuals_Object {
   Shizu_Object _parent;
   void (*notifyVisualsShutdown)(Shizu_State*, Visuals_Object*);

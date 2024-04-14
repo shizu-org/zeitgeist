@@ -5,7 +5,6 @@
 
 #include "Zeitgeist.h"
 
-extern Shizu_TypeDescriptor const Zeitgeist_Rendition_Type;
 Shizu_declareType(Zeitgeist_Rendition);
 
 struct Zeitgeist_Rendition {
@@ -14,9 +13,8 @@ struct Zeitgeist_Rendition {
   /** The path to the folder of the rendition. */
   Shizu_String* folderPath;
 
-  /** The library handle if the library is loaded. Rendition_LibraryHandle_Invalid otherwise. */
-  //Shizu_OperatingSystem_DllHandle libraryHandle;
-  Shizu_Dll* dll;
+  /** The library handle if the library is loaded. The null pointer otherwise. */
+  Shizu_Dl* dl;
 
   Shizu_String*(*getName)(Shizu_State* state, Zeitgeist_Rendition* rendition);
 };

@@ -26,7 +26,6 @@
 Shizu_Rendition_Export char const* 
 Shizu_getDlName
   (
-    Shizu_State* state
   )
 {
   static char const* NAME = "<Dl: Room (OpenGL)>";
