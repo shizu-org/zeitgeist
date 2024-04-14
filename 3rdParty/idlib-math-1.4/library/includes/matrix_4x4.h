@@ -1,4 +1,24 @@
-// Copyright (c) 2023-2024 Michael Heilmann.All rights reserved.
+/*
+  IdLib Math
+  Copyright (C) 2023-2024 Michael Heilmann. All rights reserved.
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+*/
+
 #if !defined(IDLIB_MATRIX_4X4_H_INCLUDED)
 #define IDLIB_MATRIX_4X4_H_INCLUDED
 
@@ -28,6 +48,7 @@ typedef struct idlib_matrix_4x4_f32 {
 /// @param target Pointer to the idlib_matrix_4x4_f32 object to which the result is assigned.
 /// @param operand1 Pointer to the idlib_matrix_4x4_f32 object which is the augend (aka first summand aka first term).
 /// @param operand2 Pointer to the idlib_matrix_4x_f32 object which is the addend (aka second summand aka second term).
+/// @see https://github.com/michaelheilmann/idlib-math/tree/feature-markdown-documentation/documentation/matrix/matrix_4x4_f32_add.md
 static inline void
 idlib_matrix_4x4_f32_add
   (
@@ -41,6 +62,7 @@ idlib_matrix_4x4_f32_add
 /// @param target Pointer to the idlib_matrix_4x4_f32 object to which the result is assigned.
 /// @param operand1 Pointer to the idlib_matrix_4x4_f32 object which is the minuend (aka first term).
 /// @param operand2 Pointer to the idlib_matrix_4x_f32 object which is the subtrahend (aka second term).
+/// @see https://github.com/michaelheilmann/idlib-math/tree/feature-markdown-documentation/feature-markdown-documentation/matrix/matrix_4x4_f32_subtract.md
 static inline void
 idlib_matrix_4x4_f32_subtract
   (
@@ -52,6 +74,7 @@ idlib_matrix_4x4_f32_subtract
 /// @since 1.4
 /// @brief Assign an idlib_matrix_4x4_f32 object the values of the zero matrix.
 /// @param target Pointer to the idlib_matrix_4x4_f32 object to which the result is assigned.
+/// @see https://github.com/michaelheilmann/idlib-math/tree/feature-markdown-documentation/documentation/matrix/matrix_4x4_f32_set_zero.md
 static inline void
 idlib_matrix_4x4_f32_set_zero
   (
@@ -61,6 +84,7 @@ idlib_matrix_4x4_f32_set_zero
 /// @since 1.0
 /// @brief Assign an idlib_matrix_4x4_f32 object the values of the identity matrix.
 /// @param target Pointer to the idlib_matrix_4x4_f32 object to which the result is assigned.
+/// @see https://github.com/michaelheilmann/idlib-math/tree/feature-markdown-documentation/matrix/matrix_4x4_f32_set_identity.md
 static inline void
 idlib_matrix_4x4_f32_set_identity
   (
@@ -85,6 +109,7 @@ idlib_matrix_4x4_f32_set_identity
 /// y = idlib_vector_3_f32_get_y(operand)
 /// z = idlib_vector_3_f32_get_z(operand)
 /// @endcode
+/// @see https://github.com/michaelheilmann/idlib-math/tree/feature-markdown-documentation/matrix/matrix_4x4_f32_set_translate.md
 static inline void
 idlib_matrix_4x4_f32_set_translate
   (
@@ -109,6 +134,7 @@ idlib_matrix_4x4_f32_set_translate
 /// c = cos(2 * pi * operand1 / 360)
 /// s = sin(2 * pi * operand1 / 360)
 /// @endcode
+/// @see https://github.com/michaelheilmann/idlib-math/tree/feature-markdown-documentation/matrix/matrix_4x4_f32_set_rotation_x.md
 static inline void
 idlib_matrix_4x4_f32_set_rotation_x
   (
@@ -133,6 +159,7 @@ idlib_matrix_4x4_f32_set_rotation_x
 /// c = cos(2 * pi * operand1 / 360)
 /// s = sin(2 * pi * operand1 / 360)
 /// @endcode
+/// @see https://github.com/michaelheilmann/idlib-math/tree/feature-markdown-documentation/matrix/matrix_4x4_f32_set_rotation_y.md
 static inline void
 idlib_matrix_4x4_f32_set_rotation_y
   (
@@ -157,6 +184,7 @@ idlib_matrix_4x4_f32_set_rotation_y
 /// c = cos(2 * pi * operand1 / 360)
 /// s = sin(2 * pi * operand1 / 360)
 /// @endcode
+/// @see https://github.com/michaelheilmann/idlib-math/tree/feature-markdown-documentation/matrix/matrix_4x4_f32_set_rotation_z.md
 static inline void
 idlib_matrix_4x4_f32_set_rotation_z
   (
@@ -348,6 +376,7 @@ idlib_matrix_4x4_f32_negate
 /// @param target A pointer to the idlib_matrix_4x4_f32 object to assign the result to.
 /// @param operand Pointer to the idlib_matrix_4x4_f32 object to transpose.
 /// @remarks @a target and @a operand all may refer to the same idlib_matrix_4x4_f32 object.
+/// @see https://github.com/michaelheilmann/idlib-math/tree/feature-markdown-documentation/documentation/matrix/matrix_4x4_f32_transpose.md
 static inline void
 idlib_matrix_4x4_f32_transpose
   (
