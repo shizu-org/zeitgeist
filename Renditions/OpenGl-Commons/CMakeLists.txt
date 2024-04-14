@@ -40,6 +40,10 @@ list(APPEND ${name}.header_files Sources/RenderBuffer.h)
 
 end_library()
 
+source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${${name}.configuration_files})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${${name}.header_files})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${${name}.source_files})
+
 target_link_libraries(${name} ${project_name}-Library)
 
 target_include_directories(${name} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/Sources)
