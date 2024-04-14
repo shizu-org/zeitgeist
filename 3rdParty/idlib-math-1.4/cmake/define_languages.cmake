@@ -2,20 +2,18 @@
 # This file is licensed under the "zlib License".
 
 # Macro to define an enumeration of languages.
-# The enumeration constants ${target}.language_(string|id)_(unknown|c|cpp|masm) are defined where
-# ${target}.language_id_* are numeric ID, which are guaranteed to be unique, and ${target}.language_string_* are a human-readable strings which is merely descriptive.
+#
+# The enumeration constants ${target}.language_(unknown|c|cpp|masm) are defined.
+# Each constant is a string of an unique name identifying a language.
+#
 # @param target The target.
 macro(define_languages target)
   # Unknown language.
-  set(${target}.language_string_unknown "<unknown language>")
-  set(${target}.language_id_unknown 0)
+  set(${target}.language_unknown "<unknown language>")
   # The "C" language.
-  set(${target}.language_string_c "C")
-  set(${target}.language_id_c 1)
+  set(${target}.language_c "C")
   # The "C++" language.
-  set(${target}.language_string_cpp "CPP")
-  set(${target}.language_id_cpp 2)
+  set(${target}.language_cpp "CPP")
   # The "MASM" language.
-  set(${target}.language_string_masm "MASM")
-  set(${target}.language_id_masm 3)
+  set(${target}.language_masm "MASM")
 endmacro()
