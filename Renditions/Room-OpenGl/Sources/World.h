@@ -9,13 +9,14 @@
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-Zeitgeist_ObjectType_Declare(Player)
+extern Shizu_TypeDescriptor const Player_Type;
+Shizu_declareDlType(Player);
 
 /**
  * @brief The state of the player.
  */
 struct Player {
-	Zeitgeist_Object parent;
+	Shizu_Object parent;
 	/**
 	 * @brief A position vector indicating the position of the player in world coordinates.
 	 * @remarks The default position is (0,0,0).
@@ -26,8 +27,8 @@ struct Player {
 	 * @brief A scalar indicating the rotation of the player around the Y axis.
 	 * @remarks The default direction is (0,0,-1), the default rotation is 0.
 	 */
-	Zeitgeist_Real32 rotationY;
-	Zeitgeist_Real32 rotationYSpeed;
+	Shizu_Float32 rotationY;
+	Shizu_Float32 rotationYSpeed;
 
 	/**
 	 * @brief If "strate left" is down.
@@ -62,13 +63,13 @@ struct Player {
 Player*
 Player_create
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 void
 Player_onKeyboardKeyMessage
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		Player* self,
 		KeyboardKeyMessage* message
 	);
@@ -76,9 +77,9 @@ Player_onKeyboardKeyMessage
 void
 Player_update
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		Player* self,
-		Zeitgeist_Real32 tick
+		Shizu_Float32 tick
 	);
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -163,7 +164,8 @@ Player_update
  * - a ceiling of a room
  * - a west, north, east, or south walls of a room
  */
-Zeitgeist_ObjectType_Declare(StaticGeometryGl)
+extern Shizu_TypeDescriptor const StaticGeometryGl_Type;
+Shizu_declareDlType(StaticGeometryGl)
 
 /**
  * @since 0.1
@@ -176,7 +178,7 @@ Zeitgeist_ObjectType_Declare(StaticGeometryGl)
  * - a west, north, east, or south walls of a room
  */
 struct StaticGeometryGl {
-	Zeitgeist_Object parent;
+	Shizu_Object parent;
 
 	/**
 	 * @brief The OpenGL ID of the color texture.
@@ -213,7 +215,7 @@ struct StaticGeometryGl {
 void
 StaticGeometryGl_unmaterialize
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self
 	);
 
@@ -228,7 +230,7 @@ StaticGeometryGl_unmaterialize
 void
 StaticGeometryGl_setData
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		size_t numberOfVertices,
 		size_t numberOfBytes,
@@ -246,11 +248,11 @@ StaticGeometryGl_setData
 void
 StaticGeometryGl_setDataNorthWall
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 height
+		Shizu_Float32 breadth,
+		Shizu_Float32 height
 	);
 
 /**
@@ -264,11 +266,11 @@ StaticGeometryGl_setDataNorthWall
 void
 StaticGeometryGl_setDataSouthWall
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 height
+		Shizu_Float32 breadth,
+		Shizu_Float32 height
 	);
 
 /**
@@ -282,11 +284,11 @@ StaticGeometryGl_setDataSouthWall
 void
 StaticGeometryGl_setDataEastWall
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 height
+		Shizu_Float32 breadth,
+		Shizu_Float32 height
 	);
 
 /**
@@ -300,11 +302,11 @@ StaticGeometryGl_setDataEastWall
 void
 StaticGeometryGl_setDataWestWall
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 height
+		Shizu_Float32 breadth,
+		Shizu_Float32 height
 	);
 
 /**
@@ -318,11 +320,11 @@ StaticGeometryGl_setDataWestWall
 void
 StaticGeometryGl_setDataFloor
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 length
+		Shizu_Float32 breadth,
+		Shizu_Float32 length
 	);
 
 /**
@@ -336,27 +338,28 @@ StaticGeometryGl_setDataFloor
 void
 StaticGeometryGl_setDataCeiling
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 length
+		Shizu_Float32 breadth,
+		Shizu_Float32 length
 	);
 
 StaticGeometryGl*
 StaticGeometryGl_create
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-Zeitgeist_ObjectType_Declare(World)
+extern Shizu_TypeDescriptor const World_Type;
+Shizu_declareDlType(World)
 
 struct World {
-	Zeitgeist_Object _parent;
+	Shizu_Object _parent;
 	/// @brief Pointer to the list of StaticGeometryGl objects.
-	Zeitgeist_List* geometries;
+	Shizu_List* geometries;
 	/// @brief Information on the player.
 	Player* player;
 };
@@ -364,15 +367,15 @@ struct World {
 World*
 World_create
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 void
 World_update
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		World* self,
-		Zeitgeist_Real32 tick
+		Shizu_Float32 tick
 	);
 
 #endif // WORLD_H_INCLUDED

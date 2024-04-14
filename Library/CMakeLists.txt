@@ -12,33 +12,6 @@ list(APPEND ${name}.source_files Zeitgeist/Configure.h.in)
 list(APPEND ${name}.source_files Zeitgeist.c)
 list(APPEND ${name}.header_files Zeitgeist.h)
 
-list(APPEND ${name}.source_files Zeitgeist/Value.c)
-list(APPEND ${name}.header_files Zeitgeist/Value.h)
-
-list(APPEND ${name}.source_files Zeitgeist/List.c)
-list(APPEND ${name}.header_files Zeitgeist/List.h)
-
-list(APPEND ${name}.source_files Zeitgeist/Map.c)
-list(APPEND ${name}.header_files Zeitgeist/Map.h)
-
-list(APPEND ${name}.source_files Zeitgeist/Stack.c)
-list(APPEND ${name}.header_files Zeitgeist/Stack.h)
-
-list(APPEND ${name}.source_files Zeitgeist/String.c)
-list(APPEND ${name}.header_files Zeitgeist/String.h)
-
-list(APPEND ${name}.source_files Zeitgeist/Object.c)
-list(APPEND ${name}.header_files Zeitgeist/Object.h)
-
-list(APPEND ${name}.source_files Zeitgeist/Gc.c)
-list(APPEND ${name}.header_files Zeitgeist/Gc.h)
-
-list(APPEND ${name}.source_files Zeitgeist/WeakReferences.c)
-list(APPEND ${name}.header_files Zeitgeist/WeakReferences.h)
-
-list(APPEND ${name}.source_files Zeitgeist/Locks.c)
-list(APPEND ${name}.header_files Zeitgeist/Locks.h)
-
 list(APPEND ${name}.source_files Zeitgeist/Rendition.c)
 list(APPEND ${name}.header_files Zeitgeist/Rendition.h)
 
@@ -72,6 +45,7 @@ list(APPEND ${name}.source_files Zeitgeist/Configure.h)
 
 end_library()
 
+#target_link_libraries(${name})
 target_link_libraries(${name} Shizu.Runtime)
 
 target_include_directories(${name} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})

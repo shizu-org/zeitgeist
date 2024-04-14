@@ -18,33 +18,34 @@
 #define KeyboardKey_S (10)
 #define KeyboardKey_D (11)
 
-Zeitgeist_ObjectType_Declare(KeyboardKeyMessage)
+extern Shizu_TypeDescriptor const KeyboardKeyMessage_Type;
+Shizu_declareType(KeyboardKeyMessage)
 
 struct KeyboardKeyMessage {
-	Zeitgeist_Object _parent;
-	Zeitgeist_Integer action;
-	Zeitgeist_Integer key;
+	Shizu_Object _parent;
+	Shizu_Integer32 action;
+	Shizu_Integer32 key;
 };
 
 KeyboardKeyMessage*
 KeyboardKeyMessage_create
 	(
-		Zeitgeist_State* state,
-		Zeitgeist_Integer action,
-		Zeitgeist_Integer key
+		Shizu_State* state,
+		Shizu_Integer32 action,
+		Shizu_Integer32 key
 	);
 
-Zeitgeist_Integer
+Shizu_Integer32
 KeyboardKeyMessage_getAction
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		KeyboardKeyMessage* self
 	);
 
-Zeitgeist_Integer
+Shizu_Integer32
 KeyboardKeyMessage_getKey
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		KeyboardKeyMessage* self
 	);
 

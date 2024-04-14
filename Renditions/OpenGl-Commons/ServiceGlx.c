@@ -45,7 +45,7 @@ isExtensionSupported
 static int
 getBestFbc
   (
-    Zeitgeist_State* state,
+    Shizu_State* state,
     GLXFBConfig* configs,
     int numberOfConfigs
   );
@@ -60,22 +60,22 @@ errorHandler
 static void
 shutdownContext
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   );
 
 static void
 startupWindow
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   );
 
 static void
 shutdownWindow
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   );
 
-static Zeitgeist_Value
+static Shizu_Value
 mapKeyboardKey
   (
     XEvent *event
@@ -122,7 +122,7 @@ isExtensionSupported
 static int
 getBestFbc
   (
-    Zeitgeist_State* state,
+    Shizu_State* state,
     GLXFBConfig* configs,
     int numberOfConfigs
   )
@@ -158,7 +158,7 @@ errorHandler
 static void
 startupContext
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 {
   g_oldErrorHandler = XSetErrorHandler(&errorHandler);
@@ -168,7 +168,8 @@ startupContext
   if (!extensions) {
     fprintf(stderr, "%s:%d: unable to get extension strings\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
 
   // NOTE: It is not necessary to create or make current to a context before calling glXGetProcAddressARB.
@@ -177,7 +178,8 @@ startupContext
   if (!glXCreateContextAttribsARB) {
     fprintf(stderr, "%s:%d: unable to get %s\n", __FILE__, __LINE__, "glXCreateContextAttribsARB");
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   
   // Check for the GLX_ARB_create_context extension string and the function.
@@ -185,7 +187,8 @@ startupContext
   if (!isExtensionSupported(extensions, "GLX_ARB_create_context") || !glXCreateContextAttribsARB) {
     fprintf(stderr, "%s:%d: unable to get %s extension\n", __FILE__, __LINE__, "GLX_ARB_create_context  / glXCreateContextAttribsARB");
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   
   int contextAttribs[] = {
@@ -200,7 +203,8 @@ startupContext
   if (!g_context) {
     fprintf(stderr, "%s:%d: unable to get create context\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   
   if (!glXIsDirect(g_display, g_context)) {
@@ -208,7 +212,8 @@ startupContext
     glXDestroyContext(g_display, g_context);
     g_context = NULL;
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   
   if (!glXMakeCurrent(g_display, g_window, g_context)) {
@@ -216,7 +221,8 @@ startupContext
     glXDestroyContext(g_display, g_context);
     g_context = NULL;
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   
   XSetErrorHandler(g_oldErrorHandler);
@@ -225,7 +231,7 @@ startupContext
 static void
 shutdownContext
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 {
   glXMakeCurrent(g_display, 0, 0);
@@ -236,7 +242,7 @@ shutdownContext
 static void
 startupWindow
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 { 
   g_oldErrorHandler = XSetErrorHandler(&errorHandler);
@@ -245,7 +251,8 @@ startupWindow
   if (!g_display) {
     fprintf(stderr, "%s:%d: unable to open display\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   // Get a matching FB config
   static int glx_visualAttributes[] = {
@@ -272,14 +279,16 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to get GLX version\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   if ((glx_major == 1 && glx_minor < 3) || (glx_major < 1)) {
     XCloseDisplay(g_display);
     g_display = NULL;
     fprintf(stderr, "%s:%d: GLX version %d.%d smaller than the minimum required version %d.%d\n", __FILE__, __LINE__, glx_major, glx_minor, 1, 3);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   
   int glx_fbConfigCount;
@@ -289,7 +298,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to get matching frame buffer configuration(s)\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   //
   int glx_bestFbConfigIndex = getBestFbc(state, glx_fbConfigs, glx_fbConfigCount);
@@ -300,7 +310,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to get matching frame buffer configuration(s)\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   g_glx_bestFbConfig = glx_fbConfigs[ glx_bestFbConfigIndex ];
   
@@ -314,7 +325,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to get matching visual\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   
   XSetWindowAttributes swa;
@@ -328,7 +340,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to create a color map\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   swa.background_pixmap = None ;
   swa.border_pixel      = 0;
@@ -345,7 +358,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to create window\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   
   XFree(x_visualInfo);
@@ -366,7 +380,7 @@ startupWindow
 static void
 shutdownWindow
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 { 
   XDestroyWindow(g_display, g_window);
@@ -378,7 +392,7 @@ shutdownWindow
 void
 ServiceGlx_startup
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 { 
   startupWindow(state);
@@ -388,7 +402,7 @@ ServiceGlx_startup
 void
 ServiceGlx_shutdown
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 {
   shutdownContext(state);
@@ -398,21 +412,21 @@ ServiceGlx_shutdown
 void
 ServiceGlx_setTitle
   (
-    Zeitgeist_State* state,
-    Zeitgeist_String* title
+    Shizu_State* state,
+    Shizu_String* title
   )
 {
-  Zeitgeist_String* zeroTerminator = Zeitgeist_State_createString(state, "", 1);
-  title = Zeitgeist_String_concatenate(state, title, zeroTerminator);
+  Shizu_String* zeroTerminator = Shizu_String_create(state, "", 1);
+  title = Shizu_String_concatenate(state, title, zeroTerminator);
   
   XTextProperty prop;
-  prop.value = title->bytes;
+  prop.value = (char*)Shizu_String_getBytes(state, title);
   prop.encoding = XA_STRING;
   prop.format = 8;
-  prop.nitems = title->numberOfBytes - 1;
+  prop.nitems = Shizu_String_getNumberOfBytes(state, title) - 1;
   g_oldErrorHandler = XSetErrorHandler(&errorHandler);
   XSetWMName(g_display, g_window, &prop);
-  XStoreName(g_display, g_window, title->bytes);
+  XStoreName(g_display, g_window, Shizu_String_getBytes(state, title));
   XSync(g_display, False);
   if (g_error) {
     fprintf(stderr, "failed to set title\n");
@@ -420,48 +434,48 @@ ServiceGlx_setTitle
   XSetErrorHandler(g_oldErrorHandler);
 }
 
-static Zeitgeist_Value
+static Shizu_Value
 mapKeyboardKey
   (
     XEvent *event
   )
 {
-  KeySym keySym = XLookupKeysym(event, 0);
+  KeySym keySym = XLookupKeysym(&event->xkey, 0);
   switch (keySym) {
     case XK_Escape: {
-      Zeitgeist_Value value;
-      Zeitgeist_Value_setInteger(&value, KeyboardKey_Escape);
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_Escape);
       return value;
     } break;
     case XK_Up: {
-      Zeitgeist_Value value;
-      Zeitgeist_Value_setInteger(&value, KeyboardKey_Up);
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_Up);
       return value;
     } break;
     case XK_Down: {
-      Zeitgeist_Value value;
-      Zeitgeist_Value_setInteger(&value, KeyboardKey_Down);
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_Down);
       return value;
     } break;
     case XK_Left: {
-      Zeitgeist_Value value;
-      Zeitgeist_Value_setInteger(&value, KeyboardKey_Left);
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_Left);
       return value;
     } break;
     case XK_Right: {
-      Zeitgeist_Value value;
-      Zeitgeist_Value_setInteger(&value, KeyboardKey_Right);
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_Right);
       return value;
     } break;
     default: {
-      Zeitgeist_Value value;
-      Zeitgeist_Value_setVoid(&value, Zeitgeist_Void_Void);
+      Shizu_Value value;
+      Shizu_Value_setVoid(&value, Shizu_Void_Void);
       return value;
     } break;
   };
 }
 
-void ServiceGlx_update(Zeitgeist_State* state) {
+void ServiceGlx_update(Shizu_State* state) {
   XEvent e;
   while (XPending(g_display)) {
     XNextEvent(g_display, &e);
@@ -472,50 +486,50 @@ void ServiceGlx_update(Zeitgeist_State* state) {
         }
       } break;
       case KeyPress: {
-        Zeitgeist_JumpTarget jumpTarget;
-        Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+        Shizu_JumpTarget jumpTarget;
+        Shizu_State_pushJumpTarget(state, &jumpTarget);
         if (!setjmp(jumpTarget.environment)) {
-          Zeitgeist_Value mappedKey = mapKeyboardKey(&e);
-          if (Zeitgeist_Value_hasInteger(&mappedKey)) {
-            KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Pressed, Zeitgeist_Value_getInteger(&mappedKey));
+          Shizu_Value mappedKey = mapKeyboardKey(&e);
+          if (Shizu_Value_isInteger32(&mappedKey)) {
+            KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Pressed, Shizu_Value_getInteger32(&mappedKey));
             ServiceGl_emitKeyboardKeyMessage(state, message);
           }
-          Zeitgeist_State_popJumpTarget(state);
+          Shizu_State_popJumpTarget(state);
         } else {
-          Zeitgeist_State_popJumpTarget(state);
+          Shizu_State_popJumpTarget(state);
         }
       } break;
       case KeyRelease: {
-        Zeitgeist_JumpTarget jumpTarget;
-        Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+        Shizu_JumpTarget jumpTarget;
+        Shizu_State_pushJumpTarget(state, &jumpTarget);
         if (!setjmp(jumpTarget.environment)) {
-          Zeitgeist_Value mappedKey = mapKeyboardKey(&e);
-          if (Zeitgeist_Value_hasInteger(&mappedKey)) {
-            KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Released, Zeitgeist_Value_getInteger(&mappedKey));
+          Shizu_Value mappedKey = mapKeyboardKey(&e);
+          if (Shizu_Value_isInteger32(&mappedKey)) {
+            KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Released, Shizu_Value_getInteger32(&mappedKey));
             ServiceGl_emitKeyboardKeyMessage(state, message);
           }
-          Zeitgeist_State_popJumpTarget(state);
+          Shizu_State_popJumpTarget(state);
         } else {
-          Zeitgeist_State_popJumpTarget(state);
+          Shizu_State_popJumpTarget(state);
         }
       } break;
     };
   }
 }
 
-Zeitgeist_Boolean
+Shizu_Boolean
 ServiceGlx_quitRequested
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 { return g_quitRequested; }
 
 void
 ServiceGlx_getClientSize
   (
-    Zeitgeist_State* state,
-    Zeitgeist_Integer *width,
-    Zeitgeist_Integer *height
+    Shizu_State* state,
+    Shizu_Integer32 *width,
+    Shizu_Integer32 *height
   )
 {
   XWindowAttributes windowAttributes;
@@ -527,7 +541,7 @@ ServiceGlx_getClientSize
 void*
 ServiceGlx_link
   (
-    Zeitgeist_State* state,
+    Shizu_State* state,
     char const* functionName,
     char const* extensionName
   )
@@ -538,13 +552,15 @@ ServiceGlx_link
     if (!isExtensionSupported(extensionNames, extensionName)) {
       extensionNames = glGetString(GL_EXTENSIONS);
       if (!isExtensionSupported(extensionNames, extensionName)) {
-        Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+        Shizu_State_setError(state, 1);
+        Shizu_State_jump(state);
       }
     }
   }
   void* p = glXGetProcAddress(functionName);
   if (!p) {
-    Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
   }
   return p;
 }
@@ -552,14 +568,14 @@ ServiceGlx_link
 void
 ServiceGlx_beginFrame
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 {/*Intentionally empty.*/}
 
 void
 ServiceGlx_endFrame
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 {
   glXSwapBuffers(g_display, g_window);

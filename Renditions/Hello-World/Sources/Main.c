@@ -9,42 +9,50 @@
 // fprintf, stdout
 #include <stdio.h>
 
-#if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
-	#define Zeitgeist_Rendition_Export _declspec(dllexport)
+#if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
+  #define Shizu_Rendition_Export _declspec(dllexport)
 #else
-	#define Zeitgeist_Rendition_Export
+  #define Shizu_Rendition_Export
 #endif
 
-Zeitgeist_Rendition_Export Zeitgeist_String*
+Shizu_Rendition_Export char const*
+Shizu_getDlName
+  (
+    Shizu_State* state
+  )
+{
+  static char const* NAME = "<Dl:Hello World>";
+  return NAME;
+}
+
+Shizu_Rendition_Export Shizu_String*
 Zeitgeist_Rendition_getName
-	(
-		Zeitgeist_State* state
-	)
-{
-	return Zeitgeist_State_createString(state, "Hello World", strlen("Hello World"));
-}
+  (
+    Shizu_State* state
+  )
+{ return Shizu_String_create(state, "Hello World", strlen("Hello World")); }
 
-Zeitgeist_Rendition_Export void
+Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
-	(
-		Zeitgeist_State* state
-	)
+  (
+    Shizu_State* state
+  )
 {
-	fprintf(stdout, "Hello, World!\n");
-	Zeitgeist_UpstreamRequest* request = Zeitgeist_UpstreamRequest_createExitProcessRequest(state);
-	Zeitgeist_sendUpstreamRequest(state, request);
+  fprintf(stdout, "Hello, World!\n");
+  Zeitgeist_UpstreamRequest* request = Zeitgeist_UpstreamRequest_createExitProcessRequest(state);
+  Zeitgeist_sendUpstreamRequest(state, request);
 }
 
-Zeitgeist_Rendition_Export void
+Shizu_Rendition_Export void
 Zeitgeist_Rendition_load
-	(
-		Zeitgeist_State* state
-	)
+  (
+    Shizu_State* state
+  )
 {/*Intentionally empty.*/}
 
-Zeitgeist_Rendition_Export void
+Shizu_Rendition_Export void
 Zeitgeist_Rendition_unload
-	(
-		Zeitgeist_State* state
-	)
+  (
+    Shizu_State* state
+  )
 {/*Intentionally empty.*/}

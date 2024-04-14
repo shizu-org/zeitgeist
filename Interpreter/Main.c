@@ -2,311 +2,229 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include "idlib_file_system.h"
 #include "Zeitgeist/Rendition.h"
 
-#if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
-	#define WIN32_LEAN_AND_MEAN
-	#include <Windows.h>
-	#include <strsafe.h>
-	#include <tchar.h>
-#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
-	#include <sys/types.h>
-	#include <dirent.h>
-	// strcmp
-	#include <string.h>
-#else
-	#error("operating system not (yet) supported")
-#endif
+typedef struct LoadRenditionsContext {
+  Shizu_State* state;
+  Shizu_List* list;
+  Shizu_String* prefix;
+} LoadRenditionsContext;
 
-static Zeitgeist_List*
+static bool loadRenditionsCallback(LoadRenditionsContext* context, char const* bytes, size_t numberOfBytes) {
+  Shizu_JumpTarget jumpTarget;
+  Shizu_State_pushJumpTarget(context->state, &jumpTarget);
+  bool result = true;
+  if (!setjmp(jumpTarget.environment)) {
+    Shizu_String* string = Shizu_String_create(context->state, bytes, numberOfBytes);
+    string = Shizu_String_concatenate(context->state, context->prefix, string);
+    Zeitgeist_Rendition* rendition = Zeitgeist_createRendition(context->state, string);
+    Shizu_List_appendObject(context->state, context->list, (Shizu_Object*)rendition);
+    Shizu_State_popJumpTarget(context->state);
+  } else {
+    Shizu_State_popJumpTarget(context->state);
+    return false;
+  }
+  return true;
+}
+
+static Shizu_List*
 loadRenditions
-	(
-		Zeitgeist_State* state
-	)
+  (
+    Shizu_State* state
+  )
 {
-	Zeitgeist_List* renditions = Zeitgeist_List_create(state);
-#if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
-	WIN32_FIND_DATA ffd;
-	TCHAR szDir[MAX_PATH];
-	StringCchCopy(szDir, MAX_PATH, TEXT("." RENDITION_DIRECTORY_SEPARATOR "Renditions"));
-	StringCchCat(szDir, MAX_PATH, TEXT(RENDITION_DIRECTORY_SEPARATOR "*"));
-	HANDLE hFind = INVALID_HANDLE_VALUE;
-	hFind = FindFirstFile(szDir, &ffd);
-	if (INVALID_HANDLE_VALUE == hFind) {
-		longjmp(state->jumpTarget->environment, -1);
-	}
-	Zeitgeist_JumpTarget jumpTarget;
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
-	if (!setjmp(jumpTarget.environment)) {
-		Zeitgeist_String* prefix = Zeitgeist_State_createString(state, "." RENDITION_DIRECTORY_SEPARATOR "Renditions" RENDITION_DIRECTORY_SEPARATOR,
-																														strlen("." RENDITION_DIRECTORY_SEPARATOR "Renditions" RENDITION_DIRECTORY_SEPARATOR));
-		do {
-			if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				if (!strcmp(ffd.cFileName, ".") || !strcmp(ffd.cFileName, "..")) {
-					continue;
-				}
-				Zeitgeist_String* suffix = Zeitgeist_State_createString(state, ffd.cFileName, strlen(ffd.cFileName));
-				Zeitgeist_String* path = Zeitgeist_String_concatenate(state, prefix, suffix);
-				Zeitgeist_Rendition* rendition = Zeitgeist_createRendition(state, path);
-				Zeitgeist_List_appendObject(state, renditions, (Zeitgeist_Object*)rendition);
-			}
-		} while (FindNextFile(hFind, &ffd) != 0);
-		Zeitgeist_State_popJumpTarget(state);
-		FindClose(hFind);
-		hFind = INVALID_HANDLE_VALUE;
-	} else {
-		Zeitgeist_State_popJumpTarget(state);
-		FindClose(hFind);
-		hFind = INVALID_HANDLE_VALUE;
-		longjmp(state->jumpTarget->environment, -1);
-	}
-#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
-	DIR* dir;
-	struct dirent* ent;
-	if ((dir = opendir("." RENDITION_DIRECTORY_SEPARATOR "Renditions")) != NULL) {
-		Zeitgeist_JumpTarget jumpTarget;
-		Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
-		if (!setjmp(jumpTarget.environment)) {
-			Zeitgeist_String* prefix = Zeitgeist_State_createString(state, "." RENDITION_DIRECTORY_SEPARATOR "Renditions" RENDITION_DIRECTORY_SEPARATOR,
-																															strlen("." RENDITION_DIRECTORY_SEPARATOR "Renditions" RENDITION_DIRECTORY_SEPARATOR));
-			while ((ent = readdir(dir)) != NULL) {
-			#if 0
-				fprintf(stdout, "%s (", ent->d_name);
-				switch (ent->d_type) {
-					case DT_BLK:
-						fprintf(stdout, "DB_BLK");
-						break;
-					case DT_CHR:
-						fprintf(stdout, "DT_CHR");
-						break;
-					case DT_DIR:
-						fprintf(stdout, "DT_DIR");
-						break;
-					case DT_FIFO:
-						fprintf(stdout, "DT_FIFO");
-						break;
-					case DT_LNK:
-						fprintf(stdout, "DT_LNK");
-						break;
-					case DT_REG:
-						fprintf(stdout, "DT_REG");
-						break;
-					case DT_SOCK:
-						fprintf(stdout, "DT_SOCK");
-						break;
-					case DT_UNKNOWN:
-						fprintf(stdout, "DT_UNKNOWN");
-						break;
-					default:
-						fprintf(stdout, "<unknown>");
-						break;
-				};
-				fprintf(stdout, ")\n");
-			#endif
-				if (ent->d_type == DT_DIR && (strcmp(ent->d_name, ".") && strcmp(ent->d_name, ".."))) {
-					Zeitgeist_String* suffix = Zeitgeist_State_createString(state, ent->d_name, strlen(ent->d_name));
-					Zeitgeist_String* path = Zeitgeist_String_concatenate(state, prefix, suffix);
-					Zeitgeist_Rendition* rendition = Zeitgeist_createRendition(state, path);
-					Zeitgeist_List_appendObject(state, renditions, (Zeitgeist_Object*)rendition);
-				}
-			}
-			Zeitgeist_State_popJumpTarget(state);
-			closedir(dir);
-			dir = NULL;
-		} else {
-			Zeitgeist_State_popJumpTarget(state);
-			closedir(dir);
-			dir = NULL;
-			longjmp(state->jumpTarget->environment, -1);
-		}
-	} else {
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
-	}
-#else
-	#error("operating system not (yet) supported")
-#endif
-	return renditions;
+  Shizu_List* renditions = Shizu_List_create(state);
+  LoadRenditionsContext context;
+  context.state = state;
+  context.list = renditions;
+  context.prefix = Shizu_String_create(state, "." Shizu_OperatingSystem_DirectorySeparator "Renditions" Shizu_OperatingSystem_DirectorySeparator,
+                                       strlen("." Shizu_OperatingSystem_DirectorySeparator "Renditions" Shizu_OperatingSystem_DirectorySeparator));
+  if (idlib_enumerate_files("." Shizu_OperatingSystem_DirectorySeparator "Renditions", &context, &loadRenditionsCallback, true, true)) {
+    Shizu_State_jump(state);
+  }
+  return renditions;
 }
 
 // command implementation: "--list-renditions"
 static void
 onListRenditions
-	(
-		Zeitgeist_State* state
-	)
+  (
+    Shizu_State* state
+  )
 {
-	Zeitgeist_List* renditions = loadRenditions(state);
-	Zeitgeist_Value size = Zeitgeist_List_getSize(state, renditions);
-	for (size_t i = 0, n = Zeitgeist_Value_getInteger(&size); i < n; ++i) {
-		Zeitgeist_Value value = Zeitgeist_List_getValue(state, renditions, i);
-		if (!Zeitgeist_Value_hasObject(&value)) {
-			state->lastError = 1;
-			longjmp(state->jumpTarget->environment, -1);
-		}
-		Zeitgeist_Rendition* rendition = (Zeitgeist_Rendition*)Zeitgeist_Value_getObject(&value);
-		Zeitgeist_String* name = Zeitgeist_Rendition_getName(state, rendition);
-		fprintf(stdout, "%zu) `%.*s`\n", i + 1, (int)name->numberOfBytes, name->bytes);
-	}
+  Shizu_List* renditions = loadRenditions(state);
+  Shizu_Value size = Shizu_List_getSize(state, renditions);
+  for (size_t i = 0, n = Shizu_Value_getInteger32(&size); i < n; ++i) {
+    Shizu_Value value = Shizu_List_getValue(state, renditions, i);
+    if (!Shizu_Value_isObject(&value)) {
+      Shizu_State_setError(state, 1);
+      Shizu_State_jump(state);
+    }
+    Zeitgeist_Rendition* rendition = (Zeitgeist_Rendition*)Shizu_Value_getObject(&value);
+    Shizu_String* name = Zeitgeist_Rendition_getName(state, rendition);
+    fprintf(stdout, "%zu) `%.*s`\n", i + 1, (int)Shizu_String_getNumberOfBytes(state, name), Shizu_String_getBytes(state, name));
+  }
 }
 
 static void
 onRendition1
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	)
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* rendition
+  )
 { 
-	Zeitgeist_String* renditionName = Zeitgeist_Rendition_getName(state, rendition);
-	Zeitgeist_ForeignProcedure* loadFunction = Zeitgeist_Rendition_getLoad(state, rendition);
-	if (!loadFunction) {
-		fprintf(stderr, "unable to acquire unload function of rendition `%.*s`\n", (int)renditionName->numberOfBytes, renditionName->bytes);
-		longjmp(state->jumpTarget->environment, -1);
-	}
-	Zeitgeist_ForeignProcedure* unloadFunction = Zeitgeist_Rendition_getUnload(state, rendition);
-	if (!unloadFunction) {
-		fprintf(stderr, "unable to acquire unload function of rendition `%.*s`\n", (int)renditionName->numberOfBytes, renditionName->bytes);
-		longjmp(state->jumpTarget->environment, -1);
-	}
-	Zeitgeist_ForeignProcedure* updateFunction = Zeitgeist_Rendition_getUpdate(state, rendition);
-	if (!updateFunction) {
-		fprintf(stderr, "unable to acquire update function of rendition `%.*s`\n", (int)renditionName->numberOfBytes, renditionName->bytes);
-		longjmp(state->jumpTarget->environment, -1);
-	}
-	(*loadFunction)(state);
-	Zeitgeist_JumpTarget jumpTarget1;
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget1);
-	if (!setjmp(jumpTarget1.environment)) {
-		Zeitgeist_Stack_pushObject(state, (Zeitgeist_Object*)rendition);
-		Zeitgeist_JumpTarget jumpTarget2;
-		Zeitgeist_State_pushJumpTarget(state, &jumpTarget2);
-		if (!setjmp(jumpTarget1.environment)) {
-			while (!Zeitgeist_State_isExitProcessRequested(state)) {
-				(*updateFunction)(state);
-				Zeitgeist_State_update(state);
-			}
-			Zeitgeist_State_popJumpTarget(state);
-			(*unloadFunction)(state);
-		} else {
-			Zeitgeist_State_popJumpTarget(state);
-			(*unloadFunction)(state);
-			longjmp(state->jumpTarget->environment, -1);
-		}
-		Zeitgeist_State_popJumpTarget(state);
-		Zeitgeist_Stack_pop(state);
-	} else {
-		Zeitgeist_State_popJumpTarget(state);
-		Zeitgeist_Stack_pop(state);
-		longjmp(state->jumpTarget->environment, -1);
-	}
+  Shizu_String* renditionName = Zeitgeist_Rendition_getName(state, rendition);
+  Shizu_CxxFunction* loadFunction = Zeitgeist_Rendition_getLoad(state, rendition);
+  if (!loadFunction) {
+    fprintf(stderr, "unable to acquire unload function of rendition `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, renditionName), Shizu_String_getBytes(state, renditionName));
+    Shizu_State_jump(state);
+  }
+  Shizu_CxxFunction* unloadFunction = Zeitgeist_Rendition_getUnload(state, rendition);
+  if (!unloadFunction) {
+    fprintf(stderr, "unable to acquire unload function of rendition `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, renditionName), Shizu_String_getBytes(state, renditionName));
+    Shizu_State_jump(state);
+  }
+  Shizu_CxxFunction* updateFunction = Zeitgeist_Rendition_getUpdate(state, rendition);
+  if (!updateFunction) {
+    fprintf(stderr, "unable to acquire update function of rendition `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, renditionName), Shizu_String_getBytes(state, renditionName));
+    Shizu_State_jump(state);
+  }
+  (*loadFunction)(state);
+  Shizu_JumpTarget jumpTarget1;
+  Shizu_State_pushJumpTarget(state, &jumpTarget1);
+  if (!setjmp(jumpTarget1.environment)) {
+    Shizu_Stack_pushObject(state, (Shizu_Object*)rendition);
+    Shizu_JumpTarget jumpTarget2;
+    Shizu_State_pushJumpTarget(state, &jumpTarget2);
+    if (!setjmp(jumpTarget1.environment)) {
+      while (!Shizu_State_getProcessExitRequested(state)) {
+        (*updateFunction)(state);
+        Shizu_Gc_run(state);
+      }
+      Shizu_State_popJumpTarget(state);
+      (*unloadFunction)(state);
+    } else {
+      Shizu_State_popJumpTarget(state);
+      (*unloadFunction)(state);
+      Shizu_State_jump(state);
+    }
+    Shizu_State_popJumpTarget(state);
+    Shizu_Stack_pop(state);
+  } else {
+    Shizu_State_popJumpTarget(state);
+    Shizu_Stack_pop(state);
+    Shizu_State_jump(state);
+  }
 }
 
 // command implementation: "--rendition <name>"
 static void
 onRendition
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_String* renditionName
-	)
+  (
+    Shizu_State* state,
+    Shizu_String* renditionName
+  )
 { 
-	Zeitgeist_List* loadedRenditions = loadRenditions(state);
-	Zeitgeist_Value size = Zeitgeist_List_getSize(state, loadedRenditions);
-	for (size_t i = 0, n = Zeitgeist_Value_getInteger(&size); i < n; ++i) {
-		Zeitgeist_Value value = Zeitgeist_List_getValue(state, loadedRenditions, i);
-		if (!Zeitgeist_Value_hasObject(&value)) {
-			state->lastError = 1;
-			longjmp(state->jumpTarget->environment, -1);
-		}
-		Zeitgeist_Rendition* loadedRendition = (Zeitgeist_Rendition*)Zeitgeist_Value_getObject(&value);
-		Zeitgeist_String* loadedRenditionName = Zeitgeist_Rendition_getName(state, loadedRendition);
-		if (Zeitgeist_String_areEqual(state, renditionName, loadedRenditionName)) {
-			onRendition1(state, loadedRendition);
-		}
-	}
+  Shizu_List* loadedRenditions = loadRenditions(state);
+  Shizu_Value size = Shizu_List_getSize(state, loadedRenditions);
+  for (size_t i = 0, n = Shizu_Value_getInteger32(&size); i < n; ++i) {
+    Shizu_Value value = Shizu_List_getValue(state, loadedRenditions, i);
+    if (!Shizu_Value_isObject(&value)) {
+      Shizu_State_setError(state, 1);
+      Shizu_State_jump(state);
+    }
+    Zeitgeist_Rendition* loadedRendition = (Zeitgeist_Rendition*)Shizu_Value_getObject(&value);
+    Shizu_String* loadedRenditionName = Zeitgeist_Rendition_getName(state, loadedRendition);
+    if (Shizu_String_isEqualTo(state, renditionName, loadedRenditionName)) {
+      onRendition1(state, loadedRendition);
+    }
+  }
 }
 
 static void
 onHelp
-	(
-		Zeitgeist_State* state
-	)
+  (
+    Shizu_State* state
+  )
 {
-	fprintf(stdout, "usage: zeitgeist-interpreter [--rendition <name> ] [--list-renditions] [--help]\n");
-	fprintf(stdout, "--rendition <name> Execute rendition by its name\n");
-	fprintf(stdout, "--list-renditions List names of all available renditions\n");
-	fprintf(stdout, "--help Show this help\n");
+  fprintf(stdout, "usage: zeitgeist-interpreter [--rendition <name> ] [--list-renditions] [--help]\n");
+  fprintf(stdout, "--rendition <name> Execute rendition by its name\n");
+  fprintf(stdout, "--list-renditions List names of all available renditions\n");
+  fprintf(stdout, "--help Show this help\n");
 }
 
 static void
 main1
-	(
-		Zeitgeist_State* state,
-		int argc,
-		char** argv
-	)
+  (
+    Shizu_State* state,
+    int argc,
+    char** argv
+  )
 {
-	Zeitgeist_String* listRenditions = Zeitgeist_State_createString(state, "--list-renditions", strlen("--list-renditions"));
-	Zeitgeist_String* rendition = Zeitgeist_State_createString(state, "--rendition", strlen("--rendition"));
-	Zeitgeist_String* help = Zeitgeist_State_createString(state, "--help", strlen("--help"));
-	if (argc < 2) {
-		fprintf(stderr, "error: no command specified\n");
-		longjmp(state->jumpTarget->environment, -1);
-	}
-	for (int argi = 1; argi < argc; ++argi) {
-		Zeitgeist_String* arg = Zeitgeist_State_createString(state, argv[argi], strlen(argv[argi]));
-		if (arg->numberOfBytes > 128) {
-			fprintf(stderr, "error: command `%.*s` too long\n", (int)64, arg->bytes);
-			longjmp(state->jumpTarget->environment, -1);
-		}
-		if (Zeitgeist_String_areEqual(state, arg, listRenditions)) {
-			if (argc != 2) {
-				fprintf(stderr, "error: unknown arguments to command `%.*s`\n", (int)arg->numberOfBytes, arg->bytes);
-				longjmp(state->jumpTarget->environment, -1);
-			}
-			fprintf(stdout, "listing renditions\n");
-			onListRenditions(state);
-			break;
-		} else if (Zeitgeist_String_areEqual(state, arg, rendition)) {
-			if (argc != 3) {
-				fprintf(stderr, "error: missing argument for command `%.*s`\n", (int)arg->numberOfBytes, arg->bytes);
-				longjmp(state->jumpTarget->environment, -1);
-			}
-			fprintf(stdout, "executing rendition\n");
-			onRendition(state, Zeitgeist_State_createString(state, argv[argi + 1], strlen(argv[argi + 1])));
-			break;
-		} else if (Zeitgeist_String_areEqual(state, arg, help)) {
-			onHelp(state);
-			state->exitProcessRequested = Zeitgeist_Boolean_True;
-		} else {
-			fprintf(stderr, "error: unknown command `%.*s`\n", (int)arg->numberOfBytes, arg->bytes);
-			longjmp(state->jumpTarget->environment, -1);
-		}
-	}
+  Shizu_String* listRenditions = Shizu_String_create(state, "--list-renditions", strlen("--list-renditions"));
+  Shizu_String* rendition = Shizu_String_create(state, "--rendition", strlen("--rendition"));
+  Shizu_String* help = Shizu_String_create(state, "--help", strlen("--help"));
+  if (argc < 2) {
+    fprintf(stderr, "error: no command specified\n");
+    Shizu_State_jump(state);
+  }
+  for (int argi = 1; argi < argc; ++argi) {
+    Shizu_String* arg = Shizu_String_create(state, argv[argi], strlen(argv[argi]));
+    if (Shizu_String_getNumberOfBytes(state, arg) > 128) {
+      fprintf(stderr, "error: command `%.*s` too long\n", (int)64, Shizu_String_getBytes(state, arg));
+      Shizu_State_jump(state);
+    }
+    if (Shizu_String_isEqualTo(state, arg, listRenditions)) {
+      if (argc != 2) {
+        fprintf(stderr, "error: unknown arguments to command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
+        Shizu_State_jump(state);
+      }
+      fprintf(stdout, "listing renditions\n");
+      onListRenditions(state);
+      break;
+    } else if (Shizu_String_isEqualTo(state, arg, rendition)) {
+      if (argc != 3) {
+        fprintf(stderr, "error: missing argument for command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
+        Shizu_State_jump(state);
+      }
+      fprintf(stdout, "executing rendition\n");
+      onRendition(state, Shizu_String_create(state, argv[argi + 1], strlen(argv[argi + 1])));
+      break;
+    } else if (Shizu_String_isEqualTo(state, arg, help)) {
+      onHelp(state);
+      Shizu_State_setProcessExitRequested(state, Shizu_Boolean_True);
+    } else {
+      fprintf(stderr, "error: unknown command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
+      Shizu_State_jump(state);
+    }
+  }
 }
 
 int
 main
-	(
-		int argc,
-		char** argv
-	)
+  (
+    int argc,
+    char** argv
+  )
 {
-	Zeitgeist_State* state = Zeitgeist_createState();
-	if (!state) {
-		return EXIT_FAILURE;
-	}
-	int exitCode = EXIT_SUCCESS;
-	Zeitgeist_JumpTarget jumpTarget;
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
-	if (!setjmp(jumpTarget.environment)) {
-		main1(state, argc, argv);
-		exitCode = EXIT_SUCCESS;
-		Zeitgeist_State_popJumpTarget(state);
-	} else {
-		exitCode = EXIT_FAILURE;
-		Zeitgeist_State_popJumpTarget(state);
-	}
-	Zeitgeist_State_destroy(state);
-	state = NULL;
-	return exitCode;
+  Shizu_State* state = NULL;
+  if (Shizu_State_create(&state)) {
+    return EXIT_FAILURE;
+  }
+  int exitCode = EXIT_SUCCESS;
+  Shizu_JumpTarget jumpTarget;
+  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  if (!setjmp(jumpTarget.environment)) {
+    main1(state, argc, argv);
+    exitCode = EXIT_SUCCESS;
+    Shizu_State_popJumpTarget(state);
+  } else {
+    exitCode = EXIT_FAILURE;
+    Shizu_State_popJumpTarget(state);
+  }
+  Shizu_State_destroy(state);
+  state = NULL;
+  return exitCode;
 }

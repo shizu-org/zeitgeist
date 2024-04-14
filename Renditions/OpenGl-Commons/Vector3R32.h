@@ -4,26 +4,27 @@
 #include "Zeitgeist.h"
 #include "idlib-math.h"
 
-Zeitgeist_ObjectType_Declare(Vector3R32)
+extern Shizu_TypeDescriptor const Vector3R32_Type;
+Shizu_declareType(Vector3R32)
 
 typedef struct Vector3R32 {
-	Zeitgeist_Object _parent;
+	Shizu_Object _parent;
 	idlib_vector_3_f32 v;
 } Vector3R32;
 
 Vector3R32*
 Vector3R32_create
 	(
-		Zeitgeist_State* state,
-		Zeitgeist_Real32 x,
-		Zeitgeist_Real32 y,
-		Zeitgeist_Real32 z
+		Shizu_State* state,
+		Shizu_Float32 x,
+		Shizu_Float32 y,
+		Shizu_Float32 z
 	);
 
 Vector3R32*
 Vector3R32_add
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		Vector3R32* left,
 		Vector3R32* right
 	);
@@ -31,7 +32,7 @@ Vector3R32_add
 Vector3R32*
 Vector3R32_subtract
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		Vector3R32* left,
 		Vector3R32* right
 	);

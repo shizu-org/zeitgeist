@@ -5,84 +5,85 @@
 #include "idlib-math.h"
 typedef struct Vector3R32 Vector3R32;
 
-Zeitgeist_ObjectType_Declare(Matrix4R32)
+extern Shizu_TypeDescriptor const Matrix4R32_Type;
+Shizu_declareType(Matrix4R32)
 
 struct Matrix4R32 {
-  Zeitgeist_Object _parent;
+  Shizu_Object _parent;
   idlib_matrix_4x4_f32 m;
 };
 
 Matrix4R32*
 Matrix4R32_createIdentity
-	(
-		Zeitgeist_State* state
-	);
+  (
+    Shizu_State* state
+  );
 
 Matrix4R32*
 Matrix4R32_createTranslate
-	(
-		Zeitgeist_State* state,
-		Vector3R32* translation
-	);
+  (
+    Shizu_State* state,
+    Vector3R32* translation
+  );
 
 Matrix4R32*
 Matrix4R32_createRotateY
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Real32 degrees
-	);
+  (
+    Shizu_State* state,
+    Shizu_Float32 degrees
+  );
 
 Matrix4R32*
 Matrix4R32_createPerspective
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Real32 fieldOfViewY,
-		Zeitgeist_Real32 aspectRatio,
-		Zeitgeist_Real32 near,
-		Zeitgeist_Real32 far
-	);
+  (
+    Shizu_State* state,
+    Shizu_Float32 fieldOfViewY,
+    Shizu_Float32 aspectRatio,
+    Shizu_Float32 near,
+    Shizu_Float32 far
+  );
 
 Matrix4R32*
 Matrix4R32_createOrthographic
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Real32 left,
-		Zeitgeist_Real32 right,
-		Zeitgeist_Real32 bottom,
-		Zeitgeist_Real32 top,
-		Zeitgeist_Real32 near,
-		Zeitgeist_Real32 far
-	);
+  (
+    Shizu_State* state,
+    Shizu_Float32 left,
+    Shizu_Float32 right,
+    Shizu_Float32 bottom,
+    Shizu_Float32 top,
+    Shizu_Float32 near,
+    Shizu_Float32 far
+  );
 
 Matrix4R32*
 Matrix4R32_createLookAt
-	(
-		Zeitgeist_State* state,
-		Vector3R32* source,
-		Vector3R32* target,
-		Vector3R32* up
-	);
+  (
+    Shizu_State* state,
+    Vector3R32* source,
+    Vector3R32* target,
+    Vector3R32* up
+  );
 
 Matrix4R32*
 Matrix4R32_createScale
-	(
-		Zeitgeist_State* state,
-		Vector3R32* scale
-	);
+  (
+    Shizu_State* state,
+    Vector3R32* scale
+  );
 
 Matrix4R32*
 Matrix4R32_negate
-	(
-		Zeitgeist_State* state,
-		Matrix4R32* matrix
-	);
+  (
+    Shizu_State* state,
+    Matrix4R32* matrix
+  );
 
 Matrix4R32*
 Matrix4R32_multiply
-	(
-		Zeitgeist_State* state,
-		Matrix4R32* operand1,
-		Matrix4R32* operand2
-	);
+  (
+    Shizu_State* state,
+    Matrix4R32* operand1,
+    Matrix4R32* operand2
+  );
 
 #endif // MATRIX4R32_H_INCLUDED

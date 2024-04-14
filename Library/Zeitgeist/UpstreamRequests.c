@@ -7,32 +7,36 @@
 // malloc, free
 #include <malloc.h>
 
-Zeitgeist_ObjectType const g_Zeitgeist_UpstreamRequest_Type = {
-  .name = "Zeitgeist.UpstreamRequest",
-  .parentType = &g_Zeitgeist_Object_Type,
-  .destruct = NULL,
+Shizu_defineType(Zeitgeist_UpstreamRequest, Shizu_Object);
+
+Shizu_TypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
+  .staticInitialize = NULL,
+  .staticFinalize = NULL,
+  .staticVisit = NULL,
+  .finalize = NULL,
   .visit = NULL,
 };
 
 Zeitgeist_UpstreamRequest*
 Zeitgeist_UpstreamRequest_createExitProcessRequest
   (
-    Zeitgeist_State* state
+    Shizu_State* state
   )
 {
-  Zeitgeist_UpstreamRequest* self = Zeitgeist_allocateObject(state, sizeof(Zeitgeist_UpstreamRequest), NULL, NULL);
+  Zeitgeist_UpstreamRequest* self = (Zeitgeist_UpstreamRequest*)Shizu_Gc_allocate(state, sizeof(Zeitgeist_UpstreamRequest));
   self->type = Zeitgeist_UpstreamRequestType_ExitProcessRequest;
+  ((Shizu_Object*)self)->type = Zeitgeist_UpstreamRequest_getType(state);
   return self;
 }
 
 void
 Zeitgeist_sendUpstreamRequest
   (
-    Zeitgeist_State* state,
+    Shizu_State* state,
     Zeitgeist_UpstreamRequest* request
   )
 { 
   if (Zeitgeist_UpstreamRequestType_ExitProcessRequest == request->type) {
-    state->exitProcessRequested = true;
+    Shizu_State_setProcessExitRequested(state, Shizu_Boolean_True);
   }
 }

@@ -1,20 +1,24 @@
 #include "KeyboardKeyMessage.h"
 
-Zeitgeist_ObjectType const g_KeyboardKeyMessage_Type = {
-	.name = "KeyboardKeyMessage",
-	.parentType = &g_Zeitgeist_Object_Type,
-	.destruct = NULL,
+Shizu_TypeDescriptor const KeyboardKeyMessage_Type = {
+	.staticInitialize = NULL,
+	.staticFinalize = NULL,
+	.staticVisit = NULL,
+	.finalize = NULL,
+	.visit = NULL,
 };
+
+Shizu_defineType(KeyboardKeyMessage, Shizu_Object);
 
 KeyboardKeyMessage*
 KeyboardKeyMessage_create
 	(
-		Zeitgeist_State* state,
-		Zeitgeist_Integer action,
-		Zeitgeist_Integer key
+		Shizu_State* state,
+		Shizu_Integer32 action,
+		Shizu_Integer32 key
 	)
 {
-	KeyboardKeyMessage* self = Zeitgeist_allocateObject(state, sizeof(KeyboardKeyMessage), NULL, NULL);
+	KeyboardKeyMessage* self = (KeyboardKeyMessage*)Shizu_Gc_allocate(state, sizeof(KeyboardKeyMessage));
 
 	self->action = action;
 	self->key = key;
@@ -22,26 +26,26 @@ KeyboardKeyMessage_create
 	return self;
 }
 
-Zeitgeist_Integer
+Shizu_Integer32
 KeyboardKeyMessage_getAction
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		KeyboardKeyMessage* self
 	)
 {
-	cDebugAssert(NULL != state);
-	cDebugAssert(NULL != self);
+	Shizu_debugAssert(NULL != state);
+	Shizu_debugAssert(NULL != self);
 	return self->action;
 }
 
-Zeitgeist_Integer
+Shizu_Integer32
 KeyboardKeyMessage_getKey
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		KeyboardKeyMessage* self
 	)
 {
-	cDebugAssert(NULL != state);
-	cDebugAssert(NULL != self);
+	Shizu_debugAssert(NULL != state);
+	Shizu_debugAssert(NULL != self);
 	return self->key;
 }

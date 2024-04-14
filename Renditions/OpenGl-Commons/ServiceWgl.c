@@ -12,14 +12,6 @@
 #include "ServiceGl.h"
 #include "KeyboardKeyMessage.h"
 
-// ServiceGl_emitMouseButtonMessage
-//#include "ServiceGl.h"
-//#include "MouseButtonMessage.h"
-
-// ServiceGl_emitPointerMessage
-//#include "ServiceGl.h"
-//#include "MousePointerMessage.h"
-
 #if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
 
 	#define WIN32_LEAN_AND_MEAN
@@ -91,7 +83,7 @@ static bool g_quitRequested = false;
 static void
 createIcon
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		HICON* RETURN,
 		COLORREF color,
 		int width,
@@ -101,7 +93,7 @@ createIcon
 static void
 createIcons
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		HWND hWnd,
 		COLORREF color
 	);
@@ -109,7 +101,7 @@ createIcons
 static void
 destroyIcons
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 // Helper to check for extension string presence.	Adapted from:
@@ -130,7 +122,7 @@ windowCallbackLegacy
 		LPARAM lparam
 	);
 
-static Zeitgeist_Value
+static Shizu_Value
 mapKeyboardKey
 	(
 		WPARAM wParam
@@ -148,43 +140,43 @@ windowCallback
 static void
 choosePixelFormatLegacy
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 void
 choosePixelFormat
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 static void
 shutdownLegacy
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 static void
 startupLegacy
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 static void
 shutdown
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 static void
 startup
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	);
 
 static void
 createIcon
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		HICON* RETURN,
 		COLORREF color,
 		int width,
@@ -194,7 +186,8 @@ createIcon
 	// Obtain a handle to the screen device context.
 	HDC hdcScreen = GetDC(NULL);
 	if (!hdcScreen) {
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 
 	// Create a memory device context, which we will draw into.
@@ -202,7 +195,8 @@ createIcon
 	if (!hdcMem) {
 		ReleaseDC(NULL, hdcScreen);
 		hdcScreen = NULL;
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 
 	// Create the bitmap, and select it into the device context for drawing.
@@ -212,7 +206,8 @@ createIcon
 		hdcMem = NULL;
 		ReleaseDC(NULL, hdcScreen);
 		hdcScreen = NULL;
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	HBITMAP hbmpOld = (HBITMAP)SelectObject(hdcMem, hbmp);
 
@@ -254,7 +249,7 @@ createIcon
 static void
 createIcons
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		HWND hWnd,
 		COLORREF color
 	)
@@ -267,23 +262,24 @@ createIcons
 
 	// Create small icon.
 	size = GetSystemMetrics(SM_CXSMICON);
-	Zeitgeist_JumpTarget jumpTarget;
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_JumpTarget jumpTarget;
+	Shizu_State_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		createIcon(state, &g_hSmallIcon, color, size, size);
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 	} else {
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 		DestroyIcon(g_hBigIcon);
 		g_hBigIcon = NULL;
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 }
 
 static void
 destroyIcons
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
 	if (g_hSmallIcon) {
@@ -346,7 +342,7 @@ windowCallbackLegacy
 	return DefWindowProc(wnd, msg, wparam, lparam);
 }
 
-static Zeitgeist_Value
+static Shizu_Value
 mapKeyboardKey
 	(
 		WPARAM wParam
@@ -355,64 +351,64 @@ mapKeyboardKey
 	// https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 	switch (wParam) {
 		case VK_UP: {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_Up);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_Up);
 			return value;
 		} break;
 		case VK_DOWN: {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_Down);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_Down);
 			return value;
 		} break;
 		case VK_LEFT: {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_Left);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_Left);
 			return value;
 		} break;
 		case VK_RIGHT: {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_Right);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_Right);
 			return value;
 		} break;
 		case VK_ESCAPE: {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_Escape);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_Escape);
 			return value;
 		} break;
 		case 0x51: /*Q*/ {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_Q);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_Q);
 			return value;
 		} break;
 		case 0x45: /*E*/ {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_E);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_E);
 			return value;
 		} break;
 		case 0x57: /*W*/ {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_W);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_W);
 			return value;
 		} break;
 		case 0x41: /*A*/ {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_A);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_A);
 			return value;
 		} break;
 		case 0x53: /*S*/ {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_S);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_S);
 			return value;
 		} break;
 		case 0x44: /*D*/ {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setInteger(&value, KeyboardKey_D);
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_D);
 			return value;
 		} break;
 
 		default: {
-			Zeitgeist_Value value;
-			Zeitgeist_Value_setVoid(&value, Zeitgeist_Void_Void);
+			Shizu_Value value;
+			Shizu_Value_setVoid(&value, Shizu_Void_Void);
 			return value;
 		} break;
 	};
@@ -433,7 +429,7 @@ windowCallback
 			if (!pCreateStruct) {
 				return -1;
 			}
-			Zeitgeist_State* state = (Zeitgeist_State*)pCreateStruct->lpCreateParams;
+			Shizu_State* state = (Shizu_State*)pCreateStruct->lpCreateParams;
 			if (!SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)state)) {
 				if (GetLastError()) {
 					return -1;
@@ -447,38 +443,38 @@ windowCallback
 		} break;
 		case WM_KEYDOWN: {
 			//fprintf(stdout, "[service wgl] WM_KEYDOWN\n");
-			Zeitgeist_State* state = (Zeitgeist_State*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			Shizu_State* state = (Shizu_State*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (state) {
-				Zeitgeist_JumpTarget jumpTarget;
-				Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+				Shizu_JumpTarget jumpTarget;
+				Shizu_State_pushJumpTarget(state, &jumpTarget);
 				if (!setjmp(jumpTarget.environment)) {
-					Zeitgeist_Value mappedKey = mapKeyboardKey(wParam);
-					if (Zeitgeist_Value_hasInteger(&mappedKey)) {
-						KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Pressed, Zeitgeist_Value_getInteger(&mappedKey));
+					Shizu_Value mappedKey = mapKeyboardKey(wParam);
+					if (Shizu_Value_isInteger32(&mappedKey)) {
+						KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Pressed, Shizu_Value_getInteger32(&mappedKey));
 						ServiceGl_emitKeyboardKeyMessage(state, message);
 					}
-					Zeitgeist_State_popJumpTarget(state);
+					Shizu_State_popJumpTarget(state);
 				} else {
-					Zeitgeist_State_popJumpTarget(state);
+					Shizu_State_popJumpTarget(state);
 				}
 			}
 			return 0;
 		} break;
 		case WM_KEYUP: {
 			//fprintf(stdout, "[service wgl] WM_KEYUP\n");
-			Zeitgeist_State* state = (Zeitgeist_State*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			Shizu_State* state = (Shizu_State*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (state) {
-				Zeitgeist_JumpTarget jumpTarget;
-				Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+				Shizu_JumpTarget jumpTarget;
+				Shizu_State_pushJumpTarget(state, &jumpTarget);
 				if (!setjmp(jumpTarget.environment)) {
-					Zeitgeist_Value mappedKey = mapKeyboardKey(wParam);
-					if (Zeitgeist_Value_hasInteger(&mappedKey)) {
-						KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Released, Zeitgeist_Value_getInteger(&mappedKey));
+					Shizu_Value mappedKey = mapKeyboardKey(wParam);
+					if (Shizu_Value_isInteger32(&mappedKey)) {
+						KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Released, Shizu_Value_getInteger32(&mappedKey));
 						ServiceGl_emitKeyboardKeyMessage(state, message);
 					}
-					Zeitgeist_State_popJumpTarget(state);
+					Shizu_State_popJumpTarget(state);
 				} else {
-					Zeitgeist_State_popJumpTarget(state);
+					Shizu_State_popJumpTarget(state);
 				}
 			}
 			return 0;
@@ -494,7 +490,7 @@ windowCallback
 static void
 choosePixelFormatLegacy
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
 	PIXELFORMATDESCRIPTOR descriptor;
@@ -507,25 +503,25 @@ choosePixelFormatLegacy
 	int pixelFormat = ChoosePixelFormat(g_hDc, &descriptor);
 	if (!pixelFormat) {
 		//
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	if (!DescribePixelFormat(g_hDc, pixelFormat, sizeof(descriptor), &descriptor)) {
 		//
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	if (!SetPixelFormat(g_hDc, pixelFormat, &descriptor)) {
 		//
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 }
 
 void
 choosePixelFormat
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 { 
 	int samples = 0;
@@ -544,24 +540,24 @@ choosePixelFormat
 	};
 	int i, n;
 	if (!wglChoosePixelFormatARB(g_hDc, pixelFormatAttribs, 0, 1, &i, &n)) {
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	PIXELFORMATDESCRIPTOR desc;
 	if (!DescribePixelFormat(g_hDc, i, sizeof(desc), &desc)) {
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	if (!SetPixelFormat(g_hDc, i, &desc)) {
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 }
 
 static void
 shutdownLegacy
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
 	wglCreateContextAttribsARB = NULL;
@@ -574,22 +570,22 @@ shutdownLegacy
 static void
 startupLegacy
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
-	Zeitgeist_JumpTarget jumpTarget;
+	Shizu_JumpTarget jumpTarget;
 
 	g_hInstance = GetModuleHandle(NULL);
 	if (!g_hInstance) {
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	g_className = _strdup("windowClassLegacy");
 	if (!g_className) {
 		g_hInstance = NULL;
 		//
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	WNDCLASSEX wcex;
@@ -613,8 +609,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	g_hWnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE,
 		 										  g_className,
@@ -638,17 +634,17 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		state->lastError = 1;
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	//
 	COLORREF color = RGB(0, 0, 0);
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		createIcons(state, g_hWnd, color);
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 	} else {
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 		//
 		DestroyWindow(g_hWnd);
 		g_hWnd = NULL;
@@ -661,7 +657,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	SendMessage(g_hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hBigIcon);
 	SendMessage(g_hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hSmallIcon);
@@ -682,14 +679,15 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		choosePixelFormatLegacy(state);
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 	} else {
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 		//
 		ReleaseDC(g_hWnd, g_hDc);
 		g_hDc = NULL;
@@ -707,7 +705,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	g_hGlrc = wglCreateContext(g_hDc);
 	if (!g_hGlrc) {
@@ -728,7 +727,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	if (!wglMakeCurrent(g_hDc, g_hGlrc)) {
 		//
@@ -751,7 +751,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	//
 	wglGetPixelFormatAttribivARB = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribivARB");
@@ -776,7 +777,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	wglGetPixelFormatAttribfvARB = (PFNWGLGETPIXELFORMATATTRIBFVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribfvARB");
 	if (!wglGetPixelFormatAttribfvARB) {
@@ -801,7 +803,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
 	if (!wglGetPixelFormatAttribfvARB) {
@@ -827,7 +830,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
 	if (!wglGetPixelFormatAttribfvARB) {
@@ -854,7 +858,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
 	if (!wglCreateContextAttribsARB) {
@@ -881,7 +886,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	//
 	wglDeleteContext(g_hGlrc);
@@ -905,7 +911,7 @@ startupLegacy
 static void
 shutdown
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 { 
 	if (g_hGlrc) {
@@ -943,16 +949,17 @@ shutdown
 static void
 startup
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
-	Zeitgeist_JumpTarget jumpTarget;
+	Shizu_JumpTarget jumpTarget;
 
 	g_hInstance = GetModuleHandle(NULL);
 	if (!g_hInstance) {
 		shutdownLegacy(state);
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	g_className = _strdup("windowClass");
 	if (!g_className) {
@@ -960,7 +967,8 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	WNDCLASSEX wcex;
@@ -986,7 +994,8 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	g_hWnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE,
 													g_className,
@@ -1012,16 +1021,17 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	//
 	COLORREF color = RGB(0, 0, 0);
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		createIcons(state, g_hWnd, color);
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 	} else {
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 		//
 		DestroyWindow(g_hWnd);
 		g_hWnd = NULL;
@@ -1034,7 +1044,8 @@ startup
 		//
 		g_hInstance = NULL;
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	SendMessage(g_hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hBigIcon);
 	SendMessage(g_hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hSmallIcon);
@@ -1057,15 +1068,16 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	//
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		choosePixelFormat(state);
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 	} else {
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 		//
 		ReleaseDC(g_hWnd, g_hDc);
 		g_hDc = NULL;
@@ -1085,7 +1097,8 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	//
 	ShowWindow(g_hWnd, SW_SHOW);
@@ -1118,7 +1131,8 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	if (!wglMakeCurrent(g_hDc, g_hGlrc)) {
 		//
@@ -1143,27 +1157,28 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 }
 
 void
 ServiceWgl_startup
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
 	fprintf(stdout, "[Hello World (OpenGL)] starting up WGL service\n");
 	startupLegacy(state);
-	Zeitgeist_JumpTarget jumpTarget;
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_JumpTarget jumpTarget;
+	Shizu_State_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		startup(state);
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 	} else {
-		Zeitgeist_State_popJumpTarget(state);
+		Shizu_State_popJumpTarget(state);
 		shutdownLegacy(state);
-		longjmp(state->jumpTarget->environment, -1);
+		Shizu_State_jump(state);
 	}
 	g_quitRequested = false;
 }
@@ -1171,7 +1186,7 @@ ServiceWgl_startup
 void
 ServiceWgl_shutdown
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
  	)
 {
 	fprintf(stdout, "[Hello World (OpenGL)] shutting down WGL service\n");
@@ -1182,19 +1197,19 @@ ServiceWgl_shutdown
 void
 ServiceWgl_setTitle
 	(
-		Zeitgeist_State* state,
-		Zeitgeist_String* title
+		Shizu_State* state,
+		Shizu_String* title
 	)
 {
-	Zeitgeist_String* zeroTerminator = Zeitgeist_State_createString(state, "", 1);
-	title = Zeitgeist_String_concatenate(state, title, zeroTerminator);
-	SetWindowText(g_hWnd, title->bytes);
+	Shizu_String* zeroTerminator = Shizu_String_create(state, "", 1);
+	title = Shizu_String_concatenate(state, title, zeroTerminator);
+	SetWindowText(g_hWnd, Shizu_String_getBytes(state, title));
 }
 
 void
 ServiceWgl_update
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
 	MSG message;
@@ -1208,19 +1223,19 @@ ServiceWgl_update
 	}
 }
 
-Zeitgeist_Boolean
+Shizu_Boolean
 ServiceWgl_quitRequested
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 { return g_quitRequested; }
 
 void
 ServiceWgl_getClientSize
 	(
-		Zeitgeist_State* state,
-		Zeitgeist_Integer *width,
-		Zeitgeist_Integer *height
+		Shizu_State* state,
+		Shizu_Integer32 *width,
+		Shizu_Integer32 *height
 	)
 {
 	RECT rectangle;
@@ -1232,7 +1247,7 @@ ServiceWgl_getClientSize
 void*
 ServiceWgl_link
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		char const* functionName,
 		char const* extensionName
 	)
@@ -1240,12 +1255,14 @@ ServiceWgl_link
 	if (extensionName) {
 		char const* extensionNames = wglGetExtensionsStringARB(g_hDc);
 		if (!isExtensionSupported(extensionNames, extensionName)) {
-			Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+			Shizu_State_setError(state, 1);
+			Shizu_State_jump(state);
 		}
 	}
 	void* p = wglGetProcAddress(functionName);
 	if (!p) {
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	return p;
 }
@@ -1253,14 +1270,14 @@ ServiceWgl_link
 void
 ServiceWgl_beginFrame
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {/*Intentionally empty.*/}
 
 void
 ServiceWgl_endFrame
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
 	SwapBuffers(g_hDc);

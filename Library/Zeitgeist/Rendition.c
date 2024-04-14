@@ -13,247 +13,183 @@
 // fprintf, stdio
 #include <stdio.h>
 
-#if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
-	static void* getRenditionLibrarySymbol(HMODULE libraryHandle, char const *symbolName) {
-		return GetProcAddress(libraryHandle, symbolName);
-	} 
-#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
-	static void* getRenditionLibrarySymbol(void* libraryHandle, char const* symbolName) {
-		return dlsym(libraryHandle, symbolName);
-	}
-#else
-	#error("operating system not (yet) supported")
-#endif
-
-static void
-Zeitgeist_Rendition_destruct
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	);
-
 static void
 Zeitgeist_Rendition_finalize
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	);
-
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* rendition
+  );
 
 static void
 Zeitgeist_Rendition_visit
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	);
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* rendition
+  );
 
-Zeitgeist_ObjectType const g_Rendition_Type = {
-	.name = "Rendition",
-	.parentType = &g_Zeitgeist_Object_Type,
-	.destruct = (void(*)(Zeitgeist_State*,Zeitgeist_Object*))&Zeitgeist_Rendition_destruct,
-	.visit = (void(*)(Zeitgeist_State*,Zeitgeist_Object*))&Zeitgeist_Rendition_visit,
+Shizu_defineType(Zeitgeist_Rendition, Shizu_Object);
+
+Shizu_TypeDescriptor const Zeitgeist_Rendition_Type = {
+  .staticInitialize = NULL,
+  .staticFinalize = NULL,
+  .staticVisit = NULL,
+  .finalize = (Shizu_OnFinalizeCallback*)&Zeitgeist_Rendition_finalize,
+  .visit = (Shizu_OnVisitCallback*)&Zeitgeist_Rendition_visit,
 };
 
 static void
-Zeitgeist_Rendition_destruct
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* self
-	)
-{
-	if (self->libraryHandle) {
-	#if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
-		FreeModule(self->libraryHandle);
-		self->libraryHandle = NULL;
-	#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
-		dlclose(self->libraryHandle);
-		self->libraryHandle = NULL;
-	#else
-		#error("operating system not (yet) supported")
-	#endif
-	}
-}
-
-static void
 Zeitgeist_Rendition_finalize
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	)
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* self
+  )
 { 
-	if (rendition->libraryHandle) {
-	#if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
-		FreeModule(rendition->libraryHandle);
-		rendition->libraryHandle = NULL;
-	#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
-		dlclose(rendition->libraryHandle);
-		rendition->libraryHandle = NULL;
-	#else
-		#error("operating system not (yet) supported")
-	#endif
-	}
+  if (self->dll) {
+    Shizu_Dll_unref(state, self->dll);
+    self->dll = NULL;
+  }
 }
 
 static void
 Zeitgeist_Rendition_visit
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	)
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* self
+  )
 {
-	if (rendition->folderPath) {
-		Zeitgeist_String_visit(state, rendition->folderPath);
-	}
+  if (self->folderPath) {
+    Shizu_Gc_visitObject(state, (Shizu_Object*)self->folderPath);
+  }
 }
 
 static void
 Zeitgeist_Rendition_ensureLibraryLoaded
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	)
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* self
+  )
 {
-#if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
-	if (!rendition->libraryHandle) {
-		Zeitgeist_String* zeroTerminator = Zeitgeist_State_createString(state, "", sizeof(char));
-		Zeitgeist_String* libraryPath = Zeitgeist_State_createString(state, RENDITION_DIRECTORY_SEPARATOR "library" RENDITION_EXTENSION,
-			strlen(RENDITION_DIRECTORY_SEPARATOR "library" RENDITION_EXTENSION));
-		libraryPath = Zeitgeist_String_concatenate(state, rendition->folderPath, libraryPath);
-		libraryPath = Zeitgeist_String_concatenate(state, libraryPath, zeroTerminator);
-		rendition->libraryHandle = LoadLibrary(libraryPath->bytes);
-		if (!rendition->libraryHandle) {
-			fprintf(stderr, "unable to link `%.*s`\n", (int)libraryPath->numberOfBytes, libraryPath->bytes);
-			longjmp(state->jumpTarget->environment, -1);
-		}
-	}
-#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
-	if (!rendition->libraryHandle) {
-		Zeitgeist_String* zeroTerminator = Zeitgeist_State_createString(state, "", sizeof(char));
-		Zeitgeist_String* libraryPath = Zeitgeist_State_createString(state, RENDITION_DIRECTORY_SEPARATOR "library" RENDITION_EXTENSION,
-			strlen(RENDITION_DIRECTORY_SEPARATOR "library" RENDITION_EXTENSION));
-		libraryPath = Zeitgeist_String_concatenate(state, rendition->folderPath, libraryPath);
-		libraryPath = Zeitgeist_String_concatenate(state, libraryPath, zeroTerminator);
-		rendition->libraryHandle = dlopen(libraryPath->bytes, RTLD_LAZY | RTLD_GLOBAL);
-		if (!rendition->libraryHandle) {
-			fprintf(stderr, "unable to link `%.*s`\n", (int)libraryPath->numberOfBytes, libraryPath->bytes);
-			longjmp(state->jumpTarget->environment, -1);
-		}
-	}
-#else
-	#error("operating system not (yet) supported")
-#endif	
+  if (!self->dll) {
+    Shizu_String* zeroTerminator = Shizu_String_create(state, "", sizeof(char));
+    Shizu_String* libraryPath = Shizu_String_create(state, Shizu_OperatingSystem_DirectorySeparator "library" Shizu_OperatingSystem_DllExtension,
+                                                    strlen(Shizu_OperatingSystem_DirectorySeparator "library" Shizu_OperatingSystem_DllExtension));
+    libraryPath = Shizu_String_concatenate(state, self->folderPath, libraryPath);
+    libraryPath = Shizu_String_concatenate(state, libraryPath, zeroTerminator);
+    self->dll = Shizu_State_getOrLoadDll(state, Shizu_String_getBytes(state, libraryPath), true);
+    if (!self->dll) {
+      fprintf(stderr, "unable to link `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, libraryPath), Shizu_String_getBytes(state, libraryPath));
+      Shizu_State_jump(state);
+    }
+  }
 }
 
 Zeitgeist_Rendition*
 Zeitgeist_createRendition
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_String* folderPath
-	)
+  (
+    Shizu_State* state,
+    Shizu_String* folderPath
+  )
 {
-	Zeitgeist_Rendition* self = Zeitgeist_allocateObject(state, sizeof(Zeitgeist_Rendition), NULL, NULL);
-	self->folderPath = folderPath;
-	self->libraryHandle = NULL;
-
-	((Zeitgeist_Object*)self)->finalize = (void (*)(Zeitgeist_State*, Zeitgeist_Object*)) & Zeitgeist_Rendition_finalize;
-	((Zeitgeist_Object*)self)->visit = (void (*)(Zeitgeist_State*, Zeitgeist_Object*)) & Zeitgeist_Rendition_visit;
-
-	return self;
+  Zeitgeist_Rendition* self = (Zeitgeist_Rendition*)Shizu_Gc_allocate(state, sizeof(Zeitgeist_Rendition));
+  self->folderPath = folderPath;
+  self->dll = NULL;
+  ((Shizu_Object*)self)->type = Zeitgeist_Rendition_getType(state);
+  return self;
 }
 
-Zeitgeist_String*
+Shizu_String*
 Zeitgeist_Rendition_getName
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	)
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* rendition
+  )
 {
-	Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
-	Zeitgeist_JumpTarget jumpTarget;
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
-	if (!setjmp(jumpTarget.environment)) {
-		Zeitgeist_String* (*getName)(Zeitgeist_State*) = (Zeitgeist_String * (*)(Zeitgeist_State*))getRenditionLibrarySymbol(rendition->libraryHandle, "Zeitgeist_Rendition_getName");
-		if (!getName) {
-			fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_getName", (int)rendition->folderPath->numberOfBytes, rendition->folderPath->bytes);
-			longjmp(state->jumpTarget->environment, -1);
-		}
-		Zeitgeist_String* name = getName(state);
-		Zeitgeist_State_popJumpTarget(state);
-		return name;
-	} else {
-		Zeitgeist_State_popJumpTarget(state);
-		longjmp(state->jumpTarget->environment, -1);
-	}
+  Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
+  Shizu_JumpTarget jumpTarget;
+  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  if (!setjmp(jumpTarget.environment)) {
+    Shizu_String* (*getName)(Shizu_State*) = (Shizu_String * (*)(Shizu_State*))Shizu_Dll_getSymbol(state, rendition->dll, "Zeitgeist_Rendition_getName");
+    if (!getName) {
+      fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_getName", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
+      Shizu_State_jump(state);
+    }
+    Shizu_String* name = getName(state);
+    Shizu_State_popJumpTarget(state);
+    return name;
+  } else {
+    Shizu_State_popJumpTarget(state);
+    Shizu_State_jump(state);
+  }
 }
 
-Zeitgeist_ForeignProcedure*
+Shizu_CxxFunction*
 Zeitgeist_Rendition_getUpdate
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	)
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* rendition
+  )
 {
-	Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
-	Zeitgeist_JumpTarget jumpTarget;
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
-	if (!setjmp(jumpTarget.environment)) {
-		Zeitgeist_ForeignProcedure* f = (void (*)(Zeitgeist_State*))getRenditionLibrarySymbol(rendition->libraryHandle, "Zeitgeist_Rendition_update");
-		if (!f) {
-			fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_update", (int)rendition->folderPath->numberOfBytes, rendition->folderPath->bytes);
-			longjmp(state->jumpTarget->environment, -1);
-		}
-		Zeitgeist_State_popJumpTarget(state);
-		return f;
-	} else {
-		Zeitgeist_State_popJumpTarget(state);
-		longjmp(state->jumpTarget->environment, -1);
-	}
+  Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
+  Shizu_JumpTarget jumpTarget;
+  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  if (!setjmp(jumpTarget.environment)) {
+    Shizu_CxxFunction* f = (void (*)(Shizu_State*))Shizu_Dll_getSymbol(state, rendition->dll, "Zeitgeist_Rendition_update");
+    if (!f) {
+      fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_update", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
+      Shizu_State_jump(state);
+    }
+    Shizu_State_popJumpTarget(state);
+    return f;
+  } else {
+    Shizu_State_popJumpTarget(state);
+    Shizu_State_jump(state);
+  }
 }
 
-Zeitgeist_ForeignProcedure*
+Shizu_CxxFunction*
 Zeitgeist_Rendition_getLoad
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	)
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* rendition
+  )
 {
-	Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
-	Zeitgeist_JumpTarget jumpTarget;
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
-	if (!setjmp(jumpTarget.environment)) {
-		Zeitgeist_ForeignProcedure* f = (void (*)(Zeitgeist_State*))getRenditionLibrarySymbol(rendition->libraryHandle, "Zeitgeist_Rendition_load");
-		if (!f) {
-			fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_load", (int)rendition->folderPath->numberOfBytes, rendition->folderPath->bytes);
-			longjmp(state->jumpTarget->environment, -1);
-		}
-		Zeitgeist_State_popJumpTarget(state);
-		return f;
-	} else {
-		Zeitgeist_State_popJumpTarget(state);
-		longjmp(state->jumpTarget->environment, -1);
-	}
+  Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
+  Shizu_JumpTarget jumpTarget;
+  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  if (!setjmp(jumpTarget.environment)) {
+    Shizu_CxxFunction* f = (void (*)(Shizu_State*))Shizu_Dll_getSymbol(state, rendition->dll, "Zeitgeist_Rendition_load");
+    if (!f) {
+      fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_load", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
+      Shizu_State_jump(state);
+    }
+    Shizu_State_popJumpTarget(state);
+    return f;
+  } else {
+    Shizu_State_popJumpTarget(state);
+    Shizu_State_jump(state);
+  }
 }
 
-Zeitgeist_ForeignProcedure*
+Shizu_CxxFunction*
 Zeitgeist_Rendition_getUnload
-	(
-		Zeitgeist_State* state,
-		Zeitgeist_Rendition* rendition
-	)
+  (
+    Shizu_State* state,
+    Zeitgeist_Rendition* rendition
+  )
 {
-	Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
-	Zeitgeist_JumpTarget jumpTarget;
-	Zeitgeist_State_pushJumpTarget(state, &jumpTarget);
-	if (!setjmp(jumpTarget.environment)) {
-		Zeitgeist_ForeignProcedure* f = (void (*)(Zeitgeist_State*))getRenditionLibrarySymbol(rendition->libraryHandle, "Zeitgeist_Rendition_unload");
-		if (!f) {
-			fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_unload", (int)rendition->folderPath->numberOfBytes, rendition->folderPath->bytes);
-			longjmp(state->jumpTarget->environment, -1);
-		}
-		Zeitgeist_State_popJumpTarget(state);
-		return f;
-	} else {
-		Zeitgeist_State_popJumpTarget(state);
-		longjmp(state->jumpTarget->environment, -1);
-	}
+  Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
+  Shizu_JumpTarget jumpTarget;
+  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  if (!setjmp(jumpTarget.environment)) {
+    Shizu_CxxFunction* f = (void (*)(Shizu_State*))Shizu_Dll_getSymbol(state, rendition->dll, "Zeitgeist_Rendition_unload");
+    if (!f) {
+      fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_unload", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
+      Shizu_State_jump(state);
+    }
+    Shizu_State_popJumpTarget(state);
+    return f;
+  } else {
+    Shizu_State_popJumpTarget(state);
+    Shizu_State_jump(state);
+  }
 }

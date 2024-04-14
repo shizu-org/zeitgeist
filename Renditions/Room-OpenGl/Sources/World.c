@@ -1,40 +1,55 @@
 #include "World.h"
 
-#include "Zeitgeist/List.h"
 #include "Zeitgeist/UpstreamRequests.h"
 
 #include "KeyboardKeyMessage.h"
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-Zeitgeist_ObjectType const g_Player_Type = {
-	.name = "Player",
-	.parentType = &g_Zeitgeist_Object_Type,
-	.destruct = NULL,
+Shizu_defineDlType(Player, Shizu_Object);
+extern char const*
+Shizu_getDlName
+	(
+		Shizu_State* state
+	);
+
+static void
+Player_visit
+	(
+		Shizu_State* state,
+		Player* self
+	);
+
+Shizu_TypeDescriptor const Player_Type = {
+	.staticInitialize = NULL,
+	.staticFinalize = NULL,
+	.staticVisit = NULL,
+	.finalize = NULL,
+	.visit = (Shizu_OnVisitCallback*) & Player_visit,
 };
 
 static void
 Player_visit
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		Player* self
 	)
 {
 	if (self->position) {
-		Zeitgeist_Gc_visitObject(state, (Zeitgeist_Object*)self->position);
+		Shizu_Gc_visitObject(state, (Shizu_Object*)self->position);
 	}
 	if (self->positionSpeed) {
-		Zeitgeist_Gc_visitObject(state, (Zeitgeist_Object*)self->positionSpeed);
+		Shizu_Gc_visitObject(state, (Shizu_Object*)self->positionSpeed);
 	}
 }
 
 Player*
 Player_create
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
-	Player* self = Zeitgeist_allocateObject(state, sizeof(Player), NULL, NULL);
+	Player* self = (Player*)Shizu_Gc_allocate(state, sizeof(Player));
 	self->position = Vector3R32_create(state, 0.f, 0.f, 0.f);
 	self->positionSpeed = Vector3R32_create(state, 0.f, 0.f, 0.f);
 	self->rotationY = 0.f;
@@ -47,14 +62,14 @@ Player_create
 	self->turnLeftDown = false ;
 	self->turnRightDown = false;
 
-	((Zeitgeist_Object*)self)->visit = (void(*)(Zeitgeist_State*, Zeitgeist_Object*)) & Player_visit;
+	((Shizu_Object*)self)->type = Player_getType(state);// visit = (void(*)(Shizu_State*, Shizu_Object*)) & Player_visit;
 	return self;
 }
 
 void
 Player_onKeyboardKeyMessage
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		Player* self,
 		KeyboardKeyMessage* message
 	)
@@ -88,9 +103,9 @@ Player_onKeyboardKeyMessage
 void
 Player_update
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		Player* self,
-		Zeitgeist_Real32 tick
+		Shizu_Float32 tick
 	)
 {
 	self->positionSpeed = Vector3R32_create(state, 0.f, 0.f, 0.f);
@@ -129,7 +144,7 @@ Player_update
 	if (idlib_vector_3_f32_normalize(&v, &v)) {
 		Matrix4R32* rotationY = Matrix4R32_createRotateY(state, self->rotationY);
 		idlib_matrix_4x4_3f_transform_direction(&v, &rotationY->m, &v);
-		Zeitgeist_Real32 speed = 0.0001f * tick;
+		Shizu_Float32 speed = 0.0001f * tick;
 		v.e[0] *= speed;
 		v.e[1] *= speed;
 		v.e[2] *= speed;
@@ -140,42 +155,34 @@ Player_update
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 static void
-StaticGeometryGl_destruct
+StaticGeometryGl_finalize
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self
 	);
 
-Zeitgeist_ObjectType const g_StaticGeometryGl_Type = {
-	.name = "StaticGeometryGl",
-	.parentType = &g_Zeitgeist_Object_Type,
-	.destruct = (void(*)(Zeitgeist_State*,Zeitgeist_Object*))&StaticGeometryGl_destruct,
+Shizu_defineDlType(StaticGeometryGl, Shizu_Object);
+
+Shizu_TypeDescriptor const StaticGeometryGl_Type = {
+	.staticInitialize = NULL,
+	.staticFinalize = NULL,
+	.staticVisit = NULL,
+	.finalize = (Shizu_OnFinalizeCallback*)&StaticGeometryGl_finalize,
 	.visit = NULL,
 };
 
 static void
-StaticGeometryGl_destruct
+StaticGeometryGl_finalize
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self
 	)
 { StaticGeometryGl_unmaterialize(state, self); }
 
-
-static void
-StaticGeometryGl_finalize
-	(
-		Zeitgeist_State* state,
-		StaticGeometryGl* self
-	)
-{
-	StaticGeometryGl_unmaterialize(state, self);
-}
-
 void
 StaticGeometryGl_unmaterialize
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self
 	)
 {
@@ -196,10 +203,10 @@ StaticGeometryGl_unmaterialize
 StaticGeometryGl*
 StaticGeometryGl_create
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
-	StaticGeometryGl* self = Zeitgeist_allocateObject(state, sizeof(StaticGeometryGl), NULL, NULL);
+	StaticGeometryGl* self = (StaticGeometryGl*)Shizu_Gc_allocate(state, sizeof(StaticGeometryGl));
 
 	self->numberOfVertices = 0;
 	self->bufferId = 0;
@@ -209,14 +216,16 @@ StaticGeometryGl_create
 	glGenBuffers(1, &self->bufferId);
 	if (glGetError()) {
 		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenBuffers");
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	glGenVertexArrays(1, &self->vertexArrayId);
 	if (glGetError()) {
 		glDeleteBuffers(1, &self->bufferId);
 		self->bufferId = 0;
 		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 	glGenTextures(1, &self->colorTextureId);
 	if (glGetError()) {
@@ -225,17 +234,18 @@ StaticGeometryGl_create
 		glDeleteBuffers(1, &self->bufferId);
 		self->bufferId = 0;
 		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
-		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+		Shizu_State_setError(state, 1);
+		Shizu_State_jump(state);
 	}
 
-	((Zeitgeist_Object*)self)->finalize = (void(*)(Zeitgeist_State*, Zeitgeist_Object*)) & StaticGeometryGl_finalize;
+	((Shizu_Object*)self)->type = StaticGeometryGl_getType(state);//(void(*)(Shizu_State*, Shizu_Object*))& StaticGeometryGl_finalize;
 	return self;
 }
 
 void
 StaticGeometryGl_setData
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		size_t numberOfVertices,
 		size_t numberOfBytes,
@@ -305,7 +315,7 @@ struct VERTEX {
 	static void
 	debugCheckNormal
 		(
-			Zeitgeist_State* state,
+			Shizu_State* state,
 			struct VERTEX const* vertices,
 			idlib_vector_3_f32 const* n
 		)
@@ -317,7 +327,8 @@ struct VERTEX {
 		idlib_vector_3_f32_cross(&z, &x, &y);
 		idlib_vector_3_f32_normalize(&z, &z);
 		if (!idlib_vector_3_f32_are_equal(n, &z)) {
-			Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+			Shizu_State_setError(state, 1);
+			Shizu_State_jump(state);
 		}
 
 		idlib_vector_3_f32 nn;
@@ -330,7 +341,8 @@ struct VERTEX {
 		idlib_vector_3_f32_cross(&z, &x, &y);
 		idlib_vector_3_f32_normalize(&z, &z);
 		if (!idlib_vector_3_f32_are_equal(&nn, &z)) {
-			Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
+			Shizu_State_setError(state, 1);
+			Shizu_State_jump(state);
 		}
 	}
 
@@ -339,7 +351,7 @@ struct VERTEX {
 	static void
 	debugCheckNormal
 		(
-			Zeitgeist_State* state,
+			Shizu_State* state,
 			struct VERTEX const* vertices,
 			idlib_vector_3_f32 const* n
 		)
@@ -350,11 +362,11 @@ struct VERTEX {
 void
 StaticGeometryGl_setDataNorthWall
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 height
+		Shizu_Float32 breadth,
+		Shizu_Float32 height
 	)
 {
 	idlib_color_3_f32 ambientColor;
@@ -385,11 +397,11 @@ StaticGeometryGl_setDataNorthWall
 void
 StaticGeometryGl_setDataSouthWall
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 height
+		Shizu_Float32 breadth,
+		Shizu_Float32 height
 	)
 {
 	idlib_color_3_f32 ambientColor;
@@ -420,11 +432,11 @@ StaticGeometryGl_setDataSouthWall
 void
 StaticGeometryGl_setDataEastWall
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 height
+		Shizu_Float32 breadth,
+		Shizu_Float32 height
 	)
 {
 	idlib_color_3_f32 ambientColor;
@@ -455,11 +467,11 @@ StaticGeometryGl_setDataEastWall
 void
 StaticGeometryGl_setDataWestWall
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 height
+		Shizu_Float32 breadth,
+		Shizu_Float32 height
 	)
 {
 	idlib_color_3_f32 ambientColor;
@@ -490,11 +502,11 @@ StaticGeometryGl_setDataWestWall
 void
 StaticGeometryGl_setDataFloor
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 length
+		Shizu_Float32 breadth,
+		Shizu_Float32 length
 	)
 {
 	idlib_color_3_f32 ambientColor;
@@ -525,11 +537,11 @@ StaticGeometryGl_setDataFloor
 void
 StaticGeometryGl_setDataCeiling
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		StaticGeometryGl* self,
 		Vector3R32* translation,
-		Zeitgeist_Real32 breadth,
-		Zeitgeist_Real32 length
+		Shizu_Float32 breadth,
+		Shizu_Float32 length
 	)
 {
 	idlib_color_3_f32 ambientColor;
@@ -560,75 +572,92 @@ StaticGeometryGl_setDataCeiling
 static void
 World_visit
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
+		World* self
+	);
+
+Shizu_defineDlType(World, Shizu_Object);
+
+Shizu_TypeDescriptor const World_Type = {
+	.staticInitialize = NULL,
+	.staticFinalize = NULL,
+	.staticVisit = NULL,
+	.finalize = NULL,
+	.visit = (Shizu_OnVisitCallback*)&World_visit,
+};
+
+static void
+World_visit
+	(
+		Shizu_State* state,
 		World* self
 	)
 {
 	if (self->geometries) {
-		Zeitgeist_Gc_visitObject(state, (Zeitgeist_Object*)self->geometries);
+		Shizu_Gc_visitObject(state, (Shizu_Object*)self->geometries);
 	}
 	if (self->player) {
-		Zeitgeist_Gc_visitObject(state, (Zeitgeist_Object*)self->player);
+		Shizu_Gc_visitObject(state, (Shizu_Object*)self->player);
 	}
 }
 
 World*
 World_create
 	(
-		Zeitgeist_State* state
+		Shizu_State* state
 	)
 {
-	World* self = Zeitgeist_allocateObject(state, sizeof(World), NULL, NULL);
+	World* self = (World*)Shizu_Gc_allocate(state, sizeof(World));
 	self->player = NULL;
 	self->geometries = NULL;
 
-	self->geometries = Zeitgeist_List_create(state);
+	self->geometries = Shizu_List_create(state);
 	
 	StaticGeometryGl* geometry = NULL;
 
 	// Extend along the x-axis in metres.
-	static const Zeitgeist_Real32 breadth = 5.f;
+	static const Shizu_Float32 breadth = 5.f;
 	// Extend along the z-axis in metres.
-	static const Zeitgeist_Real32 length = 5.f;
+	static const Shizu_Float32 length = 5.f;
 	// Extend along the y-axis in metres.
-	static const Zeitgeist_Real32 height = 4.f;
+	static const Shizu_Float32 height = 4.f;
 
 	geometry = StaticGeometryGl_create(state);
 	StaticGeometryGl_setDataFloor(state, geometry, Vector3R32_create(state, 0.f, -height / 2.f, 0.f), breadth, length);
-	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
+	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
 	geometry = StaticGeometryGl_create(state);
 	StaticGeometryGl_setDataCeiling(state, geometry, Vector3R32_create(state, 0.f, +height / 2.f, 0.f), breadth, length);
-	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
+	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
 	geometry = StaticGeometryGl_create(state);
 	StaticGeometryGl_setDataWestWall(state, geometry, Vector3R32_create(state, -breadth / 2.f, 0.f, 0.f), length, height);
-	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
+	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
 	geometry = StaticGeometryGl_create(state);
 	StaticGeometryGl_setDataNorthWall(state, geometry, Vector3R32_create(state, 0.f, 0.f, -length / 2.f), breadth, height);
-	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
+	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
 	geometry = StaticGeometryGl_create(state);
 	StaticGeometryGl_setDataEastWall(state, geometry, Vector3R32_create(state, +breadth / 2.f, 0.f, 0.f), length, height);
-	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
+	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
 	geometry = StaticGeometryGl_create(state);
 	StaticGeometryGl_setDataSouthWall(state, geometry, Vector3R32_create(state, 0.f, 0.f, +length / 2.f), breadth, height);
-	Zeitgeist_List_appendObject(state, self->geometries, (Zeitgeist_Object*)geometry);
+	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
 	self->player = Player_create(state);
 
-	((Zeitgeist_Object*)self)->visit = (void(*)(Zeitgeist_State*, Zeitgeist_Object*)) & World_visit;
+	((Shizu_Object*)self)->type = World_getType(state);// (void(*)(Shizu_State*, Shizu_Object*))& World_visit;
 	return self;
 }
 
 void
 World_update
 	(
-		Zeitgeist_State* state,
+		Shizu_State* state,
 		World* self,
-		Zeitgeist_Real32 tick
+		Shizu_Float32 tick
 	)
 {
 	Player_update(state, self->player, tick);
