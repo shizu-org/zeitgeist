@@ -74,6 +74,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${${name}.header_files})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${${name}.source_files})
 
 # We must link libm under Linux.
-if (${${name}.operating_system_id} EQUAL ${${name}.operating_system_id_linux})
+if (${${name}.operating_system} STREQUAL ${${name}.operating_system_linux})
+  message(STATUS "linking to libm")
   target_link_libraries(${name} m)
 endif()

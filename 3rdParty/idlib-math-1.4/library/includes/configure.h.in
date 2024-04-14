@@ -8,7 +8,7 @@
  * @since 1.0
  * @brief An unkown operating system.
  */
-#define IDLIB_OperatingSystem_Unknown (0)
+#define IDLIB_OPERATINGSYSTEM_UNKNOWN (0)
 
 /**
  * @since 1.0
@@ -76,7 +76,7 @@
  * @since 1.0
  * @brief An unknown C compiler.
  */
-#define IDLIB_Compiler_C_Unknown (0)
+#define IDLIB_COMPILER_C_UNKNOWN (0)
 
 /**
  * @since 1.0
