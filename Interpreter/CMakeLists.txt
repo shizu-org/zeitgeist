@@ -10,7 +10,7 @@ begin_executable()
 list(APPEND ${name}.source_files Main.c)
 
 end_executable()
-target_link_libraries(${name} ${project_name}-Library idlib-file-system)
+target_link_libraries(${name} ${project_name}-Library idlib-process idlib-file-system)
 
 # We must link libm under Linux.
 if (${${name}.operating_system_id} EQUAL ${${name}.operating_system_id_linux})

@@ -13,7 +13,7 @@ list(APPEND ${name}.header_files Sources/World.h)
 
 end_plugin_library()
 
-target_link_libraries(${name} ${project_name}-OpenGl-Commons ${project_name}-Library)
+target_link_libraries(${name} ${project_name}-OpenGl-Commons idlib-process ${project_name}-Library)
 add_dependencies(${name} ${project_name}-Interpreter)
 
 copy_plugin(${project_name}-Interpreter ${name})
