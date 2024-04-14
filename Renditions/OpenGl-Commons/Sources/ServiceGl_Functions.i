@@ -28,6 +28,12 @@ Define(PFNGLBINDBUFFERPROC, glBindBuffer)
 Define(PFNGLBUFFERDATAPROC, glBufferData)
 Define(PFNGLDELETEBUFFERSPROC, glDeleteBuffers)
 
+// framebuffers
+Define(PFNGLGENFRAMEBUFFERSPROC, glGenFramebuffers)
+Define(PFNGLDELETEFRAMEBUFFERSPROC, glDeleteFramebuffers)
+Define(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)
+Define(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D)
+
 // vertex arrays
 Define(PFNGLGENVERTEXARRAYSPROC, glGenVertexArrays)
 Define(PFNGLBINDVERTEXARRAYPROC, glBindVertexArray)
