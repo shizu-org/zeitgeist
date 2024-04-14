@@ -112,7 +112,8 @@ Shizu_State1_acquire
   int result = idlib_get_global(process, NAME, strlen(NAME), &self);
   if (result != IDLIB_SUCCESS && result != IDLIB_NOT_EXISTS) {
     idlib_relinquish_process(process);
-    process = NULL;   
+    process = NULL;
+    return 1;
   }
   if (result == IDLIB_NOT_EXISTS) {
     self = malloc(sizeof(Shizu_State1));
@@ -122,6 +123,7 @@ Shizu_State1_acquire
       return 1;
     }
     self->process = process;
+    self->referenceCount = 0;
 
     self->processExitRequested = false;
     self->error = 0;
@@ -134,7 +136,11 @@ Shizu_State1_acquire
       process = NULL;
       return 1;
     }    
+  } else {
+    idlib_relinquish_process(process);
+    process = NULL;
   }
+
   self->referenceCount++;
   *RETURN = self;
   return 0;

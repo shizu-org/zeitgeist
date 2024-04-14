@@ -525,7 +525,9 @@ struct Shizu_Dll {
 struct Shizu_State {
   int referenceCount;
   Shizu_State1* state1;
+#if 0
   idlib_process* process;
+#endif
   NamedStorageService namedStorageService;
   Shizu_Dll* dlls;
   Shizu_Gc* gc;
@@ -552,23 +554,31 @@ Shizu_State_create
     return 1;
   }
   if (!g_singleton) {
+  #if 0
     idlib_process* process = NULL;
     if (idlib_acquire_process(&process)) {
       return 1;
     }
+  #endif
 
     Shizu_State* self = malloc(sizeof(Shizu_State));
     if (!self) {
+    #if 0
       idlib_relinquish_process(process);
       process = NULL;
+    #endif
       return 1;
     }
+  #if 0
     self->process = process;
+  #endif
     if (Shizu_State1_acquire(&self->state1)) {
       free(self);
       self = NULL;
+    #if 0
       idlib_relinquish_process(process);
       process = NULL;
+    #endif
       return 1;
     }
     if (NamedStorageService_initialize(&self->namedStorageService)) {
@@ -576,8 +586,10 @@ Shizu_State_create
       self->state1 = NULL;
       free(self);
       self = NULL;
+    #if 0
       idlib_relinquish_process(process);
       process = NULL;
+    #endif
       return 1;
     }
     self->gc = NULL;
@@ -598,8 +610,10 @@ Shizu_State_create
       self->state1 = NULL;
       free(self);
       self = NULL;
+    #if 0
       idlib_relinquish_process(process);
       process = NULL;
+    #endif
       return 1;
     }
     //
@@ -616,8 +630,10 @@ Shizu_State_create
       self->state1 = NULL;
       free(self);
       self = NULL;
+    #if 0
       idlib_relinquish_process(process);
       process = NULL;
+    #endif
       return 1;
     }
     //
@@ -636,8 +652,10 @@ Shizu_State_create
       self->state1 = NULL;
       free(self);
       self = NULL;
+    #if 0
       idlib_relinquish_process(process);
       process = NULL;
+    #endif
       return 1;
     }
     //
@@ -658,11 +676,14 @@ Shizu_State_create
       self->state1 = NULL;
       free(self);
       self = NULL;
+    #if 0
       idlib_relinquish_process(process);
       process = NULL;
+    #endif
       return 1;
     }
     self->referenceCount = 0;
+  #if 0
     if (idlib_add_global(process, NAME, strlen(NAME), self)) {
       Shizu_Types_uninitialize(self);
       Shizu_Stack_shutdown(self, self->stack);
@@ -680,6 +701,7 @@ Shizu_State_create
       process = NULL;
       return 1;
     }
+  #endif
     g_singleton = self;
   }
   g_singleton->referenceCount++;
@@ -809,10 +831,12 @@ Shizu_State_destroy
   }
   if (0 == --self->referenceCount) {
     Shizu_Gc_run(self);
+  #if 0
     idlib_process* process = self->process;
     self->process = NULL;
     idlib_remove_global(process, NAME, strlen(NAME));
     idlib_relinquish_process(process);
+  #endif
     Shizu_Stack_shutdown(self, self->stack);
     self->stack = NULL;
     Shizu_Locks_shutdown(self, self->locks);
