@@ -69,29 +69,29 @@ Zeitgeist_Value_getForeignFunction
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 bool
-Zeitgeist_Value_hasForeignObject
+Zeitgeist_Value_hasObject
 	(
 		Zeitgeist_Value const* value
 	)
-{ return Zeitgeist_ValueTag_ForeignObject == value->tag; }
+{ return Zeitgeist_ValueTag_Object == value->tag; }
 
 void
-Zeitgeist_Value_setForeignObject
+Zeitgeist_Value_setObject
 	(
 		Zeitgeist_Value* value,
-		Zeitgeist_ForeignObject* foreignObjectValue
+		Zeitgeist_Object* objectValue
 	)
 {
-	value->tag = Zeitgeist_ValueTag_ForeignObject;
-	value->foreignObjectValue = foreignObjectValue;
+	value->tag = Zeitgeist_ValueTag_Object;
+	value->objectValue = objectValue;
 }
 
-Zeitgeist_ForeignObject*
-Zeitgeist_Value_getForeignObject
+Zeitgeist_Object*
+Zeitgeist_Value_getObject
 	(
 		Zeitgeist_Value const* value
 	)
-{ return value->foreignObjectValue; }
+{ return value->objectValue; }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

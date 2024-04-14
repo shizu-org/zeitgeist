@@ -6,6 +6,8 @@
 #include "Zeitgeist/Object.h"
 #include "Zeitgeist/Value.h"
 
+extern Zeitgeist_ObjectType const g_Zeitgeist_UpstreamRequest_Type;
+
 /**
  * @since 0.1
  * @brief An upstream request is send from an Rendition to Zeitgeist.
@@ -20,7 +22,7 @@ typedef struct Zeitgeist_UpstreamRequest Zeitgeist_UpstreamRequest;
 #define Zeitgeist_UpstreamRequestType_ExitProcessRequest (1)
 
 struct Zeitgeist_UpstreamRequest {
-  Zeitgeist_ForeignObject _parent;
+  Zeitgeist_Object _parent;
   Zeitgeist_Integer type;
 };
 

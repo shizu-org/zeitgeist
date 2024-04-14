@@ -179,32 +179,32 @@ Zeitgeist_Stack_getForeignFunction
 { return Zeitgeist_Value_getForeignFunction(state->stack->elements + state->stack->size - 1 - index); }
 
 void
-Zeitgeist_Stack_pushForeignObject
+Zeitgeist_Stack_pushObject
 	(
 		Zeitgeist_State* state,
-		Zeitgeist_ForeignObject* foreignObjectValue
+		Zeitgeist_Object* foreignObjectValue
 	)
 {
 	Zeitgeist_Value value;
-	Zeitgeist_Value_setForeignObject(&value, foreignObjectValue);
+	Zeitgeist_Value_setObject(&value, foreignObjectValue);
 	Zeitgeist_Stack_push(state, &value);
 }
 
 bool
-Zeitgeist_Stack_isForeignObject
+Zeitgeist_Stack_isObject
 	(
 		Zeitgeist_State* state,
 		size_t index
 	)
-{ return Zeitgeist_Value_hasForeignObject(state->stack->elements + state->stack->size - 1 - index); }
+{ return Zeitgeist_Value_hasObject(state->stack->elements + state->stack->size - 1 - index); }
 
-Zeitgeist_ForeignObject*
-Zeitgeist_Stack_getForeignObject
+Zeitgeist_Object*
+Zeitgeist_Stack_getObject
 	(
 		Zeitgeist_State* state,
 		size_t index
 	)
-{ return Zeitgeist_Value_getForeignObject(state->stack->elements + state->stack->size - 1 - index); }
+{ return Zeitgeist_Value_getObject(state->stack->elements + state->stack->size - 1 - index); }
 
 void
 Zeitgeist_Stack_pushInteger

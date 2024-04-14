@@ -71,9 +71,9 @@ Locks_premark
 							Zeitgeist_Gc_Object_setGray(object);
 						}
 					} break;
-					case Zeitgeist_Gc_TypeTag_ForeignObject: {
+					case Zeitgeist_Gc_TypeTag_Object: {
 						if (Zeitgeist_Gc_Object_isWhite(object)) {
-							((Zeitgeist_ForeignObject*)object)->gclist = state->gc.gray;
+							((Zeitgeist_Object*)object)->gclist = state->gc.gray;
 							state->gc.gray = object;
 							Zeitgeist_Gc_Object_setGray(object);
 						}

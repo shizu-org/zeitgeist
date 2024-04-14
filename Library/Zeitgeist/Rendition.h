@@ -25,10 +25,10 @@ typedef void (Zeitgeist_ForeignProcedure)(Zeitgeist_State*);
 	#error("operating system not (yet) supported")
 #endif
 
-typedef struct Zeitgeist_Rendition Zeitgeist_Rendition;
+Zeitgeist_ObjectType_Declare(Zeitgeist_Rendition)
 
 struct Zeitgeist_Rendition {
-	Zeitgeist_ForeignObject _parent;
+	Zeitgeist_Object _parent;
 
 	/** The path to the folder of the rendition. */
 	Zeitgeist_String* folderPath;

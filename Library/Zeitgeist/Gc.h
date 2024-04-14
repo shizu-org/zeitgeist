@@ -28,7 +28,7 @@
  * @since 0.1
  * Type tag. See Zeitgeist_Gc_Objectc::typeTag for more information.
  */
-#define Zeitgeist_Gc_TypeTag_ForeignObject (3)
+#define Zeitgeist_Gc_TypeTag_Object (3)
 
 /**
  * @since 0.1
@@ -74,7 +74,7 @@ struct Zeitgeist_Gc_Object {
 	 * @brief The type of the garbage collected object.
 	 * Zeitgeist_Gc_TypeTag_List indicates an GC object of type List.
 	 * Zeitgeist_Gc_TypeTag_Map indicates an GC object of type Map.
-	 * Zeitgeist_Gc_TypeTag_ForeignObject indicates a GC object of type ForeignObject.
+	 * Zeitgeist_Gc_TypeTag_Object indicates a GC object of type Object.
 	 * Zeitgeist_Gc_TypeTag_String indicates a GC object of type String.
 	 * Zeitgeist_Gc_TypeTag_WeakReference indicates a GC object of type WeakReference.
 	 */
@@ -158,7 +158,7 @@ Zeitgeist_Gc_Object_isGray
 	);
 
 typedef struct Zeitgeist_State Zeitgeist_State;
-typedef struct Zeitgeist_ForeignObject Zeitgeist_ForeignObject;
+typedef struct Zeitgeist_Object Zeitgeist_Object;
 typedef struct Zeitgeist_List Zeitgeist_List;
 typedef struct Zeitgeist_Map Zeitgeist_Map;
 typedef struct Zeitgeist_String Zeitgeist_String;
@@ -166,13 +166,13 @@ typedef struct Zeitgeist_Value Zeitgeist_Value;
 typedef struct Zeitgeist_WeakReference Zeitgeist_WeakReference;
 
 /**
- * @brief If the foreign object is white, color it gray and put it into the gray list.
+ * @brief If the object is white, color it gray and put it into the gray list.
  */
 void
-Zeitgeist_Gc_visitForeignObject
+Zeitgeist_Gc_visitObject
 	(
 		Zeitgeist_State* state,
-		Zeitgeist_ForeignObject* foreignObject
+		Zeitgeist_Object* foreignObject
 	);
 
 /**
@@ -206,7 +206,7 @@ Zeitgeist_Gc_visitString
 	);
 
 /**
- * @brief Traverbase the value, calling Zeitgeist_Gc_visit(ForeignObject|List|Map|String|WeakReference) if required.
+ * @brief Traverbase the value, calling Zeitgeist_Gc_visit(Object|List|Map|String|WeakReference) if required.
  */
 void
 Zeitgeist_Gc_visitValue

@@ -228,23 +228,23 @@ Zeitgeist_List_appendInteger
 
 /**
  * @since 0.1
- * @brief Append a Zeitgeist_ForeignObject* value to a Zeitgeist_List object.
+ * @brief Append a Zeitgeist_Object* value to a Zeitgeist_List object.
  * @param list A pointer to the Zeitgeist_List object to append to.
  * @param element The Zeitgeist_Object* value to append.
  * @undefined state does not point to a Zeitgeist_State object.
  * @undefined list does not point to a Zeitgeist_List object.
- * @undefined element is not a Zeitgeist_ForeignObject* value.
+ * @undefined element is not a Zeitgeist_Object* value.
  */
 static inline void
-Zeitgeist_List_appendForeignObject
+Zeitgeist_List_appendObject
 	(
 		Zeitgeist_State* state,
 		Zeitgeist_List* list,
-		Zeitgeist_ForeignObject * element
+		Zeitgeist_Object * element
 	)
 {
 	Zeitgeist_Value value;
-	Zeitgeist_Value_setForeignObject(&value, element);
+	Zeitgeist_Value_setObject(&value, element);
 	Zeitgeist_List_appendValue(state, list, &value);
 }
 

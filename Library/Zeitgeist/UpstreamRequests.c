@@ -7,13 +7,20 @@
 // malloc, free
 #include <malloc.h>
 
+Zeitgeist_ObjectType const g_Zeitgeist_UpstreamRequest_Type = {
+  .name = "Zeitgeist.UpstreamRequest",
+  .parentType = &g_Zeitgeist_Object_Type,
+  .destruct = NULL,
+  .visit = NULL,
+};
+
 Zeitgeist_UpstreamRequest*
 Zeitgeist_UpstreamRequest_createExitProcessRequest
   (
     Zeitgeist_State* state
   )
 {
-  Zeitgeist_UpstreamRequest* self = Zeitgeist_allocateForeignObject(state, sizeof(Zeitgeist_UpstreamRequest), NULL, NULL);
+  Zeitgeist_UpstreamRequest* self = Zeitgeist_allocateObject(state, sizeof(Zeitgeist_UpstreamRequest), NULL, NULL);
   self->type = Zeitgeist_UpstreamRequestType_ExitProcessRequest;
   return self;
 }

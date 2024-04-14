@@ -10,23 +10,30 @@
 // malloc
 #include <malloc.h>
 
+Zeitgeist_ObjectType const g_Zeitgeist_Object_Type = {
+	.name = "Zeitgeist.Object",
+	.parentType = NULL,
+	.destruct = NULL,
+};
+
 void*
-Zeitgeist_allocateForeignObject
+Zeitgeist_allocateObject
 	(
 		Zeitgeist_State* state,
 		size_t size,
-		void (*finalize)(Zeitgeist_State*, Zeitgeist_ForeignObject*),
-		void (*visit)(Zeitgeist_State*, Zeitgeist_ForeignObject*)
+		void (*finalize)(Zeitgeist_State*, Zeitgeist_Object*),
+		void (*visit)(Zeitgeist_State*, Zeitgeist_Object*)
 	)
 {
-	Zeitgeist_ForeignObject* self = malloc(size);
+	Zeitgeist_Object* self = malloc(size);
 	if (!self) {
 		fprintf(stderr, "%s:%d: unable to allocate %zu Bytes\n", __FILE__, __LINE__, size);
 		Zeitgeist_State_raiseError(state, __FILE__, __LINE__, 1);
 	}
 
-	((Zeitgeist_ForeignObject*)self)->finalize = finalize;
-	((Zeitgeist_ForeignObject*)self)->visit = visit;
+	((Zeitgeist_Object*)self)->type = NULL;
+	((Zeitgeist_Object*)self)->finalize = finalize;
+	((Zeitgeist_Object*)self)->visit = visit;
 
 	// This is currently a constant as the incremental GC is not yet implemented.
 	static const bool isGcRunning = false;
@@ -36,7 +43,7 @@ Zeitgeist_allocateForeignObject
 	state->gc.all = (Zeitgeist_Gc_Object*)self;
 
 	// Set its type tag to "foreign object".
-	((Zeitgeist_Gc_Object*)self)->typeTag = Zeitgeist_Gc_TypeTag_ForeignObject;
+	((Zeitgeist_Gc_Object*)self)->typeTag = Zeitgeist_Gc_TypeTag_Object;
 
 	if (isGcRunning) {
 		// If the GC is running, color the object "gray" and add it to the "gray" list.
@@ -52,10 +59,10 @@ Zeitgeist_allocateForeignObject
 }
 
 void
-Zeitgeist_ForeignObject_visit
+Zeitgeist_Object_visit
 	(
 		Zeitgeist_State* state,
-		Zeitgeist_ForeignObject* foreignObject
+		Zeitgeist_Object* foreignObject
 	)
 {
 	if (foreignObject->visit) {
@@ -64,10 +71,10 @@ Zeitgeist_ForeignObject_visit
 }
 
 void
-Zeitgeist_ForeignObject_finalize
+Zeitgeist_Object_finalize
 	(
 		Zeitgeist_State* state,
-		Zeitgeist_ForeignObject* foreignObject
+		Zeitgeist_Object* foreignObject
 	)
 {
 	if (foreignObject->finalize) {

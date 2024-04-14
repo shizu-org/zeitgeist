@@ -5,12 +5,9 @@ cmake_minimum_required(VERSION 3.20)
 include(${CMAKE_SOURCE_DIR}/3rdParty/idlib-math-1.4/cmake/all.cmake)
 
 set(name ${project_name}-Interpreter)
-set(${name}.sources "")
-set(${name}.headers "")
-add_executable(${name})
+begin_executable()
 
-list(APPEND ${name}.sources Main.c)
+list(APPEND ${name}.source_files Main.c)
 
-target_sources(${name} PRIVATE ${${name}.sources} ${${name}.headers})
+end_executable()
 target_link_libraries(${name} ${project_name}-Library)
-

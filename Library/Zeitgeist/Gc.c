@@ -56,10 +56,10 @@ Zeitgeist_Gc_Object_isGray
 { return Zeitgeist_Gc_Color_Gray == object->color; }
 
 void
-Zeitgeist_Gc_visitForeignObject
+Zeitgeist_Gc_visitObject
 	(
 		Zeitgeist_State* state,
-		Zeitgeist_ForeignObject* foreignObject
+		Zeitgeist_Object* foreignObject
 	)
 {
 	if (Zeitgeist_Gc_Object_isWhite((Zeitgeist_Gc_Object*)foreignObject)) {
@@ -118,8 +118,8 @@ Zeitgeist_Gc_visitValue
 		case Zeitgeist_ValueTag_Map: {
 			Zeitgeist_Gc_visitMap(state, value->mapValue);
 		} break;
-		case Zeitgeist_ValueTag_ForeignObject: {
-			Zeitgeist_Gc_visitForeignObject(state, value->foreignObjectValue);
+		case Zeitgeist_ValueTag_Object: {
+			Zeitgeist_Gc_visitObject(state, value->objectValue);
 		} break;
 		case Zeitgeist_ValueTag_List: {
 			Zeitgeist_Gc_visitList(state, value->listValue);
@@ -165,8 +165,8 @@ Zeitgeist_Gc_barrier
 				state->gc.gray = o;
 				Zeitgeist_Gc_Object_setGray(o);
 			} break;
-			case Zeitgeist_Gc_TypeTag_ForeignObject: {
-				((Zeitgeist_ForeignObject*)o)->gclist = state->gc.gray;
+			case Zeitgeist_Gc_TypeTag_Object: {
+				((Zeitgeist_Object*)o)->gclist = state->gc.gray;
 				state->gc.gray = o;
 				Zeitgeist_Gc_Object_setGray(o);
 			} break;

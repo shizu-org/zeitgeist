@@ -179,28 +179,28 @@ Zeitgeist_Stack_getForeignFunction
 
 /**
  * @since 0.1
- * @brief Push a Zeitgeist_ForeignObject* value on the stack.
+ * @brief Push a Zeitgeist_Object* value on the stack.
  * @param state A pointer to the state.
- * @param foreignObjectValue The Zeitgeist_ForeignObject* value.
+ * @param foreignObjectValue The Zeitgeist_Object* value.
  */
 void
-Zeitgeist_Stack_pushForeignObject
+Zeitgeist_Stack_pushObject
 	(
 		Zeitgeist_State* state,
-		Zeitgeist_ForeignObject* foreignObjectValue
+		Zeitgeist_Object* foreignObjectValue
 	);
 
 /**
  * @since 0.1
- * @brief Get if the value at the specified stack index is a ForeignObject* value.
+ * @brief Get if the value at the specified stack index is an Object* value.
  * @param state A pointer to the state.
- * @return @a true if the value at the specfied stack index is a ForeignObject* value. @a false otherwise.
+ * @return @a true if the value at the specfied stack index is an Object* value. @a false otherwise.
  * @undefined The stack index is not within bounds.
  * @remark The stack index must be within the bounds of [0,n) where n is the size of the stack.
  * The stack index @a 0 denotes the element on the top of the stack, the stack index @a 1 denotes the element one below the top of the stack, ...
  */
 bool
-Zeitgeist_Stack_isForeignObject
+Zeitgeist_Stack_isObject
 	(
 		Zeitgeist_State* state,
 		size_t index
@@ -208,17 +208,17 @@ Zeitgeist_Stack_isForeignObject
 
 /**
  * @since 0.1
- * @brief Get the Zeitgeist_ForeignObject* value at the specified stack index.
+ * @brief Get the Zeitgeist_Object* value at the specified stack index.
  * @param state A pointer to the state.
  * @param index The stack index.
- * @return The Zeitgeist_ForeignObject* value.
+ * @return The Zeitgeist_Object* value.
  * @undefined The stack index is not within bounds.
- * @undefined The value at the specified index is not a Zeitgeist_ForeignObject* value.
+ * @undefined The value at the specified index is not a Zeitgeist_Object* value.
  * @remark The stack index must be within the bounds of [0,n) where n is the size of the stack.
  * The stack index @a 0 denotes the element on the top of the stack, the stack index @a 1 denotes the element one below the top of the stack, ...
  */
-Zeitgeist_ForeignObject*
-Zeitgeist_Stack_getForeignObject
+Zeitgeist_Object*
+Zeitgeist_Stack_getObject
 	(
 		Zeitgeist_State* state,
 		size_t index

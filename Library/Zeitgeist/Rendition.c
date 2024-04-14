@@ -26,11 +26,19 @@
 #endif
 
 static void
+Zeitgeist_Rendition_destruct
+	(
+		Zeitgeist_State* state,
+		Zeitgeist_Rendition* rendition
+	);
+
+static void
 Zeitgeist_Rendition_finalize
 	(
 		Zeitgeist_State* state,
 		Zeitgeist_Rendition* rendition
 	);
+
 
 static void
 Zeitgeist_Rendition_visit
@@ -38,6 +46,33 @@ Zeitgeist_Rendition_visit
 		Zeitgeist_State* state,
 		Zeitgeist_Rendition* rendition
 	);
+
+Zeitgeist_ObjectType const g_Rendition_Type = {
+	.name = "Rendition",
+	.parentType = &g_Zeitgeist_Object_Type,
+	.destruct = (void(*)(Zeitgeist_State*,Zeitgeist_Object*))&Zeitgeist_Rendition_destruct,
+	.visit = (void(*)(Zeitgeist_State*,Zeitgeist_Object*))&Zeitgeist_Rendition_visit,
+};
+
+static void
+Zeitgeist_Rendition_destruct
+	(
+		Zeitgeist_State* state,
+		Zeitgeist_Rendition* self
+	)
+{
+	if (self->libraryHandle) {
+	#if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
+		FreeModule(self->libraryHandle);
+		self->libraryHandle = NULL;
+	#elif Zeitgeist_Configuration_OperatingSystem_Linux == Zeitgeist_Configuration_OperatingSystem
+		dlclose(self->libraryHandle);
+		self->libraryHandle = NULL;
+	#else
+		#error("operating system not (yet) supported")
+	#endif
+	}
+}
 
 static void
 Zeitgeist_Rendition_finalize
@@ -116,12 +151,12 @@ Zeitgeist_createRendition
 		Zeitgeist_String* folderPath
 	)
 {
-	Zeitgeist_Rendition* self = Zeitgeist_allocateForeignObject(state, sizeof(Zeitgeist_Rendition), NULL, NULL);
+	Zeitgeist_Rendition* self = Zeitgeist_allocateObject(state, sizeof(Zeitgeist_Rendition), NULL, NULL);
 	self->folderPath = folderPath;
 	self->libraryHandle = NULL;
 
-	((Zeitgeist_ForeignObject*)self)->finalize = (void (*)(Zeitgeist_State*, Zeitgeist_ForeignObject*)) & Zeitgeist_Rendition_finalize;
-	((Zeitgeist_ForeignObject*)self)->visit = (void (*)(Zeitgeist_State*, Zeitgeist_ForeignObject*)) & Zeitgeist_Rendition_visit;
+	((Zeitgeist_Object*)self)->finalize = (void (*)(Zeitgeist_State*, Zeitgeist_Object*)) & Zeitgeist_Rendition_finalize;
+	((Zeitgeist_Object*)self)->visit = (void (*)(Zeitgeist_State*, Zeitgeist_Object*)) & Zeitgeist_Rendition_visit;
 
 	return self;
 }
