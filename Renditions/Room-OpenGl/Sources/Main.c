@@ -114,7 +114,7 @@ static const GLchar* g_fragmentShader =
 
 #include "Visuals/Program.h"
 
-static Zeitgeist_Visuals_GlProgram* g_program = NULL;
+static Visuals_GlProgram* g_program = NULL;
 static World* g_world = NULL;
 
 static void
@@ -286,10 +286,10 @@ loadPrograms
     Shizu_State* state
   )
 {
-  g_program = Zeitgeist_Visuals_GlProgram_create(state, Shizu_String_create(state, g_vertexShader, strlen(g_vertexShader)),
-                                                        Shizu_String_create(state, g_fragmentShader, strlen(g_fragmentShader)));
+  g_program = Visuals_GlProgram_create(state, Shizu_String_create(state, g_vertexShader, strlen(g_vertexShader)),
+                                              Shizu_String_create(state, g_fragmentShader, strlen(g_fragmentShader)));
   Shizu_Object_lock(state, (Shizu_Object*)g_program);
-  Zeitgeist_Visuals_GlProgram_materialize(state, g_program);
+  Visuals_GlProgram_materialize(state, g_program);
 }
 
 static void
@@ -298,7 +298,7 @@ unloadPrograms
     Shizu_State* state
   )
 {
-  Zeitgeist_Visuals_GlProgram_unmaterialize(state, g_program);
+  Visuals_GlProgram_unmaterialize(state, g_program);
   Shizu_Object_unlock(state, (Shizu_Object*)g_program);
   g_program = NULL;
 }
@@ -326,7 +326,7 @@ Zeitgeist_Rendition_load
     Shizu_State_popJumpTarget(state);
   } else {
     Shizu_State_popJumpTarget(state);
-    Zeitgeist_Visuals_GlProgram_unmaterialize(state, g_program);
+    Visuals_GlProgram_unmaterialize(state, g_program);
     g_program = NULL;
     Shizu_State_jump(state);
   }
@@ -338,7 +338,7 @@ Zeitgeist_Rendition_load
   } else {
     Shizu_State_popJumpTarget(state);
     g_world = NULL;
-    Zeitgeist_Visuals_GlProgram_unmaterialize(state, g_program);
+    Visuals_GlProgram_unmaterialize(state, g_program);
     g_program = NULL;
     Shizu_State_jump(state);
   }
