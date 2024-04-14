@@ -89,9 +89,5 @@ macro(end_plugin_library)
   target_sources(${name} PRIVATE ${${name}.configuration_files} ${${name}.header_files} ${${name}.source_files})
 
   configure_warnings_and_errors(${name})
-  
-  #if (${${name}.operating_system} STREQUAL ${${name}.operating_system_linux})
-  #set_property(TARGET ${name} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  #endif()
 
 endmacro()

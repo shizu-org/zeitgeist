@@ -1,0 +1,103 @@
+#
+# Shizu Runtime
+# Copyright (C) 2024 Michael Heilmann. All rights reserved.
+#
+# This software is provided 'as-is', without any express or implied
+# warranty.  In no event will the authors be held liable for any damages
+# arising from the use of this software.
+#
+# Permission is granted to anyone to use this software for any purpose,
+# including commercial applications, and to alter it and redistribute it
+# freely, subject to the following restrictions:
+#
+# 1. The origin of this software must not be misrepresented; you must not
+#    claim that you wrote the original software. If you use this software
+#    in a product, an acknowledgment in the product documentation would be
+#    appreciated but is not required.
+# 2. Altered source versions must be plainly marked as such, and must not be
+#    misrepresented as being the original software.
+# 3. This notice may not be removed or altered from any source distribution.
+#
+
+cmake_minimum_required(VERSION 3.20)
+
+set(name ${Shizu.project-name}.Runtime)
+
+begin_library()
+
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Configure.h.in)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Include.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Include.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Gc.private.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Gc.private.h)
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Gc.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Gc.h)
+
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Value.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Type.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Type.h)
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Type.private.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Type.private.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Stack.private.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Stack.private.h)
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Stack.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Stack.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/State.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/State.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Locks.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Locks.h)
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Locks.private.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Locks.private.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Objects/List.private.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/List.private.h)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/List.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Objects/Map.private.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/Map.private.h)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/Map.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Objects/String.private.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/String.private.h)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/String.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Objects/WeakReference.private.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/WeakReference.private.h)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/WeakReference.h)
+
+# Configuration variables for 'Configure.h.in'.
+if (${${name}.operating_system} STREQUAL ${${name}.operating_system_windows})
+  set(Shizu_Configuration_OperatingSystem Shizu_Configuration_OperatingSystem_Windows)
+endif()
+if (${${name}.operating_system} STREQUAL ${${name}.operating_system_linux})
+  set(Shizu_Configuration_OperatingSystem Shizu_Configuration_OperatingSystem_Linux)
+endif()
+
+if (${${name}.compiler_c} STREQUAL ${${name}.compiler_c_msvc})
+  set(Shizu_Configuration_CompilerC Shizu_Configuration_CompilerC_Msvc)
+endif()
+if (${${name}.compiler_c} STREQUAL ${${name}.compiler_c_gcc})
+  set(Shizu_Configuration_CompilerC Shizu_Configuration_CompilerC_Gcc)
+endif()
+
+if (${${name}.instruction_set_architecture} STREQUAL ${${name}.instruction_set_architecture_x64})
+  set(Shizu_Configuration_InstructionSetArchitecture Shizu_Configuration_InstructionSetArchitecture_X64)
+endif()
+if (${${name}.instruction_set_architecture} STREQUAL ${${name}.instruction_set_architecture_x86})
+  set(Shizu_Configuration_InstructionSetArchitecture Shizu_Configuration_InstructionSetArchitecture_X86)
+endif()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/Shizu/Runtime/Configure.h.in includes/Shizu/Runtime/Configure.h)
+list(APPEND ${name}.configuration_files ${CMAKE_CURRENT_BINARY_DIR}/includes/Shizu/Runtime/Configure.h)
+
+end_library()
+
+source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${${name}.configuration_files})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${${name}.header_files})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${${name}.source_files})

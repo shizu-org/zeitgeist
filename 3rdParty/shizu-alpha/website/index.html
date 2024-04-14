@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>shizu.org</title>
+
+    <link rel="icon" href="/favicons/favicon-16x16.svg" sizes="16x16"><!-- 16×16 -->
+    <link rel="icon" href="/favicons/favicon-32x32.svg" sizes="32x32"><!-- 32×32 -->
+    <link rel="icon" href="/favicons/favicon-48x48.svg" sizes="48x48"><!-- 48×48 -->
+    <link rel="icon" href="/favicons/favicon-96x96.svg" sizes="96x96"><!-- 96×96 -->
+    <link rel="icon" href="/favicons/favicon-512x512.svg" sizes="512x512"><!-- 512×512 -->
+    <style>
+
+    body {
+    	width: 100%;
+      	height: 100%;
+      	display: flex;
+      
+      	margin: 0;
+      	padding: 0;
+      
+   		overflow: hidden;
+  		position: absolute;
+      
+      	font-size: 14vmin;
+      
+      	flex-direction: row; /*main axis is left to right/right to left*/
+    	justify-content: center; /*centers items on the line (the x-axis by default)*/
+  		align-items: center; /*centers items on the cross-axis (y by default)*/
+    }
+      
+    body > div {
+      display: flex;
+      flex-direction: column; /*main axis is top to bottom/bottom to right*/
+      justify-content: center; /*centers items on the line (the x-axis by default)*/
+      align-items: center; /*centers items on the cross-axis (y by default)*/ 
+    }
+      
+    .shizu.hyperlink {
+      cursor: default;
+      text-decoration: none;
+      color: black;
+    }
+
+    </style>
+  </head>
+  <body>
+    <div>
+    	<div><a class="shizu hyperlink" href="https://en.wiktionary.org/wiki/%E9%9D%99">静</a></div>
+    	<div>Shizu.org</div>
+    </div>
+  </body>
+</html>

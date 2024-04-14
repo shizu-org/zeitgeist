@@ -72,5 +72,7 @@ list(APPEND ${name}.source_files Zeitgeist/Configure.h)
 
 end_library()
 
+target_link_libraries(${name} Shizu.Runtime)
+
 target_include_directories(${name} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(${name} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
