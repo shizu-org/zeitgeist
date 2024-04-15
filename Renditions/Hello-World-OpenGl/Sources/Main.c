@@ -139,7 +139,7 @@ loadPrograms
   g_program = Visuals_GlProgram_create(state, Shizu_String_create(state, g_vertexShader, strlen(g_vertexShader)),
                                               Shizu_String_create(state, g_fragmentShader, strlen(g_fragmentShader)));
   Shizu_Object_lock(state, (Shizu_Object*)g_program);
-  Visuals_GlProgram_materialize(state, g_program);
+  Visuals_Object_materialize(state, (Visuals_Object*)g_program);
 }
 
 static void
@@ -148,7 +148,7 @@ unloadPrograms
     Shizu_State* state
   )
 {
-  Visuals_GlProgram_unmaterialize(state, g_program);
+  Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
   Shizu_Object_unlock(state, (Shizu_Object*)g_program);
   g_program = NULL;
 }

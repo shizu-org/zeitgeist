@@ -4,8 +4,12 @@ Shizu_TypeDescriptor const Vector3R32_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,
 	.staticVisit = NULL,
+	.size = sizeof(Vector3R32),
 	.finalize = NULL,
 	.visit = NULL,
+	.dispatchSize = sizeof(Vector3R32_Dispatch),
+	.dispatchInitialize = NULL,
+	.dispatchUninitialize = NULL,
 };
 
 Shizu_defineType(Vector3R32, Shizu_Object);

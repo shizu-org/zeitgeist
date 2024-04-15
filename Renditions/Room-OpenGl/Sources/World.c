@@ -17,8 +17,12 @@ static Shizu_TypeDescriptor const Player_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,
 	.staticVisit = NULL,
+	.size = sizeof(Player),
 	.finalize = NULL,
 	.visit = (Shizu_OnVisitCallback*) & Player_visit,
+	.dispatchSize = sizeof(Player_Dispatch),
+	.dispatchInitialize = NULL,
+	.dispatchUninitialize = NULL,
 };
 
 Shizu_defineType(Player, Shizu_Object);
@@ -160,8 +164,12 @@ static Shizu_TypeDescriptor const StaticGeometryGl_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,
 	.staticVisit = NULL,
+	.size = sizeof(StaticGeometryGl),
 	.finalize = (Shizu_OnFinalizeCallback*)&StaticGeometryGl_finalize,
 	.visit = NULL,
+	.dispatchSize = sizeof(StaticGeometryGl_Dispatch),
+	.dispatchInitialize = NULL,
+	.dispatchUninitialize = NULL,
 };
 
 Shizu_defineType(StaticGeometryGl, Shizu_Object);
@@ -575,8 +583,12 @@ static Shizu_TypeDescriptor const World_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,
 	.staticVisit = NULL,
+	.size = sizeof(World),
 	.finalize = NULL,
 	.visit = (Shizu_OnVisitCallback*)&World_visit,
+	.dispatchSize = sizeof(World_Dispatch),
+	.dispatchInitialize = NULL,
+	.dispatchUninitialize = NULL,
 };
 
 Shizu_defineType(World, Shizu_Object);

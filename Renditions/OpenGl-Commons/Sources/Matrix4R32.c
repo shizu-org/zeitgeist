@@ -16,8 +16,12 @@ Shizu_TypeDescriptor const Matrix4R32_Type = {
   .staticInitialize = NULL,
   .staticFinalize = NULL,
   .staticVisit = NULL,
+  .size = sizeof(Matrix4R32),
   .finalize = NULL,
   .visit = NULL,
+  .dispatchSize = sizeof(Matrix4R32_Dispatch),
+  .dispatchInitialize = NULL,
+  .dispatchUninitialize = NULL,
 };
 
 Shizu_defineType(Matrix4R32, Shizu_Object);

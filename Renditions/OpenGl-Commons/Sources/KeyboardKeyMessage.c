@@ -4,8 +4,12 @@ Shizu_TypeDescriptor const KeyboardKeyMessage_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,
 	.staticVisit = NULL,
+	.size = sizeof(KeyboardKeyMessage),
 	.finalize = NULL,
 	.visit = NULL,
+	.dispatchSize = sizeof(KeyboardKeyMessage_Dispatch),
+	.dispatchInitialize = NULL,
+	.dispatchUninitialize = NULL,
 };
 
 Shizu_defineType(KeyboardKeyMessage, Shizu_Object);

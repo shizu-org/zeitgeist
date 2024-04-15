@@ -7,6 +7,10 @@ typedef struct Vector3R32 Vector3R32;
 
 Shizu_declareType(Matrix4R32)
 
+struct Matrix4R32_Dispatch {
+  Shizu_Object_Dispatch _parent;
+};
+
 struct Matrix4R32 {
   Shizu_Object _parent;
   idlib_matrix_4x4_f32 m;

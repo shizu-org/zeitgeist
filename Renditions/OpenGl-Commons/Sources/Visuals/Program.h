@@ -9,6 +9,11 @@
  */
 
 Shizu_declareType(Visuals_Program);
+
+struct Visuals_Program_Dispatch {
+  Visuals_Object_Dispatch _parent;
+};
+
 struct Visuals_Program {
   Visuals_Object _parent;
   Shizu_String* vertexProgramSource;
@@ -25,6 +30,11 @@ Visuals_Program_construct
   );
 
 Shizu_declareType(Visuals_GlProgram);
+
+struct Visuals_GlProgram_Dispatch {
+  Visuals_Program_Dispatch _parent;
+};
+
 struct Visuals_GlProgram {
   Visuals_Program _parent;
   GLuint vertexProgramId;
@@ -47,20 +57,6 @@ Visuals_GlProgram_create
     Shizu_State* state,
     Shizu_String* vertexSource,
     Shizu_String* fragmentSource
-  );
-
-void
-Visuals_GlProgram_materialize
-  (
-    Shizu_State* state,
-    Visuals_GlProgram* self
-  );
-
-void
-Visuals_GlProgram_unmaterialize
-  (
-    Shizu_State* state,
-    Visuals_GlProgram* self
   );
 
 #endif // VISUALS_PROGRAM_H_INCLUDED

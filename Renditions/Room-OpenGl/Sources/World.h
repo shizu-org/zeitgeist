@@ -11,6 +11,10 @@
 
 Shizu_declareType(Player);
 
+struct Player_Dispatch {
+	Shizu_Object_Dispatch _parent;
+};
+
 /**
  * @brief The state of the player.
  */
@@ -164,6 +168,10 @@ Player_update
  * - a west, north, east, or south walls of a room
  */
 Shizu_declareType(StaticGeometryGl)
+
+struct StaticGeometryGl_Dispatch {
+	Shizu_Object_Dispatch _parent;
+};
 
 /**
  * @since 0.1
@@ -352,6 +360,10 @@ StaticGeometryGl_create
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 Shizu_declareType(World)
+
+struct World_Dispatch {
+	Shizu_Object_Dispatch _parent;
+};
 
 struct World {
 	Shizu_Object _parent;

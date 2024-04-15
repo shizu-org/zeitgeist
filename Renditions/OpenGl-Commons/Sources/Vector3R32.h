@@ -6,6 +6,10 @@
 
 Shizu_declareType(Vector3R32)
 
+struct Vector3R32_Dispatch {
+	Shizu_Object_Dispatch _parent;
+};
+
 typedef struct Vector3R32 {
 	Shizu_Object _parent;
 	idlib_vector_3_f32 v;

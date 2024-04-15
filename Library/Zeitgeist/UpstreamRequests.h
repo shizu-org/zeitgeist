@@ -18,6 +18,10 @@ Shizu_declareType(Zeitgeist_UpstreamRequest);
  */
 #define Zeitgeist_UpstreamRequestType_ExitProcessRequest (1)
 
+struct Zeitgeist_UpstreamRequest_Dispatch {
+  Shizu_Object_Dispatch _parent;
+};
+
 struct Zeitgeist_UpstreamRequest {
   Shizu_Object _parent;
   Shizu_Integer32 type;

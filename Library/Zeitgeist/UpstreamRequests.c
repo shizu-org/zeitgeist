@@ -11,8 +11,12 @@ static Shizu_TypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
   .staticInitialize = NULL,
   .staticFinalize = NULL,
   .staticVisit = NULL,
+  .size = sizeof(Zeitgeist_UpstreamRequest),
   .finalize = NULL,
   .visit = NULL,
+  .dispatchSize = sizeof(Zeitgeist_UpstreamRequest_Dispatch),
+  .dispatchInitialize = NULL,
+  .dispatchUninitialize = NULL,
 };
 
 Shizu_defineType(Zeitgeist_UpstreamRequest, Shizu_Object);

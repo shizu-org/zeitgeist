@@ -20,6 +20,10 @@
 
 Shizu_declareType(KeyboardKeyMessage)
 
+struct KeyboardKeyMessage_Dispatch {
+	Shizu_Object_Dispatch _parent;
+};
+
 struct KeyboardKeyMessage {
 	Shizu_Object _parent;
 	Shizu_Integer32 action;

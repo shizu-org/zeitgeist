@@ -7,6 +7,10 @@
 
 Shizu_declareType(Zeitgeist_Rendition);
 
+struct Zeitgeist_Rendition_Dispatch {
+  Shizu_Object_Dispatch _parent;
+};
+
 struct Zeitgeist_Rendition {
   Shizu_Object _parent;
 

@@ -31,8 +31,12 @@ static Shizu_TypeDescriptor const Zeitgeist_Rendition_Type = {
   .staticInitialize = NULL,
   .staticFinalize = NULL,
   .staticVisit = NULL,
+  .size = sizeof(Zeitgeist_Rendition),
   .finalize = (Shizu_OnFinalizeCallback*)&Zeitgeist_Rendition_finalize,
   .visit = (Shizu_OnVisitCallback*)&Zeitgeist_Rendition_visit,
+  .dispatchSize = sizeof(Zeitgeist_Rendition_Dispatch),
+  .dispatchInitialize = NULL,
+  .dispatchUninitialize = NULL,
 };
 
 Shizu_defineType(Zeitgeist_Rendition, Shizu_Object);
