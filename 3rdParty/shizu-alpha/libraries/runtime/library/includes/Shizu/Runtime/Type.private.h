@@ -29,8 +29,12 @@
 #include "Shizu/Runtime/Gc.private.h"
 
 // This flag is set after a successful call to the Shizu_OnStaticInitialize function of the type. If the call is not successful, the flag is not set.
-// A successful call to Shizu_OnStaticUninitialize clears the flags.
+// A successful call to Shizu_OnStaticUninitialize clears the flag.
 #define Shizu_TypeFlags_StaticallyInitialized (1)
+
+// This flag is set after a successful call to the Shizu_OnDispatchInitialize function of the type. If the call is not successful, the flag is not set.
+// A successful call to Shizu_OnDispatchUninitialize clears the flag.
+#define Shizu_TypeFlags_DispatchInitialized (2)
 
 typedef struct Shizu_Type Shizu_Type;
 
@@ -55,6 +59,9 @@ struct Shizu_Type {
   } children;
   // A pointer to the DL from which the type originates from or the null pointer.
   Shizu_Dl* dl;
+  // A pointer to the dispatch if Shizu_TypeFlags_DispatchInitialized is set in flags.
+  // The null pointer otherwise.
+  Shizu_Object_Dispatch* dispatch;
 };
 
 void
@@ -67,6 +74,20 @@ void
 Shizu_Types_uninitialize
   (
     Shizu_State* self
-) ;
+  );
+
+void
+Shizu_Types_ensureDispatchInitialized
+  (
+    Shizu_State* self,
+    Shizu_Type* type
+  );
+
+void
+Shizu_Types_ensureDispatchUninitialized
+  (
+    Shizu_State* self,
+    Shizu_Type* type
+  );
 
 #endif // SHIZU_RUNTIME_TYPE_PRIVATE_H_INCLUDED

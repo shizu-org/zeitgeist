@@ -58,15 +58,9 @@ hashPointer
     void* p
   );
 
-static Shizu_TypeDescriptor const Shizu_WeakReference_Type = {
-  .staticInitialize = (Shizu_OnStaticInitializeCallback*) & Shizu_WeakReference_staticInitialize,
-  .staticFinalize = (Shizu_OnStaticFinalizeCallback*) & Shizu_WeakReference_staticUninitialize,
-  .staticVisit = NULL,
-  .visit = NULL,
-  .finalize = (Shizu_OnFinalizeCallback*) & Shizu_WeakReference_finalize,
+struct Shizu_WeakReference_Dispatch {
+  Shizu_Object_Dispatch _parent;
 };
-
-Shizu_defineType(Shizu_WeakReference, Shizu_Object);
 
 struct Shizu_WeakReference {
   Shizu_Object _parent;
@@ -74,6 +68,20 @@ struct Shizu_WeakReference {
   /// @brief A pointer to the Shizu_Object value or the null pointer.
   Shizu_Object* reference;
 };
+
+static Shizu_TypeDescriptor const Shizu_WeakReference_Type = {
+  .staticInitialize = (Shizu_OnStaticInitializeCallback*) & Shizu_WeakReference_staticInitialize,
+  .staticFinalize = (Shizu_OnStaticFinalizeCallback*) & Shizu_WeakReference_staticUninitialize,
+  .staticVisit = NULL,
+  .size = sizeof(Shizu_WeakReference),
+  .visit = NULL,
+  .finalize = (Shizu_OnFinalizeCallback*) & Shizu_WeakReference_finalize,
+  .dispatchSize = sizeof(Shizu_WeakReference_Dispatch),
+  .dispatchInitialize = NULL,
+  .dispatchUninitialize = NULL,
+};
+
+Shizu_defineType(Shizu_WeakReference, Shizu_Object);
 
 typedef struct WeakReferences WeakReferences;
 

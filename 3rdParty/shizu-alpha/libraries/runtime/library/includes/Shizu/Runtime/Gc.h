@@ -27,6 +27,10 @@
 
 Shizu_declareType(Shizu_Object);
 
+struct Shizu_Object_Dispatch {
+  Shizu_Object_Dispatch* parent;
+};
+
 struct Shizu_Object {
   // Shizu_Object are kept in a singly-linked list.
   Shizu_Object* next;
@@ -43,6 +47,28 @@ struct Shizu_Object {
   // Pointer to the Shizu_Type object.
   Shizu_Type* type;
 };
+
+/// @brief Get the Shizu_Type value of a Shizu_Object value.
+/// @param self A pointer to the Shizu_State object.
+/// @param object A pointer the Shizu_Object value.
+/// @return A pointer to the Shizu_Type value of the Shizu_Object value.
+Shizu_Type*
+Shizu_State_getObjectType
+  (
+    Shizu_State* self,
+    Shizu_Object* object
+  );
+
+/// @brief Get the Shizu_Object_Dispatch value of a Shizu_Object value.
+/// @param self A pointer to the Shizu_State object.
+/// @param object A pointer the Shizu_Object value.
+/// @return A pointer to the Shizu_Object_dispatch value of the Shizu_Object value.
+Shizu_Object_Dispatch*
+Shizu_State_getObjectDispatch
+  (
+    Shizu_State* state,
+    Shizu_Object* object
+  );
 
 /// @since 1.0
 /// Allocate an object of the specified size, in Bytes.

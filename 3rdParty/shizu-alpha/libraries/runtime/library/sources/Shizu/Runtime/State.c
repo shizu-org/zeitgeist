@@ -596,6 +596,7 @@ Shizu_Types_uninitialize
       while (current) {
         if (!Shizu_Type_getChildCount(current)) {
           Shizu_Type* type = current;
+          Shizu_Types_ensureDispatchUninitialized(self, type);
           *previous = current->next;
           current = current->next;
           self->types.size--;
@@ -735,6 +736,70 @@ Shizu_State_getTypeByName
   return NULL;
 }
 
+void
+Shizu_Types_ensureDispatchUninitialized
+  (
+    Shizu_State* state,
+    Shizu_Type* type
+  )
+{
+  if (0 == (Shizu_TypeFlags_DispatchInitialized & type->flags)) {
+    return;
+  }
+  if (type->descriptor->dispatchUninitialize) {
+    type->descriptor->dispatchUninitialize(state, type->dispatch);
+  }
+  free(type->dispatch);
+  type->dispatch = NULL;
+  type->flags = ~Shizu_TypeFlags_DispatchInitialized & type->flags;
+}
+
+void
+Shizu_Types_ensureDispatchInitialized
+  (
+    Shizu_State* state,
+    Shizu_Type* type
+  )
+{
+  if (Shizu_TypeFlags_DispatchInitialized == (Shizu_TypeFlags_DispatchInitialized & type->flags)) {
+    return;
+  }
+  if (type->parentType) {
+    if (type->descriptor->dispatchSize < type->parentType->descriptor->dispatchSize) {
+      Shizu_State_setError(state, 1);
+      Shizu_State_jump(state);
+    }
+    Shizu_Types_ensureDispatchInitialized(state, type->parentType);
+  }
+  if (type->descriptor->dispatchSize < sizeof(Shizu_Object_Dispatch)) {
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
+  }
+  type->dispatch = malloc(type->descriptor->dispatchSize);
+  if (!type->dispatch) {
+    Shizu_State_setError(state, 1);
+    Shizu_State_jump(state);
+  }
+  memset(type->dispatch, 0, type->descriptor->dispatchSize);
+  if (type->parentType) {
+    memcpy(type->dispatch, type->parentType->dispatch, type->parentType->descriptor->dispatchSize);
+  }
+  if (type->descriptor->dispatchInitialize) {
+    Shizu_JumpTarget jumpTarget;
+    Shizu_State_pushJumpTarget(state, &jumpTarget);
+    if (!setjmp(jumpTarget.environment)) {
+      type->descriptor->dispatchInitialize(state, type->dispatch);
+      Shizu_State_popJumpTarget(state);
+    } else {
+      Shizu_State_popJumpTarget(state);
+      free(type->dispatch);
+      type->dispatch = NULL;
+      Shizu_State_jump(state);
+    }
+  }
+  type->flags |= Shizu_TypeFlags_DispatchInitialized;
+}
+
 Shizu_Type*
 Shizu_State_createType
   (
@@ -776,6 +841,7 @@ Shizu_State_createType
   }
   memcpy(type->name.bytes, name, numberOfBytes);
   type->flags = 0;
+  type->dispatch = NULL;
   type->parentType = parentType;
   type->descriptor = typeDescriptor;
   type->name.hashValue = hashValue;
@@ -843,6 +909,7 @@ Shizu_State_createType
       type->descriptor->staticInitialize(self);
     }
     type->flags |= Shizu_TypeFlags_StaticallyInitialized;
+    Shizu_Types_ensureDispatchInitialized(self, type);
   }
   Shizu_State_popJumpTarget(self);
   return type;

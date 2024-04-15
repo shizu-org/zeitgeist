@@ -61,8 +61,12 @@ static Shizu_TypeDescriptor const Shizu_List_Type = {
 	.staticInitialize = &Shizu_List_staticInitialize,
 	.staticFinalize = &Shizu_List_staticFinalize,
 	.staticVisit = NULL,
+	.size = sizeof(Shizu_List),
   .visit = (Shizu_OnVisitCallback*) & Shizu_List_visit,
   .finalize = (Shizu_OnFinalizeCallback*) & Shizu_List_finalize,
+	.dispatchSize = sizeof(Shizu_List_Dispatch),
+	.dispatchInitialize = NULL,
+	.dispatchUninitialize = NULL,
 };
 
 static const char* namedMemoryName = "Shizu.Lists.NamedMemory";

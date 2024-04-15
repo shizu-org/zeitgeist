@@ -61,8 +61,12 @@ static Shizu_TypeDescriptor const Shizu_Map_Type = {
   .staticInitialize = &Shizu_Map_staticInitialize,
   .staticFinalize = &Shizu_Map_staticFinalize,
   .staticVisit = NULL,
+  .size = sizeof(Shizu_Map),
   .visit = (Shizu_OnVisitCallback*) & Shizu_Map_visit,
   .finalize = (Shizu_OnFinalizeCallback*) & Shizu_Map_finalize,
+  .dispatchSize = sizeof(Shizu_Map_Dispatch),
+  .dispatchInitialize = NULL,
+  .dispatchUninitialize = NULL,
 };
 
 static const char* namedMemoryName = "Shizu.Maps.NamedMemory";

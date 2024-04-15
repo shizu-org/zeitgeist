@@ -19,4 +19,43 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+#define SHIZU_RUNTIME_PRIVATE (1)
 #include "Shizu/Runtime/Type.h"
+
+#include "Shizu/Runtime/Type.private.h"
+
+bool
+Shizu_State_isSubTypeOf
+  (
+    Shizu_State* self,
+    Shizu_Type const* x,
+    Shizu_Type const* y
+  )
+{
+  Shizu_Type const* z = x;
+  do {
+    if (z == y) {
+      break;
+    }
+    z = z->parentType;
+  } while (z);
+  return NULL != z;
+}
+
+bool
+Shizu_Type_isTrueSubTypeOf
+  (
+    Shizu_State* self,
+    Shizu_Type const* x,
+    Shizu_Type const* y
+  )
+{
+  Shizu_Type const* z = x;
+  do {
+    if (z->parentType == y) {
+      break;
+    }
+    z = z->parentType;
+  } while (z);
+  return NULL != z;
+}

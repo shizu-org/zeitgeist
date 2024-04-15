@@ -24,6 +24,9 @@
 
 #include "Shizu/Runtime/Configure.h"
 
+// bool
+#include <stdbool.h>
+
 typedef struct Shizu_Dl Shizu_Dl;
 typedef struct Shizu_State Shizu_State;
 typedef struct Shizu_Object Shizu_Object;
@@ -60,13 +63,63 @@ typedef void (Shizu_OnFinalizeCallback)(Shizu_State* state, Shizu_Object* object
 /// The type of a "onTypeDestroyed" callback function.
 typedef void (Shizu_OnTypeDestroyedCallback)(Shizu_State* state);
 
+/// @since 1.0
+/// The type of a "onDispatchInitialize" callback function.
+typedef void (Shizu_OnDispatchInitializeCallback)(Shizu_State* state, void*);
+
+/// @since 1.0
+/// The type of a "onStaticUninitialize" callback function.
+typedef void (Shizu_OnDispatchUninitializeCallback)(Shizu_State* state, void*);
+
 struct Shizu_TypeDescriptor {
   Shizu_OnStaticInitializeCallback* staticInitialize;
   Shizu_OnStaticFinalizeCallback* staticFinalize;
   Shizu_OnStaticVisitCallback* staticVisit;
+  size_t size;
   Shizu_OnVisitCallback* visit;
   Shizu_OnFinalizeCallback* finalize;
+  size_t dispatchSize;
+  Shizu_OnDispatchInitializeCallback *dispatchInitialize;
+  Shizu_OnDispatchUninitializeCallback* dispatchUninitialize;
 };
+
+/**
+ * @since 1.0
+ * @brief Get if a type is a sub-type of another type.
+ * The type-algebraic expression is 
+ * @code
+ * x <= y
+ * @endcode
+ * @param x The type to test if it is a sub-type of @a y.
+ * @param y The type to test if it is a super-type of @a x.
+ * @return @a true if @a x is a sub-type of @a y. @a false otherwise.
+ */
+bool
+Shizu_State_isSubTypeOf
+  (
+    Shizu_State* self,
+    Shizu_Type const* x,
+    Shizu_Type const* y
+  );
+
+/**
+ * @since 1.0
+ * @brief Get if a type is a true sub-type of another type.
+ * The type-algebraic expression is 
+ * @code
+ * x <= y
+ * @endcode
+ * @param x The type to test if it is a true sub-type of @a y.
+ * @param y The type to test if it is a true super-type of @a x.
+ * @return @a true if @a x is a true sub-type of @a y. @a false otherwise.
+ */
+bool
+Shizu_Type_isTrueSubTypeOf
+  (
+    Shizu_State* self,
+    Shizu_Type const* x,
+    Shizu_Type const* y
+  );
 
 Shizu_Type*
 Shizu_State_getTypeByName
@@ -88,6 +141,8 @@ Shizu_State_createType
 
 #define Shizu_declareType(Name) \
   typedef struct Name Name; \
+\
+  typedef struct Name##_Dispatch Name##_Dispatch; \
 \
   Shizu_Type* \
   Name##_getType \

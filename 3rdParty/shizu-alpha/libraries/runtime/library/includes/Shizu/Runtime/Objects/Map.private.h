@@ -41,6 +41,10 @@ struct Shizu_Map_Node {
   Shizu_Value value;
 };
 
+struct Shizu_Map_Dispatch {
+  Shizu_Object_Dispatch _parent;
+};
+
 struct Shizu_Map {
   Shizu_Object _parent;
   Shizu_Map_Node** buckets;

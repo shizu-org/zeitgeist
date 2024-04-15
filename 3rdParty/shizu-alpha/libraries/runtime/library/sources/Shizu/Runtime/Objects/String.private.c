@@ -48,8 +48,12 @@ static Shizu_TypeDescriptor const Shizu_String_Type = {
   .staticInitialize = NULL,
   .staticFinalize = NULL,
   .staticVisit = NULL,
+  .size = sizeof(Shizu_String),
   .visit = NULL,
   .finalize = (Shizu_OnFinalizeCallback*)&Shizu_String_finalize,
+  .dispatchSize = sizeof(Shizu_String_Dispatch),
+  .dispatchInitialize = NULL,
+  .dispatchUninitialize = NULL,
 };
 
 Shizu_defineType(Shizu_String, Shizu_Object);

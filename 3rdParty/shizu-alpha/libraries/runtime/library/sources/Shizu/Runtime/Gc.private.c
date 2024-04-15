@@ -89,8 +89,12 @@ Shizu_TypeDescriptor const Shizu_Object_Type = {
   .staticInitialize = NULL,
   .staticFinalize = NULL,
   .staticVisit = NULL,
+  .size = sizeof(Shizu_Object),
   .visit = NULL,
   .finalize = NULL,
+  .dispatchSize = sizeof(Shizu_Object_Dispatch),
+  .dispatchInitialize = NULL,
+  .dispatchUninitialize = NULL,
 };
 
 static void
