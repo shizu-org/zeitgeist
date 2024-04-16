@@ -6,6 +6,7 @@
 #include "Matrix4R32.h"
 #include "Vector3R32.h"
 #include "ServiceGl.h"
+#include "Visuals/VertexBuffer.h"
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -192,15 +193,10 @@ struct StaticGeometryGl {
 	GLuint colorTextureId;
 	
 	/**
-	 * @brief The OpenGL ID of the vertex buffer.
+	 * @brief The vertex buffer.
 	 */
-	GLuint bufferId;
-	
-	/**
-	 * @brief The OpenGL ID of the vertex array.
-	 */
-	GLuint vertexArrayId;
-	
+	Visuals_VertexBuffer* vertexBuffer;
+
 	/** 
    * @brief The number of vertices of this wall.
 	 */

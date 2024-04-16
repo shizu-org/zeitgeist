@@ -38,10 +38,20 @@ list(APPEND ${name}.header_files Sources/KeyboardKeyMessage.h)
 list(APPEND ${name}.source_files Sources/RenderBuffer.c)
 list(APPEND ${name}.header_files Sources/RenderBuffer.h)
 
-list(APPEND ${name}.source_files Sources/Visuals/Program.c)
-list(APPEND ${name}.header_files Sources/Visuals/Program.h)
 list(APPEND ${name}.source_files Sources/Visuals/Object.c)
 list(APPEND ${name}.header_files Sources/Visuals/Object.h)
+
+list(APPEND ${name}.source_files Sources/Visuals/Program.c)
+list(APPEND ${name}.header_files Sources/Visuals/Program.h)
+
+list(APPEND ${name}.source_files Sources/Visuals/VertexBuffer.c)
+list(APPEND ${name}.header_files Sources/Visuals/VertexBuffer.h)
+
+list(APPEND ${name}.source_files Sources/Visuals/DefaultPrograms.c)
+list(APPEND ${name}.header_files Sources/Visuals/DefaultPrograms.h)
+
+list(APPEND ${name}.source_files Sources/Visuals/RenderBuffer.c)
+list(APPEND ${name}.header_files Sources/Visuals/RenderBuffer.h)
 
 end_library()
 

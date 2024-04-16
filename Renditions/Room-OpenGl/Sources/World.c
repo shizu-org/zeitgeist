@@ -1,7 +1,5 @@
 #include "World.h"
 
-#include "Zeitgeist/UpstreamRequests.h"
-
 #include "KeyboardKeyMessage.h"
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -160,13 +158,20 @@ StaticGeometryGl_finalize
 		StaticGeometryGl* self
 	);
 
+static void
+StaticGeometryGl_visit
+	(
+		Shizu_State* state,
+		StaticGeometryGl* self
+	);
+
 static Shizu_TypeDescriptor const StaticGeometryGl_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,
 	.staticVisit = NULL,
 	.size = sizeof(StaticGeometryGl),
 	.finalize = (Shizu_OnFinalizeCallback*)&StaticGeometryGl_finalize,
-	.visit = NULL,
+	.visit = (Shizu_OnVisitCallback*)&StaticGeometryGl_visit,
 	.dispatchSize = sizeof(StaticGeometryGl_Dispatch),
 	.dispatchInitialize = NULL,
 	.dispatchUninitialize = NULL,
@@ -180,7 +185,22 @@ StaticGeometryGl_finalize
 		Shizu_State* state,
 		StaticGeometryGl* self
 	)
-{ StaticGeometryGl_unmaterialize(state, self); }
+{
+	self->vertexBuffer = NULL; 
+	StaticGeometryGl_unmaterialize(state, self);
+}
+
+static void
+StaticGeometryGl_visit
+	(
+		Shizu_State* state,
+		StaticGeometryGl* self
+	)
+{
+	if (self->vertexBuffer) {
+		Shizu_Gc_visitObject(state, (Shizu_Object*)self->vertexBuffer);
+	}
+}
 
 void
 StaticGeometryGl_unmaterialize
@@ -189,17 +209,12 @@ StaticGeometryGl_unmaterialize
 		StaticGeometryGl* self
 	)
 {
+	if (self->vertexBuffer) {
+		Visuals_Object_unmaterialize(state, (Visuals_Object*)self->vertexBuffer);
+	}
 	if (self->colorTextureId) {
 		glDeleteTextures(1, &self->colorTextureId);
 		self->colorTextureId = 0;
-	}
-	if (self->vertexArrayId) {
-		glDeleteVertexArrays(1, &self->vertexArrayId);
-		self->vertexArrayId = 0;
-	}
-	if (self->bufferId) {
-		glDeleteBuffers(1, &self->bufferId);
-		self->bufferId = 0;
 	}
 }
 
@@ -211,31 +226,13 @@ StaticGeometryGl_create
 {
 	StaticGeometryGl* self = (StaticGeometryGl*)Shizu_Gc_allocate(state, sizeof(StaticGeometryGl));
 
+	self->vertexBuffer = (Visuals_VertexBuffer*)Visuals_GlVertexBuffer_create(state);
+	Visuals_Object_materialize(state, (Visuals_Object*)self->vertexBuffer);
 	self->numberOfVertices = 0;
-	self->bufferId = 0;
-	self->vertexArrayId = 0;
-
-	while (glGetError()) { }
-	glGenBuffers(1, &self->bufferId);
-	if (glGetError()) {
-		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenBuffers");
-		Shizu_State_setError(state, 1);
-		Shizu_State_jump(state);
-	}
-	glGenVertexArrays(1, &self->vertexArrayId);
-	if (glGetError()) {
-		glDeleteBuffers(1, &self->bufferId);
-		self->bufferId = 0;
-		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
-		Shizu_State_setError(state, 1);
-		Shizu_State_jump(state);
-	}
 	glGenTextures(1, &self->colorTextureId);
 	if (glGetError()) {
-		glDeleteVertexArrays(1, &self->vertexArrayId);
-		self->vertexArrayId = 0;
-		glDeleteBuffers(1, &self->bufferId);
-		self->bufferId = 0;
+		Visuals_Object_unmaterialize(state, (Visuals_Object*)self->vertexBuffer);
+		self->vertexBuffer = NULL;
 		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
 		Shizu_State_setError(state, 1);
 		Shizu_State_jump(state);
@@ -255,56 +252,8 @@ StaticGeometryGl_setData
 		void const* bytes
 	)
 {
-	static const GLint POSITION_INDEX = 0;
-	
-	static const GLint NORMAL_INDEX = 1;
-
-	static const GLint AMBIENT_COLOR_INDEX = 2;
-
-	// Compute vertex size.
-	size_t vertexSize = numberOfBytes / numberOfVertices;
-	
-	// Warn if this does not hold. 
-	if (numberOfBytes % vertexSize) {
-		fprintf(stderr, "%s:%d: warning: additional %zu Bytes at the end of the data\n", __FILE__, __LINE__, numberOfBytes % vertexSize);
-	}
-
-	// Store the data in the buffer.
-	glBindBuffer(GL_ARRAY_BUFFER, self->bufferId);
+	Visuals_VertexBuffer_setData(state, self->vertexBuffer, Visuals_VertexSemantics_Position3d_Normal3d_ColorRgb|Visuals_VertexSyntactics_Float3_Float3_Float3, bytes, numberOfBytes);
 	self->numberOfVertices = numberOfVertices;
-	self->numberOfBytes = numberOfBytes;
-	glBufferData(GL_ARRAY_BUFFER, numberOfBytes, bytes, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindVertexArray(self->vertexArrayId);
-	glBindBuffer(GL_ARRAY_BUFFER, self->bufferId);
-
-	glEnableVertexAttribArray(POSITION_INDEX);
-	glVertexAttribPointer(POSITION_INDEX,
-		                    3,
-		                    GL_FLOAT,
-		                    GL_FALSE,
-		                    vertexSize,
-		                    (void*)(uintptr_t)0);
-
-	glEnableVertexAttribArray(NORMAL_INDEX);
-	glVertexAttribPointer(NORMAL_INDEX,
-												3,
-												GL_FLOAT,
-												GL_FALSE,
-												vertexSize,
-												(void*)(uintptr_t)(sizeof(float) * 3));
-
-	glEnableVertexAttribArray(AMBIENT_COLOR_INDEX);
-	glVertexAttribPointer(AMBIENT_COLOR_INDEX,
-		                    3,
-		                    GL_FLOAT,
-		                    GL_TRUE,
-		                    vertexSize,
-		                    (void*)(uintptr_t)(sizeof(float)*6));
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 }
 
 struct VERTEX {

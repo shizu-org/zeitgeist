@@ -15,6 +15,11 @@
 #include "ServiceGl.h"
 #include "World.h"
 
+#include "Visuals/DefaultPrograms.h"
+#include "Visuals/Program.h"
+#include "Visuals/RenderBuffer.h"
+#include "Visuals/VertexBuffer.h"
+
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   #define Shizu_Rendition_Export _declspec(dllexport)
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
@@ -41,80 +46,8 @@ Zeitgeist_Rendition_getName
   return Shizu_String_create(state, "Room (OpenGL)", strlen("Room (OpenGL)"));
 }
 
-// Vertex shader.
-// constant inputs:
-//  meshAmbientColor vec4: The ambient color of the mesh in RGBF32.
-//  inputFragmentAmbientColorType : Determine if the mesh ambient color or the vertex ambient color
-//                                  is used as the input fragment color. This can assume two values:
-//                                  0 (default and fallback, the mesh ambient color is used)
-//                                  1 (the vertex ambient color is used)
-// variable inputs:
-//  vertexPosition vec3: The vertex position in model coordinates.
-//  vertexAmbientColor vec4: The vertex ambient color in RGBF32.
-static const GLchar* g_vertexShader =
-  "#version 330 core\n"
-  // vertex variables
-  "layout(location = 0) in vec3 vertexPosition;\n"
-  "layout(location = 1) in vec3 vertexNormal;\n"
-  "layout(location = 2) in vec3 vertexColor;\n"
-  // decide if mesh color or vertex color is used.
-  "uniform int inputFragmentColorType = 0;\n"
-  "uniform vec3 meshColor = vec3(1.0, 0.8, 0.2);\n"
-  "out vec3 inputFragmentPosition;\n"
-  "out vec3 inputFragmentNormal;\n"
-  "out vec3 inputFragmentColor;\n"
-  "uniform mat4 projection = mat4(1);\n"
-  "uniform mat4 view = mat4(1);\n"
-  "uniform mat4 world = mat4(1);\n"
-  "void main() {\n"
-  "  mat4 worldProjection = projection * view * world;\n"
-  "  gl_Position = worldProjection * vec4(vertexPosition, 1.);\n"
-  "  inputFragmentPosition = (worldProjection * vec4(vertexPosition, 1.)).xyz;\n"
-  "  inputFragmentNormal = vertexNormal;\n"
-  "  if(inputFragmentColorType == 1) {\n"
-  "    inputFragmentColor = vertexColor;\n"
-  "  } else {\n"
-  "    inputFragmentColor = meshColor;\n"
-  "  }\n"
-  "}\n"
-  ;
-
-// Fragment shader.
-// light type 1:
-// directionless, locationless light
-// 
-// light type 2:
-// emit light rays from the points on a plane in the direction of the normal vector
-// 
-// The color (255, 204, 51) is the websafe color "sunglow".
-static const GLchar* g_fragmentShader =
-  "#version 330 core\n"
-  "out vec4 outputFragmentColor;\n"
-  "in vec3 inputFragmentPosition;\n"
-  "in vec3 inputFragmentNormal;\n"
-  "in vec3 inputFragmentColor;\n"
-
-  /* diffuse lighting (color + direction) */
-  "uniform vec3 diffuseLightDirection = vec3(1, 1, 1);\n"
-  "uniform vec3 diffuseLightColor = vec3(1, 1, 1);\n"
-
-  /* ambient lighting (color) */
-  "uniform vec3 ambientLightColor = vec3(1, 1, 1);\n"
-
-  "void main() {\n"
-  "  vec3 n = normalize(inputFragmentNormal);\n"
-  "  vec3 d = normalize(diffuseLightDirection);\n"
-  "  float diffuseIntensity = max(dot(n, d), 0.0);\n"
-  "  vec3 diffuse = diffuseIntensity * diffuseLightColor;\n"
-  "  vec3 ambient = ambientLightColor;\n"
-  "  vec3 color = (ambient + diffuse) * inputFragmentColor;\n"
-  "  outputFragmentColor = vec4(color, 1.f);\n"
-  "}\n"
-  ;
-
-#include "Visuals/Program.h"
-
-static Visuals_GlProgram* g_program = NULL;
+static Visuals_Program* g_program = NULL;
+static Visuals_RenderBuffer* g_renderBuffer = NULL;
 static World* g_world = NULL;
 
 static void
@@ -191,12 +124,12 @@ Zeitgeist_Rendition_update
   glViewport(0, 0, viewportWidth, viewportHeight);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glUseProgram(g_program->programId);
+  glUseProgram(((Visuals_GlProgram*)g_program)->programId);
 
   //
   Matrix4R32* world = NULL;
   world = Matrix4R32_createScale(state, Vector3R32_create(state, 0.75f, 0.75f, 1.f));
-  bindMatrix4Uniform(state, g_program->programId, "world", world);
+  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "world", world);
   // (viewRotateY^-1 * viewTranslate^-1)
   // is equivalent to
   // (viewTranslate * viewRotateY)^-1
@@ -209,28 +142,28 @@ Zeitgeist_Rendition_update
   viewRotateY = Matrix4R32_createRotateY(state, -g_world->player->rotationY);
   Matrix4R32* view = NULL;
   view = Matrix4R32_multiply(state, viewRotateY, viewTranslate);
-  bindMatrix4Uniform(state, g_program->programId, "view", view);
+  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "view", view);
   
   //
   Matrix4R32* projection = NULL;
   //projection = Matrix4R32_createOrthographic(state, -1.f, +1.f, -1.f, +1.f, -100.f, +100.f);
   projection = Matrix4R32_createPerspective(state, 90.f, viewportHeight > 0.f ? viewportWidth / viewportHeight : 16.f/9.f, 0.1f, 100.f);
-  bindMatrix4Uniform(state, g_program->programId, "projection", projection);
+  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "projection", projection);
   
   // The color (255, 204, 51) is the websafe color "sunglow".
-  bindVector3Uniform(state, g_program->programId, "meshColor", Vector3R32_create(state, 1.0f, 0.8f, 0.2f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "meshColor", Vector3R32_create(state, 1.0f, 0.8f, 0.2f));
 
-  bindIntegerUniform(state, g_program->programId, "inputFragmentColorType", 1);
+  bindIntegerUniform(state, ((Visuals_GlProgram*)g_program)->programId, "inputFragmentColorType", 1);
 
-  bindVector3Uniform(state, g_program->programId, "ambientLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
-  bindVector3Uniform(state, g_program->programId, "diffuseLightDirection", Vector3R32_create(state, 1.f, 1.f, 1.f));
-  bindVector3Uniform(state, g_program->programId, "diffuseLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "ambientLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightDirection", Vector3R32_create(state, 1.f, 1.f, 1.f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
 
   Shizu_Value sizeValue = Shizu_List_getSize(state, g_world->geometries);
   for (Shizu_Integer32 i = 0, n = Shizu_Value_getInteger32(&sizeValue); i < n; ++i) {
     Shizu_Value elementValue = Shizu_List_getValue(state, g_world->geometries, i);
     StaticGeometryGl *element = (StaticGeometryGl*)Shizu_Value_getObject(&elementValue);
-    glBindVertexArray(element->vertexArrayId);
+    glBindVertexArray(((Visuals_GlVertexBuffer*)element->vertexBuffer)->vertexArrayId);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, element->numberOfVertices);
   }
 
@@ -280,29 +213,6 @@ onKeyboardKeyMessage
   Shizu_Stack_pop(state);
 }
 
-static void
-loadPrograms
-  (
-    Shizu_State* state
-  )
-{
-  g_program = Visuals_GlProgram_create(state, Shizu_String_create(state, g_vertexShader, strlen(g_vertexShader)),
-                                              Shizu_String_create(state, g_fragmentShader, strlen(g_fragmentShader)));
-  Shizu_Object_lock(state, (Shizu_Object*)g_program);
-  Visuals_Object_materialize(state, (Visuals_Object*)g_program);
-}
-
-static void
-unloadPrograms
-  (
-    Shizu_State* state
-  )
-{
-  Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
-  Shizu_Object_unlock(state, (Shizu_Object*)g_program);
-  g_program = NULL;
-}
-
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_load
   (
@@ -316,30 +226,36 @@ Zeitgeist_Rendition_load
   Shizu_Value_setCxxFunction(&temporary, &onKeyboardKeyMessage);
   ServiceGl_addKeyboardKeyCallback(state, &temporary);
 
-  loadPrograms(state);
-
   Shizu_JumpTarget jumpTarget;
-  //
   Shizu_State_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
-    g_world = World_create(state);
+    Visuals_Program* program = Visuals_getProgram(state, "pbr1");
+    Visuals_Object_materialize(state, (Visuals_Object*)program);
+    Shizu_Object_lock(state, (Shizu_Object*)program);
+    g_program = program;
+    World* world = World_create(state);
+    Shizu_Object_lock(state, (Shizu_Object*)world);
+    g_world = world;
+    Visuals_RenderBuffer* renderBuffer = (Visuals_RenderBuffer*)Visuals_GlRenderBuffer_create(state);
+    Shizu_Object_lock(state, (Shizu_Object*)renderBuffer);
+    g_renderBuffer = renderBuffer;
     Shizu_State_popJumpTarget(state);
   } else {
     Shizu_State_popJumpTarget(state);
-    Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
-    g_program = NULL;
-    Shizu_State_jump(state);
-  }
-  //
-  Shizu_State_pushJumpTarget(state, &jumpTarget);
-  if (!setjmp(jumpTarget.environment)) {
-    Shizu_Object_lock(state, (Shizu_Object*)g_world);
-    Shizu_State_popJumpTarget(state);
-  } else {
-    Shizu_State_popJumpTarget(state);
-    g_world = NULL;
-    Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
-    g_program = NULL;
+    if (g_renderBuffer) {
+      Visuals_Object_unmaterialize(state, (Visuals_Object*)g_renderBuffer);
+      Shizu_Object_unlock(state, (Shizu_Object*)g_renderBuffer);
+      g_renderBuffer = NULL;
+    }
+    if (g_world) {
+      Shizu_Object_unlock(state, (Shizu_Object*)g_world);
+      g_world = NULL;
+    }
+    if (g_program) {
+      Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
+      Shizu_Object_unlock(state, (Shizu_Object*)g_program);
+      g_program = NULL;
+    }
     Shizu_State_jump(state);
   }
 
@@ -370,8 +286,19 @@ Zeitgeist_Rendition_unload
     StaticGeometryGl* element = (StaticGeometryGl*)Shizu_Value_getObject(&elementValue);
     StaticGeometryGl_unmaterialize(state, element);
   }
-  Shizu_Object_unlock(state, (Shizu_Object*)g_world);
-  g_world = NULL;
-  unloadPrograms(state);
+  if (g_renderBuffer) {
+    Visuals_Object_unmaterialize(state, (Visuals_Object*)g_renderBuffer);
+    Shizu_Object_unlock(state, (Shizu_Object*)g_renderBuffer);
+    g_renderBuffer = NULL;
+  }
+  if (g_world) {
+    Shizu_Object_unlock(state, (Shizu_Object*)g_world);
+    g_world = NULL;
+  }
+  if (g_program) {
+    Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
+    Shizu_Object_unlock(state, (Shizu_Object*)g_program);
+    g_program = NULL;
+  }
   ServiceGl_shutdown(state);
 }

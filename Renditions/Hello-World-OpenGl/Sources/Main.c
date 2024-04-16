@@ -1,14 +1,18 @@
 // Copyright (c) 2024 Michael Heilmann. All rights reserved.
 
-#include "Zeitgeist/UpstreamRequests.h"
-
 // strlen
 #include <string.h>
 
 // fprintf, stdout
 #include <stdio.h>
 
+#include "Zeitgeist/UpstreamRequests.h"
 #include "ServiceGl.h"
+
+#include "Visuals/DefaultPrograms.h"
+#include "Visuals/Program.h"
+#include "Visuals/RenderBuffer.h"
+#include "Visuals/VertexBuffer.h"
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   #define Shizu_Rendition_Export _declspec(dllexport)
@@ -36,28 +40,6 @@ Zeitgeist_Rendition_getName
   return Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)"));
 }
 
-// Vertex shader.
-static const GLchar* g_vertexShader =
-  "#version 330 core\n"
-  "layout(location = 0) in vec3 vertexPosition;\n"
-  "uniform mat4 scale = mat4(1);\n"
-  "void main() {\n"
-  "  gl_Position = scale * vec4(vertexPosition.xyz, 1.0);\n"
-  "}\n"
-  ;
-
-// Fragment shader.
-// The color (255, 204, 51) is the websafe color "sunglow".
-static const GLchar* g_fragmentShader =
-  "#version 330 core\n"
-  "out vec4 outputColor;\n"
-  //"uniform vec4 inputColor = vec4(1.0, 1.0, 1.0, 0.0);\n"
-  "uniform vec4 inputColor = vec4(1.0, 0.8, 0.2, 0.0);\n"
-  "void main() {\n"
-  "  outputColor = inputColor;\n"
-  "}\n"
-  ;
-
 static GLint Positions_Index = 0;
 
 typedef struct VERTEX {
@@ -71,11 +53,9 @@ static VERTEX const SQUARE[] = {
   {  1.0f, -1.0f, 0.f, },
 };
 
-#include "Visuals/Program.h"
-
-static Visuals_GlProgram* g_program = NULL;
-static GLuint g_bufferId = 0;
-static GLuint g_vertexArrayId = 0;
+static Visuals_Program* g_program = NULL;
+static Visuals_VertexBuffer* g_vertexBuffer = NULL;
+static Visuals_RenderBuffer* g_renderBuffer = NULL;
 
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
@@ -96,11 +76,11 @@ Zeitgeist_Rendition_update
 
   glViewport(0, 0, viewportWidth, viewportHeight);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glUseProgram(g_program->programId);
+  glUseProgram(((Visuals_GlProgram*)g_program)->programId);
 
   GLint location;
   
-  location = glGetUniformLocation(g_program->programId, "scale");
+  location = glGetUniformLocation(((Visuals_GlProgram*)g_program)->programId, "scale");
   if (-1 == location) {
     fprintf(stderr, "%s:%d: unable to get uniform location of `%s`\n", __FILE__, __LINE__, "scale");
   } else {
@@ -113,7 +93,7 @@ Zeitgeist_Rendition_update
     glUniformMatrix4fv(location, 1, GL_FALSE, &matrix[0]);
   }
   
-  location = glGetUniformLocation(g_program->programId, "inputColor");
+  location = glGetUniformLocation(((Visuals_GlProgram*)g_program)->programId, "inputColor");
   if (-1 == location) {
     fprintf(stderr, "%s:%d: unable to get uniform location of `%s`\n", __FILE__, __LINE__, "inputColor");
   } else {
@@ -122,35 +102,12 @@ Zeitgeist_Rendition_update
     glUniform4fv(location, 1, &vector[0]);
   }
 
-  glBindVertexArray(g_vertexArrayId);
+  glBindVertexArray(((Visuals_GlVertexBuffer*)g_vertexBuffer)->vertexArrayId);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, sizeof(SQUARE)/ sizeof(VERTEX));
   glBindVertexArray(0);
   glUseProgram(0);
 
   ServiceGl_endFrame(state);
-}
-
-static void
-loadPrograms
-  (
-    Shizu_State* state
-  )
-{
-  g_program = Visuals_GlProgram_create(state, Shizu_String_create(state, g_vertexShader, strlen(g_vertexShader)),
-                                              Shizu_String_create(state, g_fragmentShader, strlen(g_fragmentShader)));
-  Shizu_Object_lock(state, (Shizu_Object*)g_program);
-  Visuals_Object_materialize(state, (Visuals_Object*)g_program);
-}
-
-static void
-unloadPrograms
-  (
-    Shizu_State* state
-  )
-{
-  Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
-  Shizu_Object_unlock(state, (Shizu_Object*)g_program);
-  g_program = NULL;
 }
 
 Shizu_Rendition_Export void
@@ -159,24 +116,46 @@ Zeitgeist_Rendition_load
     Shizu_State* state
   )
 {
+  Shizu_JumpTarget jumpTarget;
+
   ServiceGl_startup(state);
-  ServiceGl_setTitle(state, Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)")));
 
-  loadPrograms(state);
+  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  if (!setjmp(jumpTarget.environment)) {
+    ServiceGl_setTitle(state, Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)")));
+    Visuals_Program* program = Visuals_getProgram(state, "simple");
+    Visuals_Object_materialize(state, (Visuals_Object*)program);
+    Shizu_Object_lock(state, (Shizu_Object*)program);
+    g_program = program;
+    Visuals_VertexBuffer* vertexBuffer = (Visuals_VertexBuffer*)Visuals_GlVertexBuffer_create(state);
+    Visuals_VertexBuffer_setData(state, vertexBuffer, Visuals_VertexSemantics_Position3d | Visuals_VertexSyntactics_Float3, SQUARE, sizeof(SQUARE));
+    Shizu_Object_lock(state, (Shizu_Object*)vertexBuffer);
+    g_vertexBuffer = vertexBuffer;
+    Visuals_RenderBuffer* renderBuffer = (Visuals_RenderBuffer*)Visuals_GlRenderBuffer_create(state);
+    Shizu_Object_lock(state, (Shizu_Object*)renderBuffer);
+    g_renderBuffer = renderBuffer;
+    Shizu_State_popJumpTarget(state);
+  } else {
+    Shizu_State_popJumpTarget(state);
+    if (g_renderBuffer) {
+      Visuals_Object_unmaterialize(state, (Visuals_Object*)g_renderBuffer);
+      Shizu_Object_unlock(state, (Shizu_Object*)g_renderBuffer);
+      g_renderBuffer = NULL;
+    }
+    if (g_vertexBuffer) {
+      Visuals_Object_unmaterialize(state, (Visuals_Object*)g_vertexBuffer);
+      Shizu_Object_unlock(state, (Shizu_Object*)g_vertexBuffer);
+      g_vertexBuffer = NULL;
+    }
+    if (g_program) {
+      Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
+      Shizu_Object_unlock(state, (Shizu_Object*)g_program);
+      g_program = NULL;
+    }
+    ServiceGl_shutdown(state);
+    Shizu_State_jump(state);
+  }
 
-  glGenBuffers(1, &g_bufferId);
-  glBindBuffer(GL_ARRAY_BUFFER, g_bufferId);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(SQUARE), SQUARE, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glGenVertexArrays(1, &g_vertexArrayId);
-  glBindVertexArray(g_vertexArrayId);
-  glBindBuffer(GL_ARRAY_BUFFER, g_bufferId);
-  glVertexAttribPointer(Positions_Index, 3, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(Positions_Index);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-  
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glClearColor(0.0f, 0.0f, 0.0f, 0.f);
@@ -189,10 +168,20 @@ Zeitgeist_Rendition_unload
     Shizu_State* state
   )
 {
-  glDeleteVertexArrays(1, &g_vertexArrayId);
-  g_vertexArrayId = 0;
-  glDeleteBuffers(1, &g_bufferId);
-  g_bufferId = 0;
-  unloadPrograms(state);
+  if (g_renderBuffer) {
+    Visuals_Object_unmaterialize(state, (Visuals_Object*)g_renderBuffer);
+    Shizu_Object_unlock(state, (Shizu_Object*)g_renderBuffer);
+    g_renderBuffer = NULL;
+  }
+  if (g_vertexBuffer) {
+    Visuals_Object_unmaterialize(state, (Visuals_Object*)g_vertexBuffer);
+    Shizu_Object_unlock(state, (Shizu_Object*)g_vertexBuffer);
+    g_vertexBuffer = NULL;
+  }
+  if (g_program) {
+    Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
+    Shizu_Object_unlock(state, (Shizu_Object*)g_program);
+    g_program = NULL;
+  }
   ServiceGl_shutdown(state);
 }
