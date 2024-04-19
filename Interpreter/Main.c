@@ -59,7 +59,7 @@ onListRenditions
   for (size_t i = 0, n = Shizu_Value_getInteger32(&size); i < n; ++i) {
     Shizu_Value value = Shizu_List_getValue(state, renditions, i);
     if (!Shizu_Value_isObject(&value)) {
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
     Zeitgeist_Rendition* rendition = (Zeitgeist_Rendition*)Shizu_Value_getObject(&value);
@@ -132,7 +132,7 @@ onRendition
   for (size_t i = 0, n = Shizu_Value_getInteger32(&size); i < n; ++i) {
     Shizu_Value value = Shizu_List_getValue(state, loadedRenditions, i);
     if (!Shizu_Value_isObject(&value)) {
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
     Zeitgeist_Rendition* loadedRendition = (Zeitgeist_Rendition*)Shizu_Value_getObject(&value);

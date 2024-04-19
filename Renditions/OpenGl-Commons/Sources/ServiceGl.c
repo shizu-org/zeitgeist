@@ -218,7 +218,7 @@ ServiceGl_compileShader
     glGetShaderInfoLog(shader, sizeof(log), NULL, log);
     fprintf(stderr, "error: %s: %s\n",
             type == GL_FRAGMENT_SHADER ? "frag" : "vert", (char *) log);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return shader;
@@ -242,7 +242,7 @@ ServiceGl_linkProgram
     GLchar log[4096];
     glGetProgramInfoLog(program, sizeof(log), NULL, log);
     fprintf(stderr, "error: link: %s\n", (char *) log);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return program;
@@ -325,7 +325,7 @@ ServiceGl_addKeyboardKeyCallback
     Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)Shizu_Value_getObject(value)));
     Shizu_List_appendValue(state, g_keyboardKeyListeners, &temporary);
   } else {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 }

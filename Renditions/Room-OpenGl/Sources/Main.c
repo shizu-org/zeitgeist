@@ -102,6 +102,24 @@ bindIntegerUniform
   }
 }
 
+static void
+bindBooleanUniform
+  ( 
+    Shizu_State* state,
+    GLuint programId,
+    char const* name,
+    Shizu_Boolean value
+  )
+{
+  GLint location = glGetUniformLocation(programId, name);
+  if (-1 == location) {
+    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
+  } else {
+    /// @todo Check bounds.
+    glUniform1i(location, value ? 1 : 0);
+  }
+}
+
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
   (
@@ -126,10 +144,9 @@ Zeitgeist_Rendition_update
 
   glUseProgram(((Visuals_GlProgram*)g_program)->programId);
 
-  //
   Matrix4R32* world = NULL;
   world = Matrix4R32_createScale(state, Vector3R32_create(state, 0.75f, 0.75f, 1.f));
-  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "world", world);
+  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "matrices.world", world);
   // (viewRotateY^-1 * viewTranslate^-1)
   // is equivalent to
   // (viewTranslate * viewRotateY)^-1
@@ -142,22 +159,31 @@ Zeitgeist_Rendition_update
   viewRotateY = Matrix4R32_createRotateY(state, -g_world->player->rotationY);
   Matrix4R32* view = NULL;
   view = Matrix4R32_multiply(state, viewRotateY, viewTranslate);
-  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "view", view);
+  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "matrices.view", view);
+
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "viewer.position",
+                     Vector3R32_create(state, g_world->player->position->v.e[0], g_world->player->position->v.e[1], g_world->player->position->v.e[2]));
   
   //
   Matrix4R32* projection = NULL;
   //projection = Matrix4R32_createOrthographic(state, -1.f, +1.f, -1.f, +1.f, -100.f, +100.f);
   projection = Matrix4R32_createPerspective(state, 90.f, viewportHeight > 0.f ? viewportWidth / viewportHeight : 16.f/9.f, 0.1f, 100.f);
-  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "projection", projection);
+  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "matrices.projection", projection);
   
   // The color (255, 204, 51) is the websafe color "sunglow".
   bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "meshColor", Vector3R32_create(state, 1.0f, 0.8f, 0.2f));
 
   bindIntegerUniform(state, ((Visuals_GlProgram*)g_program)->programId, "inputFragmentColorType", 1);
 
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "ambientLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightDirection", Vector3R32_create(state, 1.f, 1.f, 1.f));
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightColor", Vector3R32_create(state, 1.f, 1.f, 1.f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "ambientLightInfoX.color", Vector3R32_create(state, 0.3f, 0.3f, 0.3f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightInfoX.direction", Vector3R32_create(state, -1.f, -1.f, -1.f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightInfoX.color", Vector3R32_create(state, 1.f, 1.f, 1.f));
+
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfoX.direction", Vector3R32_create(state, -1.f, -1.f, -1.f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfoX.color", Vector3R32_create(state, 0.8f, 0.8f, 0.8f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfoX.position", Vector3R32_create(state, 0.f, 0.f, 0.f));
+  bindBooleanUniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfoX.positionless", false);
+
 
   Shizu_Value sizeValue = Shizu_List_getSize(state, g_world->geometries);
   for (Shizu_Integer32 i = 0, n = Shizu_Value_getInteger32(&sizeValue); i < n; ++i) {
@@ -181,22 +207,22 @@ onKeyboardKeyMessage
 {
   if (Shizu_Stack_getSize(state) < 2) {
     fprintf(stderr, "%s:%d: too few arguments\n", __FILE__, __LINE__);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (!Shizu_Stack_isInteger32(state, 0)) {
     fprintf(stderr, "%s:%d: invalid argument type\n", __FILE__, __LINE__);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (1 != Shizu_Stack_getInteger32(state, 0)) {
     fprintf(stderr, "%s:%d: invalid number of arguments\n", __FILE__, __LINE__);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (!Shizu_Stack_isObject(state, 1)) {
     fprintf(stderr, "%s:%d: invalid argument type\n", __FILE__, __LINE__);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   fprintf(stdout, "%s:%d: keyboard key message received\n", __FILE__, __LINE__);

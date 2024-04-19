@@ -234,7 +234,7 @@ StaticGeometryGl_create
 		Visuals_Object_unmaterialize(state, (Visuals_Object*)self->vertexBuffer);
 		self->vertexBuffer = NULL;
 		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
-		Shizu_State_setError(state, 1);
+		Shizu_State_setStatus(state, 1);
 		Shizu_State_jump(state);
 	}
 
@@ -279,7 +279,7 @@ struct VERTEX {
 		idlib_vector_3_f32_cross(&z, &x, &y);
 		idlib_vector_3_f32_normalize(&z, &z);
 		if (!idlib_vector_3_f32_are_equal(n, &z)) {
-			Shizu_State_setError(state, 1);
+			Shizu_State_setStatus(state, 1);
 			Shizu_State_jump(state);
 		}
 
@@ -293,7 +293,7 @@ struct VERTEX {
 		idlib_vector_3_f32_cross(&z, &x, &y);
 		idlib_vector_3_f32_normalize(&z, &z);
 		if (!idlib_vector_3_f32_are_equal(&nn, &z)) {
-			Shizu_State_setError(state, 1);
+			Shizu_State_setStatus(state, 1);
 			Shizu_State_jump(state);
 		}
 	}

@@ -113,7 +113,7 @@ Visuals_GlRenderBuffer_materializeImpl
   if (!self->colorTextureId) {
     glGenTextures(1, &self->colorTextureId);
     if (glGetError()) {
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
     glBindTexture(GL_TEXTURE_2D, self->colorTextureId);
@@ -124,7 +124,7 @@ Visuals_GlRenderBuffer_materializeImpl
     if (glGetError()) {
       glDeleteTextures(1, &self->colorTextureId);
       self->colorTextureId = 0;
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
   }
@@ -135,7 +135,7 @@ Visuals_GlRenderBuffer_materializeImpl
     if (glGetError()) {
       glDeleteTextures(1, &self->colorTextureId);
       self->colorTextureId = 0;
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
     glBindTexture(GL_TEXTURE_2D, self->depthStencilTextureId);
@@ -146,7 +146,7 @@ Visuals_GlRenderBuffer_materializeImpl
     if (glGetError()) {
       glDeleteTextures(1, &self->depthStencilTextureId);
       self->depthStencilTextureId = 0;
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
   }
@@ -155,7 +155,7 @@ Visuals_GlRenderBuffer_materializeImpl
   if (!self->frameBufferId) {
     glGenFramebuffers(1, &self->frameBufferId);
     if (glGetError()) {
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, self->frameBufferId);
@@ -165,7 +165,7 @@ Visuals_GlRenderBuffer_materializeImpl
     if (glGetError()) {
       glDeleteFramebuffers(1, &self->frameBufferId);
       self->frameBufferId = 0;
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
   }

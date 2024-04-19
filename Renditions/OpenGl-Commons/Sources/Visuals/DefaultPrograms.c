@@ -25,6 +25,7 @@
 #define VertexNormalName "vertexNormal"
 #define VertexColorName "vertexColor"
 
+// Blinn-Phong variables.
 // Vertex shader.
 // constant inputs:
 //  meshAmbientColor vec4: The ambient color of the mesh in RGBF32.
@@ -41,24 +42,51 @@ static const GLchar* Programs_Pbr1_vertexProgram =
   "layout(location = 0) in vec3 " VertexPositionName ";\n"
   "layout(location = 1) in vec3 " VertexNormalName ";\n"
   "layout(location = 2) in vec3 " VertexColorName ";\n"
+
+  "struct FragmentInfo {\n"
+  "  vec3 position;\n"
+  "  vec3 color;\n"
+  "  vec3 normal;\n"
+  "  float specular;\n"
+  "};\n"
+
+  "struct ViewerInfo {\n"
+  "  vec3 position;\n"
+  "};\n"
+
+  "struct MatrixInfo {\n"
+  "  mat4 projection;\n"
+  "  mat4 view;\n"
+  "  mat4 world;\n"
+  "};\n"
+
+  "out FRAGMENT {\n"
+  "  vec3 position;\n"
+  "  vec3 color;\n"
+  "  vec3 normal;\n"
+  "  float shininess;\n" /* value between 0 and 100. Used in Blinn-Phong lighting. */
+  "} _fragment;\n"
+
+  "out VIEWER {\n"
+  "  vec3 position;\n"
+  "} _viewer;\n"
+
   // decide if mesh color or vertex color is used.
   "uniform int inputFragmentColorType = 0;\n"
   "uniform vec3 meshColor = vec3(1.0, 0.8, 0.2);\n"
-  "out vec3 inputFragmentPosition;\n"
-  "out vec3 inputFragmentNormal;\n"
-  "out vec3 inputFragmentColor;\n"
-  "uniform mat4 projection = mat4(1);\n"
-  "uniform mat4 view = mat4(1);\n"
-  "uniform mat4 world = mat4(1);\n"
+  "uniform MatrixInfo matrices;\n"
+  "uniform ViewerInfo viewer;\n"
   "void main() {\n"
-  "  mat4 worldProjection = projection * view * world;\n"
+  "  mat4 worldProjection = matrices.projection * matrices.view * matrices.world;\n"
   "  gl_Position = worldProjection * vec4(vertexPosition, 1.);\n"
-  "  inputFragmentPosition = (worldProjection * vec4(vertexPosition, 1.)).xyz;\n"
-  "  inputFragmentNormal = vertexNormal;\n"
+  "  _fragment.position = (worldProjection * vec4(vertexPosition, 1.)).xyz;\n"
+  "  _fragment.normal = vertexNormal;\n"
+  "  _fragment.shininess = 0.9;\n"
+  "  _viewer.position = viewer.position;\n"
   "  if(inputFragmentColorType == 1) {\n"
-  "    inputFragmentColor = vertexColor;\n"
+  "    _fragment.color = vertexColor;\n"
   "  } else {\n"
-  "    inputFragmentColor = meshColor;\n"
+  "    _fragment.color = meshColor;\n"
   "  }\n"
   "}\n"
   ;
@@ -74,24 +102,119 @@ static const GLchar* Programs_Pbr1_vertexProgram =
 static const GLchar* Programs_Pbr1_fragmentProgram =
   "#version 330 core\n"
   "out vec4 outputFragmentColor;\n"
-  "in vec3 inputFragmentPosition;\n"
-  "in vec3 inputFragmentNormal;\n"
-  "in vec3 inputFragmentColor;\n"
 
-  /* diffuse lighting (color + direction) */
-  "uniform vec3 diffuseLightDirection = vec3(1, 1, 1);\n"
-  "uniform vec3 diffuseLightColor = vec3(1, 1, 1);\n"
+  "in FRAGMENT {\n"
+  "  vec3 position;\n"
+  "  vec3 color;\n"
+  "  vec3 normal;\n"
+  "  float shininess;\n"
+  "} _fragment; \n"
 
-  /* ambient lighting (color) */
-  "uniform vec3 ambientLightColor = vec3(1, 1, 1);\n"
+  "in VIEWER {\n"
+  "  vec3 position;\n"
+  "} _viewer;\n"
+
+  "struct ViewerInfo {\n"
+  "  vec3 position;\n"  
+  "};\n"
+
+  "struct SpecularLightInfo {\n"
+  "  vec3 color;\n"
+  "  vec3 direction;\n"/*Used if positionless = true*/
+  "  vec3 position;\n"/*Used if positionless = false*/
+  "  bool positionless;\n"
+  "};\n"
+
+  "struct DiffuseLightInfo {\n"
+  "  vec3 color;\n"
+  "  vec3 direction;\n"
+  "};\n"
+
+  "struct AmbientLightInfo {\n"
+  "  vec3 color;\n"
+  "};\n" 
+
+  /* diffuse light info. */
+  "uniform DiffuseLightInfo diffuseLightInfoX;\n"
+
+  /* ambient light info. */
+  "uniform AmbientLightInfo ambientLightInfoX;\n"
+
+  /* specular light info. */
+  "uniform SpecularLightInfo specularLightInfoX;\n"
+
+  "uniform float AmbientFactor = 0.5f;\n"
+  "uniform float DiffuseFactor = 0.4f;\n"
+  "uniform float SpecularFactor = 0.1;\n"
+
+  "struct FragmentInfo {\n"
+  "  vec3 position;\n"
+  "  vec3 color;\n"
+  "  vec3 normal;\n"
+  "  float shininess;\n"
+  "};\n"
+
+  /*
+   * The ambient light has no origin or direction.
+   */
+  "vec3 onAmbient(in FragmentInfo fragment, in AmbientLightInfo ambient) {\n"
+  "  fragment.normal = normalize(fragment.normal);\n"
+  "  vec3 ambientColor = ambient.color;\n"
+  "  return ambientColor;\n"
+  "}\n"
+
+  /*
+   * The diffuse light has no origin. The diffuse light has a direction.
+   */
+  "vec3 onDiffuse(in FragmentInfo fragment, in DiffuseLightInfo diffuse) {\n"
+  "  fragment.normal = normalize(fragment.normal);\n"
+  "  diffuse.direction = normalize(diffuse.direction);\n"
+  /* dot(x,cy) = c dot(x,y)*/
+  "  float diffuseIntensity = max(dot(fragment.normal, -diffuse.direction), 0.0);\n"
+  "  vec3 diffuseColor = diffuseIntensity * diffuse.color;\n"
+  "  return diffuseColor;\n"
+  "}\n"
+
+  /*
+   * The specular light has no origin. The specular light has a direction.
+   */
+  "vec3 onSpecular(in FragmentInfo fragment, in ViewerInfo viewer, in SpecularLightInfo specular) {\n"
+  "  vec3 viewerDirection = normalize(viewer.position - fragment.position);\n"
+  "  vec3 lightDirection;\n"
+  "  if (specular.positionless) {\n"
+  "    lightDirection = -specular.direction;\n"
+  "  } else {\n"
+  "    lightDirection = vec3(0,0,0) - fragment.position;\n"
+  "  }\n"
+  "  vec3 reflectionDirection = reflect(lightDirection, fragment.normal);\n"
+  "  float shininess = 1;\n"
+  "  float intensity = pow(max(dot(viewerDirection, reflectionDirection), 0.0), fragment.shininess); "
+  "  return intensity * specular.color;\n"
+  "}\n"
+
+  /*
+   * The ambient light has no origin or direction.
+   * The diffuse light has no origin and a direction.
+   * TO BE IMPLEMENTED: The specular light has no origin and a direction.
+   */ 
+  "vec3 light(in FragmentInfo fragment, in ViewerInfo viewer, in AmbientLightInfo ambient, in DiffuseLightInfo diffuse, in SpecularLightInfo specular) {\n"
+  "  vec3 ambientColor = onAmbient(fragment, ambient);\n"
+  "  vec3 diffuseColor = onDiffuse(fragment, diffuse);\n"
+  "  vec3 specularColor = onSpecular(fragment, viewer, specular);\n"
+  "  return (AmbientFactor * ambientColor + DiffuseFactor * diffuseColor + SpecularFactor * specularColor) * fragment.color;\n"
+  "}\n"
 
   "void main() {\n"
-  "  vec3 n = normalize(inputFragmentNormal);\n"
-  "  vec3 d = normalize(diffuseLightDirection);\n"
-  "  float diffuseIntensity = max(dot(n, d), 0.0);\n"
-  "  vec3 diffuse = diffuseIntensity * diffuseLightColor;\n"
-  "  vec3 ambient = ambientLightColor;\n"
-  "  vec3 color = (ambient + diffuse) * inputFragmentColor;\n"
+  "  FragmentInfo fragmentInfo;\n"
+  "  fragmentInfo.position = _fragment.position;\n"
+  "  fragmentInfo.color = _fragment.color;\n"
+  "  fragmentInfo.normal = _fragment.normal;\n"
+  "  fragmentInfo.shininess = _fragment.shininess;\n"
+  "\n"
+  "  ViewerInfo viewerInfo;\n"
+  "  viewerInfo.position = _viewer.position;\n"
+  "\n"
+  "  vec3 color = light(fragmentInfo, viewerInfo, ambientLightInfoX, diffuseLightInfoX, specularLightInfoX);\n"
   "  outputFragmentColor = vec4(color, 1.f);\n"
   "}\n"
   ;
@@ -134,7 +257,7 @@ Visuals_Program* Visuals_getProgram(Shizu_State* state, char const* name) {
            Visuals_GlProgram_create(state, Shizu_String_create(state, Programs_Pbr1_vertexProgram, strlen(Programs_Pbr1_vertexProgram)),
                                            Shizu_String_create(state, Programs_Pbr1_fragmentProgram, strlen(Programs_Pbr1_fragmentProgram)));
   } else {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 }

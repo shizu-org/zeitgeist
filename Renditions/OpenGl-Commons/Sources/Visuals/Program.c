@@ -76,7 +76,7 @@ Visuals_Program_construct
 static void
 Visuals_GlProgram_dispatchInitialize
   (
-    Shizu_State* state,
+    Shizu_State1* state1,
     Visuals_GlProgram_Dispatch* self
   );
 
@@ -149,8 +149,8 @@ Visuals_GlProgram_unmaterializeImpl
 
 static void
 Visuals_GlProgram_dispatchInitialize
-  (
-    Shizu_State* state,
+  (            
+    Shizu_State1* state1,
     Visuals_GlProgram_Dispatch* self
   )
 {

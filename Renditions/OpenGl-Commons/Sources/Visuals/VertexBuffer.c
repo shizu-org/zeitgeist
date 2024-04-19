@@ -60,7 +60,7 @@ Visuals_GlVertexBuffer_setData
 static void
 Visuals_GlVertexBuffer_dispatchInitialize
   (
-    Shizu_State* state,
+    Shizu_State1* state1,
     Visuals_GlVertexBuffer_Dispatch* self
   );
 
@@ -112,7 +112,7 @@ Visuals_GlVertexBuffer_materialize
     glGenBuffers(1, &self->bufferId);
     if (glGetError()) {
       fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenBuffers");
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
     glGenVertexArrays(1, &self->vertexArrayId);
@@ -120,7 +120,7 @@ Visuals_GlVertexBuffer_materialize
       glDeleteBuffers(1, &self->bufferId);
       self->bufferId = 0;
       fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
   }
@@ -170,7 +170,7 @@ Visuals_GlVertexBuffer_setData
     } break;
     default: {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     } break;
   };
@@ -229,7 +229,7 @@ Visuals_GlVertexBuffer_setData
     } break;
     default: {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     } break;
   };
@@ -242,7 +242,7 @@ Visuals_GlVertexBuffer_setData
 static void
 Visuals_GlVertexBuffer_dispatchInitialize
   (
-    Shizu_State* state,
+    Shizu_State1* state1,
     Visuals_GlVertexBuffer_Dispatch* self
   )
 {
@@ -264,7 +264,7 @@ Visuals_GlVertexBuffer_construct
   self->vertexArrayId = 0;
   self->bytes = malloc(sizeof(char));
   if (!self->bytes) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   self->numberOfBytes = 1;
@@ -272,7 +272,7 @@ Visuals_GlVertexBuffer_construct
   glGenBuffers(1, &self->bufferId);
   if (glGetError()) {
     fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenBuffers");
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   glGenVertexArrays(1, &self->vertexArrayId);
@@ -280,7 +280,7 @@ Visuals_GlVertexBuffer_construct
     glDeleteBuffers(1, &self->bufferId);
     self->bufferId = 0;
     fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   self->numberOfBytes = 1;

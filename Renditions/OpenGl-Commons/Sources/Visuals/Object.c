@@ -24,7 +24,7 @@
 static void
 dispatchInitialize
   (
-    Shizu_State* state,
+    Shizu_State1* state1,
     Visuals_Object_Dispatch* self
   );
 
@@ -52,7 +52,7 @@ Shizu_defineType(Visuals_Object, Shizu_Object);
 static void
 dispatchInitialize
   (
-    Shizu_State* state,
+    Shizu_State1* stat1e,
     Visuals_Object_Dispatch* self
   )
 {
