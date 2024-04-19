@@ -27,6 +27,8 @@
 #include "Shizu/Runtime/Stack.private.h"
 #include "Shizu/Runtime/Type.private.h"
 #include "Shizu/Runtime/Objects/WeakReference.private.h"
+#include "Shizu/Runtime/DebugAssert.h"
+#include "Shizu/Runtime/staticAssert.h"
 
 // malloc, free
 #include <malloc.h>
@@ -59,7 +61,7 @@ Shizu_Gc_startup
 {
   Shizu_Gc* self = malloc(sizeof(Gc));
   if (!self) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   self->all = NULL;
@@ -82,7 +84,7 @@ Shizu_Gc_shutdown
 static void
 Shizu_Object_typeDestroyed
   (
-    Shizu_State* state
+    Shizu_State1* state1
   );
 
 Shizu_TypeDescriptor const Shizu_Object_Type = {
@@ -100,7 +102,7 @@ Shizu_TypeDescriptor const Shizu_Object_Type = {
 static void
 Shizu_Object_typeDestroyed
   (
-    Shizu_State* state
+    Shizu_State1* state1
   )
 {/*Intentionally empty.*/}
 
@@ -175,13 +177,13 @@ Shizu_Gc_allocate
 #endif
   if (size < sizeof(Shizu_Object)) {
     fprintf(stderr, "%s:%d: size `%zu` is smaller than sizeof(Shizu_Object) = `%zu`\n", __FILE__, __LINE__, size, sizeof(Shizu_Object));
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Object* self = malloc(size);
   if (!self) {
     fprintf(stderr, "%s:%d: unable to allocate `%zu` Bytes\n", __FILE__, __LINE__, size);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Gc* gc = Shizu_State_getGc(state);

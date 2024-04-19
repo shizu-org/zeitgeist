@@ -19,10 +19,14 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+#define SHIZU_RUNTIME_PRIVATE (1)
 #include "Shizu/Runtime/State1.h"
 
 /// @todo Remove this! Currently required for Shizu_OperatingSystem_* functionality.
 #include "Shizu/Runtime/State.h"
+
+#include "Shizu/Runtime/Status.h"
+#include "Shizu/Runtime/DebugAssert.h"
 
 #include "idlib/process.h"
 
@@ -155,8 +159,8 @@ struct Shizu_State1 {
   //// Pointer to the top of the jump target stack (a singly linked list of jump targets).
   Shizu_JumpTarget* jumpTargets;
 
-  /// `0` if no error. A non-zero value otherwise.
-  int error;
+  /// #Shizu_Status_NoError if no error. A non-zero Shizu_Status_* value otherwise.
+  Shizu_Status status;
   
   /// `true` if exit was requested. `false` otherwise.
   /// initial value is `false`.
@@ -203,7 +207,7 @@ Shizu_State1_acquire
     self->dls = NULL;
 
     self->processExitRequested = false;
-    self->error = 0;
+    self->status = Shizu_Status_NoError;
     self->jumpTargets = NULL;
 
     if (idlib_add_global(self->process, NAME, strlen(NAME), self)) {
@@ -294,24 +298,24 @@ Shizu_State1_jump
 }
 
 void
-Shizu_State1_setError
+Shizu_State1_setStatus
   (
     Shizu_State1* self,
-    int error
+    Shizu_Status status
   )
 {
   Shizu_debugAssert(NULL != self);
-  self->error = error;
+  self->status = status;
 }
 
 int
-Shizu_State1_getError
+Shizu_State1_getStatus
   (
     Shizu_State1* self
   )
 {
   Shizu_debugAssert(NULL != self);
-  return self->error;
+  return self->status;
 }
 
 void

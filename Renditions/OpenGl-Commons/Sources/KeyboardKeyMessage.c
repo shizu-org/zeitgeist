@@ -1,5 +1,7 @@
 #include "KeyboardKeyMessage.h"
 
+#include "Shizu/Runtime/debugAssert.h"
+
 Shizu_TypeDescriptor const KeyboardKeyMessage_Type = {
 	.staticInitialize = NULL,
 	.staticFinalize = NULL,

@@ -32,9 +32,19 @@
 // bool
 #include <stdbool.h>
 
-//
+
+
+// Shizu includes.
 #include "Shizu/Runtime/Configure.h"
+#include "Shizu/Runtime/JumpTarget.h"
+#include "Shizu/Runtime/NoReturn.h"
+#include "Shizu/Runtime/Status.h"
 #include "Shizu/Runtime/Type.h"
+
+// Shizu forward declaration.
+typedef struct Shizu_Dl Shizu_Dl;
+
+
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
 
@@ -55,45 +65,7 @@
 
 #endif
 
-/** 
- * @since 1.0
- * Function annotation indicating a function will not return normally.
- * The function will either terminate the program (cf. exit)or perform a jump (cf. longjmp).
- */
-#if Shizu_Configuration_CompilerC_Msvc == Shizu_Configuration_CompilerC
-  #define Shizu_NoReturn() __declspec(noreturn)
-#else
-  #define Shizu_NoReturn()
-#endif
 
-/** 
- * @since 1.0
- * Macro aliasing `static_assert`/`_Static_assert`.
- */
-#if Shizu_Configuration_CompilerC_Msvc == Shizu_Configuration_CompilerC
-
-  #define Shizu_staticAssert(expression, message) \
-    static_assert(expression, message);
-
-#else
-
-  #define Shizu_staticAssert(expression, message) \
-    _Static_assert(expression, message);
-
-#endif
-
-#define Shizu_debugAssert(expression) \
-  if (!(expression)) {\
-    Shizu_debugAssertionFailed(__FILE__, __LINE__, #expression); \
-  }
-
-void
-Shizu_debugAssertionFailed
-  (
-    char const* file,
-    int line,
-    char const* expression
-  );
 
 typedef struct Shizu_Object Shizu_Object;
 
@@ -106,8 +78,6 @@ typedef struct Shizu_Locks Shizu_Locks;
 typedef struct Shizu_Stack Shizu_Stack;
 
 
-
-#include "Shizu/Runtime/JumpTarget.h"
 
 int
 Shizu_State_create
@@ -135,14 +105,14 @@ Shizu_State_popJumpTarget
   );
 
 void
-Shizu_State_setError
+Shizu_State_setStatus
   (
     Shizu_State* self,
-    int error
+    Shizu_Status status
   );
 
-int
-Shizu_State_getError
+Shizu_Status
+Shizu_State_getStatus
   (
     Shizu_State* self
   );
@@ -186,6 +156,12 @@ Shizu_State_getStack
     Shizu_State* self
   );
 
+Shizu_Types*
+Shizu_State_getTypes
+  (
+    Shizu_State* self
+  );
+
 /// @brief Allocate named memory.
 /// @param name The name.
 /// @param n The size.
@@ -220,8 +196,6 @@ Shizu_State_getNamedMemory
     char const* name,
     void** p
   );
-
-typedef struct Shizu_Dl Shizu_Dl;
 
 Shizu_Dl*
 Shizu_State_getOrLoadDl

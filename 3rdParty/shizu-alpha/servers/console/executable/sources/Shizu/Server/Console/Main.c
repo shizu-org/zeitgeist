@@ -44,7 +44,7 @@ run
 #if 0
   // Initialize networking.
   if (idlib_network_startup()) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 
@@ -52,7 +52,7 @@ run
   idlib_socket* socket = NULL;
   if (idlib_create_socket(&socket)) {
     idlib_network_shutdown();
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 

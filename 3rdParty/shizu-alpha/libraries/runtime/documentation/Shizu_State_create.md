@@ -12,16 +12,13 @@ Shizu_State_create
   );
 ```
 
-*Description*
-Get or create the `Shizu_State` singleton object.
-
 *Details*
-Each call to `Shizu_State_create` acquires a reference to that singleton.
+Each call to `Shizu_State_create` acquires a reference to that singleton object.
 If no longer required, the reference must be relinquished using `Shizu_State_destroy`.
 If there are no more references, the singleton object is destroyed.
 
 *Parameters*
-- `SELF` A pointer to a `Shizu_State` object.
+- `RETURN` A pointer to a `Shizu_State` object.
 
 *Success*
 `*RETURN` was assigned a pointer to the `Shizu_State` singleton object.

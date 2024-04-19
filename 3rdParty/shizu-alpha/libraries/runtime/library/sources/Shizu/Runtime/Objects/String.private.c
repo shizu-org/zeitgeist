@@ -84,7 +84,7 @@ Shizu_String_create
   self->bytes = malloc(numberOfBytes > 0 ? numberOfBytes : 1);
   if (!self->bytes) {
     fprintf(stderr, "%s:%d: unable to allocate `%zu` Bytes\n", __FILE__, __LINE__, numberOfBytes > 0 ? numberOfBytes : 1);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   size_t hashValue = numberOfBytes;
@@ -125,7 +125,7 @@ Shizu_String_concatenate
 {
 	// The string would be too long.
 	if (SIZE_MAX - self->numberOfBytes < other->numberOfBytes) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
 	}
   size_t hashValue = self->numberOfBytes + other->numberOfBytes;
@@ -141,7 +141,7 @@ Shizu_String_concatenate
   new->bytes = malloc(numberOfBytes > 0 ?  numberOfBytes : 1);
   if (!new->bytes) {
     fprintf(stderr, "%s:%d: unable to allocate `%zu` Bytes\n", __FILE__, __LINE__, numberOfBytes > 0 ? numberOfBytes : 1);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   new->hashValue = hashValue;

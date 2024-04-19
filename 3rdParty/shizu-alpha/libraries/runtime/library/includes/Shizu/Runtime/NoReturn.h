@@ -19,32 +19,20 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#define SHIZU_RUNTIME_PRIVATE (1)
-#include "Shizu/Runtime/Gc.h"
+#if !defined(SHIZU_RUNTIME_NORETURN_H_INCLUDED)
+#define SHIZU_RUNTIME_NORETURN_H_INCLUDED
 
-#include "Shizu/Runtime/DebugAssert.h"
-#include "Shizu/Runtime/Type.private.h"
+#include "Shizu/Runtime/Configure.h"
 
-Shizu_Type*
-Shizu_State_getObjectType
-  (
-    Shizu_State* self,
-    Shizu_Object* object
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  Shizu_debugAssert(NULL != object);
-  Shizu_debugAssert(NULL != object->type);
-  return object->type;
-}
+/** 
+ * @since 1.0
+ * Function annotation indicating a function will not return normally.
+ * The function will either terminate the program (cf. exit)or perform a jump (cf. longjmp).
+ */
+#if Shizu_Configuration_CompilerC_Msvc == Shizu_Configuration_CompilerC
+  #define Shizu_NoReturn() __declspec(noreturn)
+#else
+  #define Shizu_NoReturn()
+#endif
 
-Shizu_Object_Dispatch*
-Shizu_State_getObjectDispatch
-  (
-    Shizu_State* state,
-    Shizu_Object* object
-  )
-{
-  Shizu_Type* type = Shizu_State_getObjectType(state, object);
-  return type->dispatch;
-}
+#endif // SHIZU_RUNTIME_NORETURN_H_INCLUDED

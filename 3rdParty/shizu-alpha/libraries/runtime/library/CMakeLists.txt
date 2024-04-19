@@ -35,6 +35,7 @@ list(APPEND ${name}.header_files includes/Shizu/Runtime/Gc.private.h)
 list(APPEND ${name}.source_files sources/Shizu/Runtime/Gc.c)
 list(APPEND ${name}.header_files includes/Shizu/Runtime/Gc.h)
 
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Value.c)
 list(APPEND ${name}.header_files includes/Shizu/Runtime/Value.h)
 
 list(APPEND ${name}.source_files sources/Shizu/Runtime/Type.c)
@@ -76,6 +77,18 @@ list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/String.h)
 list(APPEND ${name}.source_files sources/Shizu/Runtime/Objects/WeakReference.private.c)
 list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/WeakReference.private.h)
 list(APPEND ${name}.header_files includes/Shizu/Runtime/Objects/WeakReference.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/Status.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/Status.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/DebugAssert.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/DebugAssert.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/StaticAssert.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/StaticAssert.h)
+
+list(APPEND ${name}.source_files sources/Shizu/Runtime/NoReturn.c)
+list(APPEND ${name}.header_files includes/Shizu/Runtime/NoReturn.h)
 
 # Configuration variables for 'Configure.h.in'.
 if (${${name}.operating_system} STREQUAL ${${name}.operating_system_windows})
@@ -119,4 +132,3 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${${name}.source_files})
 if (${${name}.operating_system_id} EQUAL ${${name}.operating_system_id_linux})
   target_compile_definitions(${name} PUBLIC _GNU_SOURCE)
 endif()
-

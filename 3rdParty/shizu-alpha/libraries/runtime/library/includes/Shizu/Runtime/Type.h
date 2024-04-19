@@ -27,11 +27,14 @@
 // bool
 #include <stdbool.h>
 
+#include "Shizu/Runtime/State1.h"
+
 typedef struct Shizu_Dl Shizu_Dl;
 typedef struct Shizu_State Shizu_State;
 typedef struct Shizu_Object Shizu_Object;
 typedef struct Shizu_Type Shizu_Type;
 typedef struct Shizu_TypeDescriptor Shizu_TypeDescriptor;
+typedef struct Shizu_Types Shizu_Types;
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   #define Shizu_DlExport() __declspec(dllexport)
@@ -61,15 +64,15 @@ typedef void (Shizu_OnFinalizeCallback)(Shizu_State* state, Shizu_Object* object
 
 /// @since 1.0
 /// The type of a "onTypeDestroyed" callback function.
-typedef void (Shizu_OnTypeDestroyedCallback)(Shizu_State* state);
+typedef void (Shizu_OnTypeDestroyedCallback)(Shizu_State1* state);
 
 /// @since 1.0
 /// The type of a "onDispatchInitialize" callback function.
-typedef void (Shizu_OnDispatchInitializeCallback)(Shizu_State* state, void*);
+typedef void (Shizu_OnDispatchInitializeCallback)(Shizu_State1* state1, void*);
 
 /// @since 1.0
 /// The type of a "onStaticUninitialize" callback function.
-typedef void (Shizu_OnDispatchUninitializeCallback)(Shizu_State* state, void*);
+typedef void (Shizu_OnDispatchUninitializeCallback)(Shizu_State1* state1, void*);
 
 struct Shizu_TypeDescriptor {
   Shizu_OnStaticInitializeCallback* staticInitialize;
@@ -157,7 +160,7 @@ Shizu_State_createType
   static void \
   Name##_typeDestroyed \
     ( \
-      Shizu_State* state \
+      Shizu_State1* state1 \
     ); \
   \
   Shizu_Type* \
@@ -169,7 +172,7 @@ Shizu_State_createType
   static void \
   Name##_typeDestroyed \
     ( \
-      Shizu_State* state \
+      Shizu_State1* state1 \
     ) \
   {/*Intentionally empty.*/} \
   \

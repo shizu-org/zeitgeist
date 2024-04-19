@@ -19,32 +19,41 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#define SHIZU_RUNTIME_PRIVATE (1)
-#include "Shizu/Runtime/Gc.h"
+#if !defined(SHIZU_RUNTIME_DEBUGASSERT_H_INCLUDED)
+#define SHIZU_RUNTIME_DEBUGASSERT_H_INCLUDED
 
-#include "Shizu/Runtime/DebugAssert.h"
-#include "Shizu/Runtime/Type.private.h"
+#include "Shizu/Runtime/Configure.h"
 
-Shizu_Type*
-Shizu_State_getObjectType
-  (
-    Shizu_State* self,
-    Shizu_Object* object
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  Shizu_debugAssert(NULL != object);
-  Shizu_debugAssert(NULL != object->type);
-  return object->type;
-}
+#if defined(_DEBUG)
 
-Shizu_Object_Dispatch*
-Shizu_State_getObjectDispatch
-  (
-    Shizu_State* state,
-    Shizu_Object* object
-  )
-{
-  Shizu_Type* type = Shizu_State_getObjectType(state, object);
-  return type->dispatch;
-}
+  /// @since 1.0
+  /// @internal
+  void
+  Shizu_debugAssertionFailed
+    (
+      char const* file,
+      int line,
+      char const* expression
+    );
+
+#endif
+
+/// @since 1.0
+/// @brief Macro terminating the program with failure if an expression evaluates to false.
+/// @param expression An expression that can be converted into logically true or logically false. 
+/// @remarks This macro evaluates to the empty statement if _DEBUG is not defined.
+#if defined(_DEBUG)
+
+  #define Shizu_debugAssert(expression) \
+    if (!(expression)) {\
+      Shizu_debugAssertionFailed(__FILE__, __LINE__, #expression); \
+    }
+
+#else
+
+  #define Shizu_debugAssert(expression) \
+    ;
+
+#endif
+
+#endif // SHIZU_RUNTIME_DEBUGASSERT_H_INCLUDED

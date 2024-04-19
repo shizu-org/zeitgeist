@@ -20,31 +20,22 @@
 */
 
 #define SHIZU_RUNTIME_PRIVATE (1)
-#include "Shizu/Runtime/Gc.h"
-
 #include "Shizu/Runtime/DebugAssert.h"
-#include "Shizu/Runtime/Type.private.h"
 
-Shizu_Type*
-Shizu_State_getObjectType
+// fprintf, stderr
+#include <stdio.h>
+
+// exit, EXIT_FAILURE
+#include <stdlib.h>
+
+void
+Shizu_debugAssertionFailed
   (
-    Shizu_State* self,
-    Shizu_Object* object
+    char const* file,
+    int line,
+    char const* expression
   )
 {
-  Shizu_debugAssert(NULL != self);
-  Shizu_debugAssert(NULL != object);
-  Shizu_debugAssert(NULL != object->type);
-  return object->type;
-}
-
-Shizu_Object_Dispatch*
-Shizu_State_getObjectDispatch
-  (
-    Shizu_State* state,
-    Shizu_Object* object
-  )
-{
-  Shizu_Type* type = Shizu_State_getObjectType(state, object);
-  return type->dispatch;
+  fprintf(stderr, "%s:%d: debug assertion `%s` failed\n", file, line, expression);
+  exit(EXIT_FAILURE);
 }

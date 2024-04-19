@@ -41,7 +41,7 @@ Shizu_Stack_startup
 {
   Shizu_Stack* self = malloc(sizeof(Shizu_Stack));
   if (!self) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, Shizu_Status_AllocationFailed);
     Shizu_State_jump(state);
   }
 
@@ -54,7 +54,7 @@ Shizu_Stack_startup
   if (self->maximalCapacity < self->minimalCapacity) {
     free(self);
     self = NULL;
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 
@@ -64,7 +64,7 @@ Shizu_Stack_startup
   if (!self->elements) {
     free(self);
     self = NULL;
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, Shizu_Status_AllocationFailed);
     Shizu_State_jump(state);
   }
   self->size = 0;
@@ -118,7 +118,7 @@ Shizu_Stack_peek
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (0 == stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return *(stack->elements + (stack->size - 1));
@@ -132,7 +132,7 @@ Shizu_Stack_pop
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (0 == stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   --stack->size;
@@ -148,7 +148,7 @@ Shizu_Stack_push
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (stack->capacity == stack->size) {
     if (stack->maximalCapacity == stack->capacity) {
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
     size_t newCapacity = stack->capacity * 2;
@@ -157,7 +157,7 @@ Shizu_Stack_push
     }
     Shizu_Value* newElements = realloc(stack->elements, sizeof(Shizu_Value) * newCapacity);
     if (!newElements) {
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, Shizu_Status_AllocationFailed);
       Shizu_State_jump(state);
     }
     stack->capacity = newCapacity;
@@ -175,7 +175,7 @@ Shizu_Stack_isBoolean
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_isBoolean(stack->elements + stack->size - index - 1);
@@ -190,7 +190,7 @@ Shizu_Stack_isCxxFunction
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_isCxxFunction(stack->elements + stack->size - index - 1);
@@ -205,7 +205,7 @@ Shizu_Stack_isFloat32
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_isFloat32(stack->elements + stack->size - index - 1);
@@ -220,7 +220,7 @@ Shizu_Stack_isInteger32
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_isInteger32(stack->elements + stack->size - index - 1);
@@ -235,7 +235,7 @@ Shizu_Stack_isObject
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_isObject(stack->elements + stack->size - index - 1);
@@ -250,7 +250,7 @@ Shizu_Stack_isVoid
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_isVoid(stack->elements + stack->size - index - 1);
@@ -265,12 +265,12 @@ Shizu_Stack_getBoolean
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value* value = stack->elements + stack->size - index - 1;
   if (!Shizu_Value_isBoolean(value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_getBoolean(value);
@@ -285,12 +285,12 @@ Shizu_Stack_getCxxFunction
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value* value = stack->elements + stack->size - index - 1;
   if (!Shizu_Value_isCxxFunction(value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_getCxxFunction(value);
@@ -305,12 +305,12 @@ Shizu_Stack_getFloat32
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value* value = stack->elements + stack->size - index - 1;
   if (!Shizu_Value_isFloat32(value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_getFloat32(value);
@@ -325,12 +325,12 @@ Shizu_Stack_getInteger32
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value* value = stack->elements + stack->size - index - 1;
   if (!Shizu_Value_isInteger32(value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_getInteger32(value);
@@ -345,12 +345,12 @@ Shizu_Stack_getObject
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value* value = stack->elements + stack->size - index - 1;
   if (!Shizu_Value_isObject(value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_getObject(value);
@@ -365,12 +365,12 @@ Shizu_Stack_getVoid
 {
   Shizu_Stack* stack = Shizu_State_getStack(state);
   if (index >= stack->size) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value* value = stack->elements + stack->size - index - 1;
   if (!Shizu_Value_isVoid(value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   return Shizu_Value_getVoid(value);

@@ -70,7 +70,7 @@ Shizu_Object_lock
     // Create the lock node if it does not exist.
     current = malloc(sizeof(LockNode));
     if (!current) {
-      Shizu_State_setError(state, 1);
+      Shizu_State_setStatus(state, Shizu_Status_AllocationFailed);
       Shizu_State_jump(state);
     }
     current->next = locks->buckets[hashIndex];
@@ -81,7 +81,7 @@ Shizu_Object_lock
   }
   // Assert the number of locks does not overflow.
   if (current->count == Shizu_Integer32_Maximum) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   // Increment the lock count.
@@ -103,11 +103,11 @@ Shizu_Object_unlock
     current = current->next;
   }
   if (!current) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (current->count == 0) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   current->count--;
@@ -121,7 +121,7 @@ Shizu_Locks_startup
 {
   Shizu_Locks* self = malloc(sizeof(Shizu_Locks));
   if (!self) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   
@@ -134,7 +134,7 @@ Shizu_Locks_startup
   if (self->maximalCapacity < self->minimalCapacity) {
     free(self);
     self = NULL;
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 
@@ -144,7 +144,7 @@ Shizu_Locks_startup
 	if (!self->buckets) {
 		free(self);
     self = NULL;
-		Shizu_State_setError(state, 1);
+		Shizu_State_setStatus(state, Shizu_Status_AllocationFailed);
     Shizu_State_jump(state);
 	}
 	for (size_t i = 0, n = self->capacity; i < n; ++i) {

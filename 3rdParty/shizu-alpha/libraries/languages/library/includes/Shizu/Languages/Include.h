@@ -1,5 +1,5 @@
 /*
-  Shizu Runtime
+  Shizu Languages
   Copyright (C) 2024 Michael Heilmann. All rights reserved.
 
   This software is provided 'as-is', without any express or implied
@@ -19,32 +19,12 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#define SHIZU_RUNTIME_PRIVATE (1)
-#include "Shizu/Runtime/Gc.h"
+#if !defined(SHIZU_LANGUAGES_INCLUDE_H_INCLUDED)
+#define SHIZU_LANGUAGES_INCLUDE_H_INCLUDED
 
-#include "Shizu/Runtime/DebugAssert.h"
-#include "Shizu/Runtime/Type.private.h"
+#define SHIZU_LANGUAGES_PRIVATE (1)
+#include "Shizu/Languages/Parser.h"
+#include "Shizu/Languages/Scanner.h"
+#undef SHIZU_LANGUAGES_PRIVATE
 
-Shizu_Type*
-Shizu_State_getObjectType
-  (
-    Shizu_State* self,
-    Shizu_Object* object
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  Shizu_debugAssert(NULL != object);
-  Shizu_debugAssert(NULL != object->type);
-  return object->type;
-}
-
-Shizu_Object_Dispatch*
-Shizu_State_getObjectDispatch
-  (
-    Shizu_State* state,
-    Shizu_Object* object
-  )
-{
-  Shizu_Type* type = Shizu_State_getObjectType(state, object);
-  return type->dispatch;
-}
+#endif // SHIZU_LANGUAGES_INCLUDE_H_INCLUDED

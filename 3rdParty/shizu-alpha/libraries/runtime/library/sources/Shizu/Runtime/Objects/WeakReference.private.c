@@ -115,13 +115,13 @@ Shizu_WeakReference_staticInitialize
   )
 {
   if (Shizu_State_allocateNamedMemory(state, namedMemoryName, sizeof(WeakReferences))) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   WeakReferences* g = NULL;
   if (Shizu_State_getNamedMemory(state, namedMemoryName, &g)) {
     Shizu_State_deallocateNamedMemory(state, namedMemoryName);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   // (2)
@@ -134,7 +134,7 @@ Shizu_WeakReference_staticInitialize
     Shizu_State_deallocateNamedMemory(state, namedMemoryName);
     free(g);
     g = NULL;
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 
@@ -145,7 +145,7 @@ Shizu_WeakReference_staticInitialize
     Shizu_State_deallocateNamedMemory(state, namedMemoryName);
 		free(g);
 		g = NULL;
-		Shizu_State_setError(state, 1);
+		Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
 	}
 	for (size_t i = 0, n = g->capacity; i < n; ++i) {
@@ -164,7 +164,7 @@ Shizu_WeakReference_staticUninitialize
 {
   WeakReferences* g = NULL;
   if (Shizu_State_getNamedMemory(state, namedMemoryName, &g)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   // TODO: In debug mode, assert the table must be empty.
@@ -195,7 +195,7 @@ Shizu_WeakReference_finalize
 {
   WeakReferences* g = NULL;
   if (Shizu_State_getNamedMemory(state, namedMemoryName, &g)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   //if (self->reference) {
@@ -235,7 +235,7 @@ Shizu_WeakReference_create
   Shizu_Type* TYPE = Shizu_WeakReference_getType(state);
   WeakReferences* g = NULL;
   if (Shizu_State_getNamedMemory(state, namedMemoryName, &g)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 

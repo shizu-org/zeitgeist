@@ -23,6 +23,7 @@
 #define SHIZU_STATE1_H_INCLUDED
 
 #include "Shizu/Runtime/JumpTarget.h"
+#include "Shizu/Runtime/Status.h"
 
 // bool
 #include <stdbool.h>
@@ -84,6 +85,12 @@
   #error("operating system not (yet) supported")
 
 #endif
+
+/**
+ * @since 1.0
+ * The type of a dynamic library (DL).
+ */
+typedef struct Shizu_Dl Shizu_Dl;
 
 /**
  * @since 1.0
@@ -175,25 +182,25 @@ Shizu_State1_jump
 
 /**
  * @since 1.0
- * @brief Set the error variable of a tier 1 state.
+ * @brief Set the status variable of a tier 1 state.
  * @param state A pointer to the tier 1 state.
- * @param error The value to assign to the variable.
+ * @param status The value to assign to the variable.
  */
 void
-Shizu_State1_setError
+Shizu_State1_setStatus
   (
     Shizu_State1* state,
-    int error
+    Shizu_Status status
   );
 
 /**
  * @since 1.0
- * @brief Get the error variable of a tier 1 state.
+ * @brief Get the status variable of a tier 1 state.
  * @param state A pointer to the tier 1 state.
  * @return The value assigned to the variable.
  */
 int
-Shizu_State1_getError
+Shizu_State1_getStatus
   (
     Shizu_State1* state
   );
@@ -222,12 +229,6 @@ Shizu_State1_getProcessExitRequested
   (
     Shizu_State1* state
   );
-
-/**
- * @since 1.0
- * The type of a dynamic library (DL).
- */
-typedef struct Shizu_Dl Shizu_Dl;
 
 /**
  * @since 1.0

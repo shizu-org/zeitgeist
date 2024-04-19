@@ -83,13 +83,13 @@ Shizu_Map_staticInitialize
   )
 {
   if (Shizu_State_allocateNamedMemory(state, namedMemoryName, sizeof(Maps))) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Maps* g = NULL;
   if (Shizu_State_getNamedMemory(state, namedMemoryName, &g)) {
     Shizu_State_deallocateNamedMemory(state, namedMemoryName);
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   g->minimumCapacity = 8;
@@ -156,7 +156,7 @@ Shizu_Map_create
   Shizu_Map* self = (Shizu_Map*)Shizu_Gc_allocate(state, sizeof(Shizu_Map));
   self->buckets = malloc(sizeof(Shizu_Map_Node*) * 8);
   if (!self->buckets) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   for (size_t i = 0, n = 8; i < n; ++i) {

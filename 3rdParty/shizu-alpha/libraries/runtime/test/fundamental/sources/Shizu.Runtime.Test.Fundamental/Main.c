@@ -62,79 +62,79 @@ test1
   /* Shizu_Boolean. */
   Shizu_Value_setBoolean(&value, Shizu_Boolean_True);
   if (!Shizu_Value_isBoolean(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (Shizu_Boolean_True != Shizu_Value_getBoolean(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 
   Shizu_Value_setBoolean(&value, Shizu_Boolean_False);
   if (!Shizu_Value_isBoolean(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (Shizu_Boolean_False != Shizu_Value_getBoolean(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 
   /* Shizu_Float32 */
   Shizu_Value_setFloat32(&value, 0.f);
   if (!Shizu_Value_isFloat32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (0.f != Shizu_Value_getFloat32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value_setFloat32(&value, Shizu_Float32_Maximum);
   if (!Shizu_Value_isFloat32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (Shizu_Float32_Maximum != Shizu_Value_getFloat32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value_setFloat32(&value, Shizu_Float32_Minimum);
   if (!Shizu_Value_isFloat32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (Shizu_Float32_Minimum != Shizu_Value_getFloat32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 
   /* Shizu_Integer32 */
   Shizu_Value_setInteger32(&value, 0);
   if (!Shizu_Value_isInteger32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (0 != Shizu_Value_getInteger32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value_setInteger32(&value, Shizu_Integer32_Maximum);
   if (!Shizu_Value_isInteger32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (Shizu_Integer32_Maximum != Shizu_Value_getInteger32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   Shizu_Value_setInteger32(&value, Shizu_Integer32_Minimum);
   if (!Shizu_Value_isInteger32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
   if (Shizu_Integer32_Minimum != Shizu_Value_getInteger32(&value)) {
-    Shizu_State_setError(state, 1);
+    Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
   }
 }

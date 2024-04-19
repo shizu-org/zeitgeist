@@ -83,13 +83,13 @@ Shizu_List_staticInitialize
 	)
 {
 	if (Shizu_State_allocateNamedMemory(state, namedMemoryName, sizeof(Lists))) {
-		Shizu_State_setError(state, 1);
+		Shizu_State_setStatus(state, 1);
 		Shizu_State_jump(state);
 	}
 	Lists* g = NULL;
 	if (Shizu_State_getNamedMemory(state, namedMemoryName, &g)) {
 		Shizu_State_deallocateNamedMemory(state, namedMemoryName);
-		Shizu_State_setError(state, 1);
+		Shizu_State_setStatus(state, 1);
 		Shizu_State_jump(state);
 	}
   g->minimumCapacity = 8;
@@ -145,7 +145,7 @@ Shizu_List_create
   Shizu_List* self = (Shizu_List*)Shizu_Gc_allocate(state, sizeof(Shizu_List));
 	self->elements = malloc(8 * sizeof(Shizu_Value));
 	if (!self->elements) {
-		Shizu_State_setError(state, 1);
+		Shizu_State_setStatus(state, 1);
     Shizu_State_jump(state);
 	}
 	self->size = 0;
@@ -200,7 +200,7 @@ Shizu_List_insertValue
 		Lists* g = NULL;
 		if (Shizu_State_getNamedMemory(state, namedMemoryName, &g)) {
 			Shizu_State_deallocateNamedMemory(state, namedMemoryName);
-			Shizu_State_setError(state, 1);
+			Shizu_State_setStatus(state, 1);
 			Shizu_State_jump(state);
 		}
 		if (oldCapacity > g->maximumCapacity / 2) {
@@ -209,7 +209,7 @@ Shizu_List_insertValue
 			// we cannot double the capacity.
 			// try to saturate the capacity.
 			if (oldCapacity == g->maximumCapacity) {
-				Shizu_State_setError(state, 1);
+				Shizu_State_setStatus(state, 1);
 				Shizu_State_jump(state);
 			} else {
 				newCapacity = g->maximumCapacity;
@@ -219,7 +219,7 @@ Shizu_List_insertValue
 		}
 		Shizu_Value* newElements = realloc(self->elements, newCapacity * sizeof(Shizu_Value));
 		if (!newElements) {
-			Shizu_State_setError(state, 1);
+			Shizu_State_setStatus(state, 1);
 			Shizu_State_jump(state);
 		}
 		self->elements = newElements;

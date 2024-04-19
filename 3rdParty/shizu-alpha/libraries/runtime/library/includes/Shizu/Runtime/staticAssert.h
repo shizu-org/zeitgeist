@@ -19,32 +19,26 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#define SHIZU_RUNTIME_PRIVATE (1)
-#include "Shizu/Runtime/Gc.h"
+#if !defined(SHIZU_RUNTIME_STATICASSERT_H_INCLUDED)
+#define SHIZU_RUNTIME_STATICASSERT_H_INCLUDED
 
-#include "Shizu/Runtime/DebugAssert.h"
-#include "Shizu/Runtime/Type.private.h"
+#include "Shizu/Runtime/Configure.h"
 
-Shizu_Type*
-Shizu_State_getObjectType
-  (
-    Shizu_State* self,
-    Shizu_Object* object
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  Shizu_debugAssert(NULL != object);
-  Shizu_debugAssert(NULL != object->type);
-  return object->type;
-}
+/// @since 1.0
+/// @brief Macro aliasing `static_assert`/`_Static_assert`.
+/// @details If the expression @a expression evaluates to logically false then a compilation error is generated with the message @a message.
+/// @param expression A compile-time evaluable expression that can be converted into logically true or logically false.
+/// @param message A string literal.
+#if Shizu_Configuration_CompilerC_Msvc == Shizu_Configuration_CompilerC
 
-Shizu_Object_Dispatch*
-Shizu_State_getObjectDispatch
-  (
-    Shizu_State* state,
-    Shizu_Object* object
-  )
-{
-  Shizu_Type* type = Shizu_State_getObjectType(state, object);
-  return type->dispatch;
-}
+  #define Shizu_staticAssert(expression, message) \
+    static_assert(expression, message);
+
+#else
+
+  #define Shizu_staticAssert(expression, message) \
+    _Static_assert(expression, message);
+
+#endif
+
+#endif // SHIZU_RUNTIME_STATICASSERT_H_INCLUDED

@@ -19,7 +19,7 @@ A zero value on success, a non-zero value on failure.
 
 *Details*
 See [Shize_State_destroy](Shizu_State_destroy.md) for more information.
-Multiple calls to `Shizu_State_create` increment the reference count of that singleton.
+Multiple calls to `Shizu_State_create` increment the reference count of that singleton object.
 
 *Success*
 The `Shizu_State` object pointed to by `SELF` was destroyed.

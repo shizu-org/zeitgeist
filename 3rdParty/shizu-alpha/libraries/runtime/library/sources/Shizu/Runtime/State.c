@@ -29,6 +29,7 @@
 #include "Shizu/Runtime/Stack.private.h"
 #include "Shizu/Runtime/Objects/WeakReference.private.h"
 #include "Shizu/Runtime/Type.private.h"
+#include "Shizu/Runtime/DebugAssert.h"
 
 // malloc, free
 #include <malloc.h>
@@ -168,214 +169,6 @@ NamedStorageService_get
 
 
 
-
-void
-Shizu_debugAssertionFailed
-  (
-    char const* file,
-    int line,
-    char const* expression
-  )
-{
-  fprintf(stderr, "%s:%d: debug assertion `%s` failed\n", file, line, expression);
-  exit(EXIT_FAILURE);
-}
-
-
-
-
-Shizu_Boolean
-Shizu_Value_getBoolean
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(Shizu_Value_isBoolean(self));
-  return self->booleanValue;
-}
-
-bool
-Shizu_Value_isBoolean
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  return Shizu_Value_Tag_Boolean == self->tag;
-}
-
-void
-Shizu_Value_setBoolean
-  (
-    Shizu_Value* self,
-    Shizu_Boolean booleanValue
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  self->booleanValue = booleanValue;
-  self->tag = Shizu_Value_Tag_Boolean;
-}
-
-Shizu_Reference(Shizu_CxxFunction)
-Shizu_Value_getCxxFunction
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(Shizu_Value_isCxxFunction(self));
-  return self->cxxFunctionValue;
-}
-
-bool
-Shizu_Value_isCxxFunction
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  return Shizu_Value_Tag_CxxFunction == self->tag;
-}
-
-void
-Shizu_Value_setCxxFunction
-  (
-    Shizu_Value* self,
-    Shizu_Reference(Shizu_CxxFunction) cxxFunctionValue
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  self->cxxFunctionValue = cxxFunctionValue;
-  self->tag = Shizu_Value_Tag_CxxFunction;
-}
-
-Shizu_Float32
-Shizu_Value_getFloat32
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(Shizu_Value_isFloat32(self));
-  return self->float32Value;
-}
-
-bool
-Shizu_Value_isFloat32
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  return Shizu_Value_Tag_Float32 == self->tag;
-}
-
-void
-Shizu_Value_setFloat32
-  (
-    Shizu_Value* self,
-    Shizu_Float32 float32Value
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  self->float32Value = float32Value;
-  self->tag = Shizu_Value_Tag_Float32;
-}
-
-Shizu_Integer32
-Shizu_Value_getInteger32
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(Shizu_Value_isInteger32(self));
-  return self->integer32Value;
-}
-
-bool
-Shizu_Value_isInteger32
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  return Shizu_Value_Tag_Integer32 == self->tag;
-}
-
-void
-Shizu_Value_setInteger32
-  (
-    Shizu_Value* self,
-    Shizu_Integer32 integer32Value
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  self->integer32Value = integer32Value;
-  self->tag = Shizu_Value_Tag_Integer32;
-}
-
-Shizu_Reference(Shizu_Object)
-Shizu_Value_getObject
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(Shizu_Value_isObject(self));
-  return self->objectValue;
-}
-
-bool
-Shizu_Value_isObject
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  return Shizu_Value_Tag_Object == self->tag;
-}
-
-void
-Shizu_Value_setObject
-  (
-    Shizu_Value* self,
-    Shizu_Reference(Shizu_Object) objectValue
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  self->objectValue = objectValue;
-  self->tag = Shizu_Value_Tag_Object;
-}
-
-Shizu_Void
-Shizu_Value_getVoid
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(Shizu_Value_isVoid(self));
-  return self->voidValue;
-}
-
-bool
-Shizu_Value_isVoid
-  (
-    Shizu_Value const* self
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  return Shizu_Value_Tag_Void == self->tag;
-}
-
-void
-Shizu_Value_setVoid
-  (
-    Shizu_Value* self,
-    Shizu_Void voidValue
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  self->voidValue = voidValue;
-  self->tag = Shizu_Value_Tag_Void;
-}
-
 struct Shizu_State {
   int referenceCount;
   Shizu_State1* state1;
@@ -383,11 +176,7 @@ struct Shizu_State {
   Shizu_Gc* gc;
   Shizu_Locks* locks;
   Shizu_Stack* stack;
-  struct {
-    Shizu_Type** elements;
-    size_t size;
-    size_t capacity;
-  } types;
+  Shizu_Types types;
 };
 
 static Shizu_State* g_singleton = NULL;
@@ -476,7 +265,7 @@ Shizu_State_create
     //
     Shizu_State_pushJumpTarget(self, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
-      Shizu_Types_initialize(self);
+      Shizu_Types_initialize(self->state1, &self->types);
       Shizu_State_popJumpTarget(self);
     } else {
       Shizu_State_popJumpTarget(self);
@@ -501,86 +290,6 @@ Shizu_State_create
   return 0;
 }
 
-static size_t
-Shizu_Type_getChildCount
-  (
-    Shizu_Type* self
-  )
-{
-  size_t count = 0;
-  while (count < self->children.capacity && self->children.elements[count]) {
-    count++;
-  }
-  return count;
-}
-
-// The type must already be removed from the state.types hash table.
-// Furthermore, the type must have zero children.
-static void
-Shizu_Type_destroy
-  (
-    Shizu_State* self,
-    Shizu_Type* type
-  )
-{
-  // Invoke the finalizer.
-  if (Shizu_TypeFlags_StaticallyInitialized == (Shizu_TypeFlags_StaticallyInitialized & type->flags) && type->descriptor->staticFinalize) {
-    type->descriptor->staticFinalize(self);
-  }
-  // Remove this type from the array of references to child types of its parent type.
-  if (type->parentType) {
-    size_t index1 = (size_t)-1;
-    for (size_t i = 0, n = type->parentType->children.capacity; i < n; ++i) {
-      if (type->parentType->children.elements[i] == type) {
-        index1 = i;
-        break;
-      }
-    }
-    size_t index2 = (size_t)-1;
-    for (size_t i = type->parentType->children.capacity; i > 0; --i) {
-      if (type->parentType->children.elements[i - 1]) {
-        index2 = i - 1;
-        break;
-      }
-    }
-    // if (index1 != index2) {
-    type->parentType->children.elements[index1] = type->parentType->children.elements[index2];
-    type->parentType->children.elements[index2] = NULL;
-    // }
-  }
-  // Deallocate array of references to children.
-  free(type->children.elements);
-  type->children.elements = NULL;
-  // Deallocate the name.
-  free(type->name.bytes);
-  type->name.bytes = NULL;
-  //
-  if (type->dl) {
-    Shizu_Dl_unref(self, type->dl);
-    type->dl = NULL;
-  }
-  // Deallocate the value.
-  free(type);
-}
-
-void
-Shizu_Types_initialize
-  (
-    Shizu_State* self
-  )
-{
-  self->types.elements = malloc(sizeof(Shizu_Type) * 8);
-  if (!self->types.elements) {
-    Shizu_State_setError(self, 1);
-    Shizu_State_jump(self);
-  }
-  for (size_t i = 0, n = 8; i < n; ++i) {
-    self->types.elements[i] = NULL;
-  }
-  self->types.size = 0;
-  self->types.capacity = 8;
-}
-
 void
 Shizu_Types_uninitialize
   (
@@ -594,16 +303,16 @@ Shizu_Types_uninitialize
       Shizu_Type** previous = &(self->types.elements[i]);
       Shizu_Type* current = self->types.elements[i];
       while (current) {
-        if (!Shizu_Type_getChildCount(current)) {
+        if (!Shizu_Types_getTypeChildCount(self->state1, &self->types, current)) {
           Shizu_Type* type = current;
-          Shizu_Types_ensureDispatchUninitialized(self, type);
+          Shizu_Types_ensureDispatchUninitialized(self->state1, &self->types, type);
           *previous = current->next;
           current = current->next;
           self->types.size--;
           if (type->typeDestroyed) {
-            type->typeDestroyed(self);
+            type->typeDestroyed(self->state1);
           }
-          Shizu_Type_destroy(self, type);
+          Shizu_Type_destroy(self, &self->types, type);
         } else {
           previous = &current->next;
           current = current->next;
@@ -672,24 +381,24 @@ Shizu_State_jump
 }
 
 void
-Shizu_State_setError
+Shizu_State_setStatus
   (
     Shizu_State* self,
-    int error
+    Shizu_Status error
   )
 {
   Shizu_debugAssert(NULL != self);
-  Shizu_State1_setError(self->state1, error);
+  Shizu_State1_setStatus(self->state1, error);
 }
 
-int
-Shizu_State_getError
+Shizu_Status
+Shizu_State_getStatus
   (
     Shizu_State* self
   )
 {
   Shizu_debugAssert(NULL != self);
-  return Shizu_State1_getError(self->state1);
+  return Shizu_State1_getStatus(self->state1);
 }
 
 void
@@ -720,84 +429,9 @@ Shizu_State_getTypeByName
     char const* name
   )
 {
-  size_t numberOfBytes = strlen(name) + 1;
-  size_t hashValue = numberOfBytes;
-  for (size_t i = 0, n = numberOfBytes; i < n; ++i) {
-    hashValue = hashValue * 37 + (size_t)name[i];
-  }
-  size_t hashIndex = hashValue % self->types.capacity;
-  for (Shizu_Type* type = self->types.elements[hashIndex]; NULL != type; type = type->next) {
-    if (type->name.hashValue == hashValue && type->name.numberOfBytes == numberOfBytes) {
-      if (!strcmp(type->name.bytes, name)) {
-        return type;
-      }
-    }
-  }
-  return NULL;
-}
-
-void
-Shizu_Types_ensureDispatchUninitialized
-  (
-    Shizu_State* state,
-    Shizu_Type* type
-  )
-{
-  if (0 == (Shizu_TypeFlags_DispatchInitialized & type->flags)) {
-    return;
-  }
-  if (type->descriptor->dispatchUninitialize) {
-    type->descriptor->dispatchUninitialize(state, type->dispatch);
-  }
-  free(type->dispatch);
-  type->dispatch = NULL;
-  type->flags = ~Shizu_TypeFlags_DispatchInitialized & type->flags;
-}
-
-void
-Shizu_Types_ensureDispatchInitialized
-  (
-    Shizu_State* state,
-    Shizu_Type* type
-  )
-{
-  if (Shizu_TypeFlags_DispatchInitialized == (Shizu_TypeFlags_DispatchInitialized & type->flags)) {
-    return;
-  }
-  if (type->parentType) {
-    if (type->descriptor->dispatchSize < type->parentType->descriptor->dispatchSize) {
-      Shizu_State_setError(state, 1);
-      Shizu_State_jump(state);
-    }
-    Shizu_Types_ensureDispatchInitialized(state, type->parentType);
-  }
-  if (type->descriptor->dispatchSize < sizeof(Shizu_Object_Dispatch)) {
-    Shizu_State_setError(state, 1);
-    Shizu_State_jump(state);
-  }
-  type->dispatch = malloc(type->descriptor->dispatchSize);
-  if (!type->dispatch) {
-    Shizu_State_setError(state, 1);
-    Shizu_State_jump(state);
-  }
-  memset(type->dispatch, 0, type->descriptor->dispatchSize);
-  if (type->parentType) {
-    memcpy(type->dispatch, type->parentType->dispatch, type->parentType->descriptor->dispatchSize);
-  }
-  if (type->descriptor->dispatchInitialize) {
-    Shizu_JumpTarget jumpTarget;
-    Shizu_State_pushJumpTarget(state, &jumpTarget);
-    if (!setjmp(jumpTarget.environment)) {
-      type->descriptor->dispatchInitialize(state, type->dispatch);
-      Shizu_State_popJumpTarget(state);
-    } else {
-      Shizu_State_popJumpTarget(state);
-      free(type->dispatch);
-      type->dispatch = NULL;
-      Shizu_State_jump(state);
-    }
-  }
-  type->flags |= Shizu_TypeFlags_DispatchInitialized;
+  Shizu_debugAssert(NULL != self);
+  Shizu_debugAssert(NULL != name);
+  return Shizu_Types_getTypeByName(self->state1, &self->types, name);
 }
 
 Shizu_Type*
@@ -811,107 +445,17 @@ Shizu_State_createType
     Shizu_TypeDescriptor const* typeDescriptor
   )
 {
-  size_t numberOfBytes = strlen(name) + 1;
-  size_t hashValue = numberOfBytes;
-  for (size_t i = 0, n = numberOfBytes; i < n; ++i) {
-    hashValue = hashValue * 37 + (size_t)name[i];
-  }
-  size_t hashIndex = hashValue % self->types.capacity;
-  for (Shizu_Type* type = self->types.elements[hashIndex]; NULL != type; type = type->next) {
-    if (type->name.hashValue == hashValue && type->name.numberOfBytes == numberOfBytes) {
-      if (!strcmp(type->name.bytes, name)) {
-        fprintf(stderr, "%s:%d: a type of name `%s` was already registered\n", __FILE__, __LINE__, name);
-        Shizu_State_setError(self, 1);
-        Shizu_State_jump(self);
-      }
-    }
-  }
-  Shizu_Type* type = malloc(sizeof(Shizu_Type));
-  if (!type) {
-    fprintf(stderr, "%s:%d: allocation of `%zu` Bytes failed\n", __FILE__, __LINE__, sizeof(Shizu_Type));
-    Shizu_State_setError(self, 1);
-    Shizu_State_jump(self);
-  }
-  type->name.bytes = malloc(numberOfBytes);
-  if (!type->name.bytes) {
-    free(type);
-    type = NULL;
-    Shizu_State_setError(self, 1);
-    Shizu_State_jump(self);
-  }
-  memcpy(type->name.bytes, name, numberOfBytes);
-  type->flags = 0;
-  type->dispatch = NULL;
-  type->parentType = parentType;
-  type->descriptor = typeDescriptor;
-  type->name.hashValue = hashValue;
-  type->name.numberOfBytes = numberOfBytes;
-  type->next = NULL;
-  type->typeDestroyed = typeDestroyed;
-  type->dl = dl;
-  // Allocate array for references to children.
-  type->children.capacity = 1;
-  type->children.elements = malloc(sizeof(Shizu_Type*) * type->children.capacity);
-  if (!type->children.elements) {
-    fprintf(stderr, "%s:%d: allocation of `%zu` Bytes failed\n", __FILE__, __LINE__, sizeof(Shizu_Type*) * type->children.capacity);
-    free(type->name.bytes);
-    type->name.bytes = NULL;
-    free(type);
-    Shizu_State_setError(self, 1);
-    Shizu_State_jump(self);
-  }
-  for (size_t i = 0, n = type->children.capacity; i < n; ++i) {
-    type->children.elements[i] = NULL;
-  }
-  // Add this type to the array of references to children of its parent type.
-  if (parentType) {
-    size_t n = Shizu_Type_getChildCount(parentType);
-    if (parentType->children.capacity == n) {
-      if (parentType->children.capacity == 65536) {
-        fprintf(stderr, "%s:%d: unable to add `%s` as child type of type `%s`.\n", __FILE__, __LINE__, name, parentType->name.bytes);
-        free(type->children.elements);
-        type->children.elements = NULL;
-        free(type->name.bytes);
-        type->name.bytes = NULL;
-        free(type);
-        Shizu_State_setError(self, 1);
-        Shizu_State_jump(self);
-      }
-      size_t newCapacity = parentType->children.capacity * 2;
-      Shizu_Type** newElements = realloc(parentType->children.elements, sizeof(Shizu_Type*) * newCapacity);
-      if (!newElements) {
-        fprintf(stderr, "%s:%d: allocation of `%zu` Bytes failed\n", __FILE__, __LINE__, sizeof(Shizu_Type*) * newCapacity);
-        free(type->children.elements);
-        type->children.elements = NULL;
-        free(type->name.bytes);
-        type->name.bytes = NULL;
-        free(type);
-        Shizu_State_setError(self, 1);
-        Shizu_State_jump(self);
-      }
-      for (size_t i = n; i < newCapacity; ++i) {
-        newElements[i] = NULL;
-      }
-      parentType->children.capacity = newCapacity;
-      parentType->children.elements = newElements;
-    }
-    parentType->children.elements[n] = type;
-  }
-
-  type->next = self->types.elements[hashIndex];
-  self->types.elements[hashIndex] = type;
-  self->types.size++;
-
+  Shizu_Type* type = Shizu_Types_createType(self->state1, &self->types, name, parentType, dl, typeDestroyed, typeDescriptor);
   Shizu_JumpTarget jumpTarget;
-  Shizu_State_pushJumpTarget(self, &jumpTarget);
+  Shizu_State1_pushJumpTarget(self->state1, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
     if (type->descriptor->staticInitialize) {
       type->descriptor->staticInitialize(self);
     }
     type->flags |= Shizu_TypeFlags_StaticallyInitialized;
-    Shizu_Types_ensureDispatchInitialized(self, type);
+    Shizu_Types_ensureDispatchInitialized(self->state1, &self->types, type);
   }
-  Shizu_State_popJumpTarget(self);
+  Shizu_State1_popJumpTarget(self->state1);
   return type;
 }
 
@@ -937,6 +481,13 @@ Shizu_State_getStack
     Shizu_State* self
   )
 { return self->stack; }
+
+Shizu_Types*
+Shizu_State_getTypes
+  (
+    Shizu_State* self
+  )
+{ return &self->types; }
 
 int
 Shizu_State_allocateNamedMemory

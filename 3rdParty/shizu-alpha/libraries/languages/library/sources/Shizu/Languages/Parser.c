@@ -1,5 +1,5 @@
 /*
-  Shizu Runtime
+  Shizu Languages
   Copyright (C) 2024 Michael Heilmann. All rights reserved.
 
   This software is provided 'as-is', without any express or implied
@@ -19,32 +19,40 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#define SHIZU_RUNTIME_PRIVATE (1)
-#include "Shizu/Runtime/Gc.h"
+#include "Shizu/Languages/Parser.h"
 
-#include "Shizu/Runtime/DebugAssert.h"
-#include "Shizu/Runtime/Type.private.h"
+static Shizu_TypeDescriptor const Shizu_L1_Parser_Type = {
+  .staticInitialize = NULL,
+  .staticFinalize = NULL,
+  .staticVisit = NULL,
+  .size = sizeof(Shizu_L1_Parser),
+  .visit = (Shizu_OnVisitCallback*)NULL,
+  .finalize = (Shizu_OnFinalizeCallback*)NULL,
+  .dispatchSize = sizeof(Shizu_L1_Parser_Dispatch),
+  .dispatchInitialize = NULL,
+  .dispatchUninitialize = NULL,
+};
 
-Shizu_Type*
-Shizu_State_getObjectType
-  (
-    Shizu_State* self,
-    Shizu_Object* object
-  )
-{
-  Shizu_debugAssert(NULL != self);
-  Shizu_debugAssert(NULL != object);
-  Shizu_debugAssert(NULL != object->type);
-  return object->type;
-}
+Shizu_defineType(Shizu_L1_Parser, Shizu_Object);
 
-Shizu_Object_Dispatch*
-Shizu_State_getObjectDispatch
+void
+Shizu_L1_Parser_construct
   (
     Shizu_State* state,
-    Shizu_Object* object
+    Shizu_L1_Parser* self
   )
 {
-  Shizu_Type* type = Shizu_State_getObjectType(state, object);
-  return type->dispatch;
+  Shizu_Type* type = Shizu_L1_Parser_getType(state);
+  ((Shizu_Object*)self)->type = type;
+}
+
+Shizu_L1_Parser*
+Shizu_L1_Parser_create
+  (
+    Shizu_State* state
+  )
+{
+  Shizu_L1_Parser* self = (Shizu_L1_Parser*)Shizu_Gc_allocate(state, sizeof(Shizu_L1_Parser));
+  Shizu_L1_Parser_construct(state, self);
+  return self;
 }

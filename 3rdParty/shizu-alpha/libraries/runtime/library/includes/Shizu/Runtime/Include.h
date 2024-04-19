@@ -27,6 +27,7 @@
 #include "Shizu/Runtime/Locks.h"
 #include "Shizu/Runtime/Stack.h"
 #include "Shizu/Runtime/State.h"
+#include "Shizu/Runtime/Status.h"
 #include "Shizu/Runtime/Value.h"
 
 #include "Shizu/Runtime/Objects/List.h"
