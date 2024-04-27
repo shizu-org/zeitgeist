@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-include(${CMAKE_SOURCE_DIR}/3rdParty/idlib-math-1.4/cmake/all.cmake)
+include(${idlib-process.source-dir}/cmake/all.cmake)
 
 set(name ${project_name}-Library)
 begin_library()
@@ -45,7 +45,7 @@ list(APPEND ${name}.source_files Zeitgeist/Configure.h)
 
 end_library()
 
-target_link_libraries(${name} Shizu.Runtime idlib-process)
+target_link_libraries(${name} Shizu.Runtime idlib-file-system idlib-process)
 
 target_include_directories(${name} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(${name} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

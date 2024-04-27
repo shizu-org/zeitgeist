@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-include(${CMAKE_SOURCE_DIR}/3rdParty/idlib-math-1.4/cmake/all.cmake)
+include(${idlib-process.source-dir}/cmake/all.cmake)
 
 set(name ${project_name}-Hello-World-OpenGl)
 begin_plugin_library()
