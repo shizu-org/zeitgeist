@@ -118,11 +118,22 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "  vec3 position;\n"  
   "};\n"
 
+  /* Type of light with a direction but without position. */
+  "#define LightType_Directional (1)\n"
+  /* Type of light with a position but without direction. */
+  "#define LightType_Point (2)\n"
+
+  /* Type of light model "Phong". */
+  "#define LightModel_Phong (1)\n"
+  /* Type of light model "Blinn-Phong". */
+  "#define LightModel_BlinnPhong (2)\n"
+
   "struct SpecularLightInfo {\n"
   "  vec3 color;\n"
-  "  vec3 direction;\n"/*Used if positionless = true*/
-  "  vec3 position;\n"/*Used if positionless = false*/
-  "  bool positionless;\n"
+  "  vec3 direction;\n"   /* Used if LightType_Directional. */
+  "  vec3 position;\n"    /* Used if LighttType_Point. */
+  "  int lightType;\n"    /* One of LightType_Directional or LightType_Point. */
+  "  int lightModel;\n"   /* One of LightModelPhong or LightModel_BlinnPhong. */
   "};\n"
 
   "struct DiffuseLightInfo {\n"
@@ -135,17 +146,17 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "};\n" 
 
   /* diffuse light info. */
-  "uniform DiffuseLightInfo diffuseLightInfoX;\n"
+  "uniform DiffuseLightInfo diffuseLightInfo;\n"
 
   /* ambient light info. */
-  "uniform AmbientLightInfo ambientLightInfoX;\n"
+  "uniform AmbientLightInfo ambientLightInfo;\n"
 
   /* specular light info. */
-  "uniform SpecularLightInfo specularLightInfoX;\n"
+  "uniform SpecularLightInfo specularLightInfo;\n"
 
-  "uniform float AmbientFactor = 0.5f;\n"
-  "uniform float DiffuseFactor = 0.4f;\n"
-  "uniform float SpecularFactor = 0.1;\n"
+  "uniform float AmbientFactor = 0.3f;\n"
+  "uniform float DiffuseFactor = 0.3f;\n"
+  "uniform float SpecularFactor = 0.3;\n"
 
   "struct FragmentInfo {\n"
   "  vec3 position;\n"
@@ -155,7 +166,7 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "};\n"
 
   /*
-   * The ambient light has no origin or direction.
+   * The ambient light.
    */
   "vec3 onAmbient(in FragmentInfo fragment, in AmbientLightInfo ambient) {\n"
   "  fragment.normal = normalize(fragment.normal);\n"
@@ -164,7 +175,7 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "}\n"
 
   /*
-   * The diffuse light has no origin. The diffuse light has a direction.
+   * The diffuse light: directional light (direction but no origin).
    */
   "vec3 onDiffuse(in FragmentInfo fragment, in DiffuseLightInfo diffuse) {\n"
   "  fragment.normal = normalize(fragment.normal);\n"
@@ -176,27 +187,38 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "}\n"
 
   /*
-   * The specular light has no origin. The specular light has a direction.
+   * The specular light: point light (origin but no direction) or directional light (direction but no origin).
    */
   "vec3 onSpecular(in FragmentInfo fragment, in ViewerInfo viewer, in SpecularLightInfo specular) {\n"
   "  vec3 viewerDirection = normalize(viewer.position - fragment.position);\n"
   "  vec3 lightDirection;\n"
-  "  if (specular.positionless) {\n"
-  "    lightDirection = -specular.direction;\n"
+  "  if (specular.lightType == LightType_Point) {\n"
+  /* Specular point light. */
+  "    lightDirection = normalize(fragment.position - specular.position);\n"
+  "  } else if (specular.lightType == LightType_Directional) {\n"
+  /* Specular directional light. */
+  "    lightDirection = specular.direction;\n"
   "  } else {\n"
-  "    lightDirection = vec3(0,0,0) - fragment.position;\n"
+  "    return vec3(1.f, 1.f, 1.f); \n"
   "  }\n"
-  "  vec3 reflectionDirection = reflect(lightDirection, fragment.normal);\n"
-  "  float shininess = 1;\n"
-  "  float intensity = pow(max(dot(viewerDirection, reflectionDirection), 0.0), fragment.shininess); "
+  "  vec3 surfaceToLightDirection = -lightDirection;\n;"
+  "  float intensity = 0;"
+  "  if (specular.lightModel == LightModel_Phong) {\n"
+  "   vec3 reflectionDirection = reflect(lightDirection, fragment.normal);\n"
+  /*
+  "   intensity = pow(max(dot(viewerDirection, reflectionDirection), 0.0), fragment.shininess);"
+  */
+  "   intensity = pow(smoothstep(0.0, 1.0, dot(viewerDirection, reflectionDirection)), fragment.shininess);\n"
+  "  } else if (specular.lightModel == LightModel_BlinnPhong) {\n"
+  "   vec3 halfWay = normalize(viewerDirection + surfaceToLightDirection);\n"
+  /*
+  "   intensity = pow(max(dot(fragment.normal, halfWay), 0.0), fragment.shininess);"
+  */
+  "   intensity = pow(smoothstep(0.0, 1.0, dot(fragment.normal, halfWay)), fragment.shininess);\n"
+  "  }\n"
   "  return intensity * specular.color;\n"
   "}\n"
-
-  /*
-   * The ambient light has no origin or direction.
-   * The diffuse light has no origin and a direction.
-   * TO BE IMPLEMENTED: The specular light has no origin and a direction.
-   */ 
+ 
   "vec3 light(in FragmentInfo fragment, in ViewerInfo viewer, in AmbientLightInfo ambient, in DiffuseLightInfo diffuse, in SpecularLightInfo specular) {\n"
   "  vec3 ambientColor = onAmbient(fragment, ambient);\n"
   "  vec3 diffuseColor = onDiffuse(fragment, diffuse);\n"
@@ -214,7 +236,7 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "  ViewerInfo viewerInfo;\n"
   "  viewerInfo.position = _viewer.position;\n"
   "\n"
-  "  vec3 color = light(fragmentInfo, viewerInfo, ambientLightInfoX, diffuseLightInfoX, specularLightInfoX);\n"
+  "  vec3 color = light(fragmentInfo, viewerInfo, ambientLightInfo, diffuseLightInfo, specularLightInfo);\n"
   "  outputFragmentColor = vec4(color, 1.f);\n"
   "}\n"
   ;

@@ -115,8 +115,24 @@ bindBooleanUniform
   if (-1 == location) {
     fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
   } else {
-    /// @todo Check bounds.
     glUniform1i(location, value ? 1 : 0);
+  }
+}
+
+static void
+bindInteger32Uniform
+  (
+    Shizu_State* state,
+    GLuint programId,
+    char const* name,
+    Shizu_Integer32 value
+  ) {
+  GLint location = glGetUniformLocation(programId, name);
+  if (-1 == location) {
+    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
+  } else {
+    // Both GLint and Shizu_Integer32 are two's complements integer hence should have the same maximal/minimal values.
+    glUniform1i(location, value);
   }
 }
 
@@ -175,15 +191,19 @@ Zeitgeist_Rendition_update
 
   bindIntegerUniform(state, ((Visuals_GlProgram*)g_program)->programId, "inputFragmentColorType", 1);
 
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "ambientLightInfoX.color", Vector3R32_create(state, 0.3f, 0.3f, 0.3f));
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightInfoX.direction", Vector3R32_create(state, -1.f, -1.f, -1.f));
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightInfoX.color", Vector3R32_create(state, 1.f, 1.f, 1.f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "ambientLightInfo.color", Vector3R32_create(state, 0.3f, 0.3f, 0.3f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightInfo.direction", Vector3R32_create(state, -1.f, -1.f, -1.f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightInfo.color", Vector3R32_create(state, 1.f, 1.f, 1.f));
 
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfoX.direction", Vector3R32_create(state, -1.f, -1.f, -1.f));
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfoX.color", Vector3R32_create(state, 0.8f, 0.8f, 0.8f));
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfoX.position", Vector3R32_create(state, 0.f, 0.f, 0.f));
-  bindBooleanUniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfoX.positionless", false);
-
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.direction", Vector3R32_create(state, -1.f, -1.f, -1.f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.color", Vector3R32_create(state, 0.8f, 0.8f, 0.8f));
+  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.position", Vector3R32_create(state, 0.f, 0.f, 0.f));
+  static const Shizu_Integer32 LightType_Directional = 1;
+  static const Shizu_Integer32 LightType_Point = 2;
+  bindInteger32Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.lightType", LightType_Point);
+  static const Shizu_Integer32 LightModel_Phong = 1;
+  static const Shizu_Integer32 LightModel_BlinnPhong = 2;
+  bindInteger32Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.lightModel", LightModel_BlinnPhong);
 
   Shizu_Value sizeValue = Shizu_List_getSize(state, g_world->geometries);
   for (Shizu_Integer32 i = 0, n = Shizu_Value_getInteger32(&sizeValue); i < n; ++i) {
