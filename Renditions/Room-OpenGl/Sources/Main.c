@@ -29,7 +29,7 @@
 #endif
 
 Shizu_Rendition_Export char const* 
-Shizu_getDlName
+Shizu_Module_getName
   (
   )
 {
