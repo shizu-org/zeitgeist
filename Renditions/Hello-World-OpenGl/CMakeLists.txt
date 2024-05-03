@@ -14,4 +14,4 @@ end_plugin_library()
 target_link_libraries(${name} ${project_name}-OpenGl-Commons ${project_name}-Library)
 add_dependencies(${name} ${project_name}-Interpreter)
 
-copy_plugin(${project_name}-Interpreter ${name})
+copy_zeitgeist_plugin(${project_name}-Interpreter ${name})

@@ -136,7 +136,7 @@ FetchContent_MakeAvailable(Shizu.Runtime idlib-math)
 
 # Copy the files of the rendition to the interpreter binary directory.
 # rendition_name The rendition name.
-macro(copy_plugin interpreter_name rendition_name)
+macro(copy_zeitgeist_plugin interpreter_name rendition_name)
   get_target_property(source_dir ${rendition_name} SOURCE_DIR)
   message(STATUS "copying ${rendition_name} to ${interpreter_name}")
   
