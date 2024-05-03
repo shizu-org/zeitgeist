@@ -11,6 +11,18 @@ list(APPEND ${name}.source_files Main.c)
 
 end_executable()
 target_link_libraries(${name} ${project_name}-Library idlib-process idlib-file-system)
+add_dependencies(${name} Shizu.Runtime.Modules.FileSystem)
+
+set(modules "")
+get_target_property(modules Shizu.Runtime modules)
+foreach (module ${modules})
+  add_dependencies(${name} ${module})
+endforeach()
+
+foreach (module ${modules})
+  copy_plugin(${name} ${module})
+endforeach()
+
 
 # We must link libm under Linux.
 if (${${name}.operating_system_id} EQUAL ${${name}.operating_system_id_linux})
