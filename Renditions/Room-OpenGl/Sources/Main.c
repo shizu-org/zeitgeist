@@ -17,11 +17,8 @@
 
 #include "Visuals/DefaultPrograms.h"
 #include "Visuals/Program.h"
-#include "Visuals/Gl/Program.h"
 #include "Visuals/RenderBuffer.h"
-#include "Visuals/Gl/RenderBuffer.h"
 #include "Visuals/VertexBuffer.h"
-#include "Visuals/Gl/VertexBuffer.h"
 #include "Visuals/Material.h"
 #include "Visuals/PhongMaterial.h"
 #include "Visuals/BlinnPhongMaterial.h"
@@ -87,92 +84,6 @@ static Visuals_Program* g_program = NULL;
 static Visuals_RenderBuffer* g_renderBuffer = NULL;
 static World* g_world = NULL;
 
-static void
-bindMatrix4Uniform
-  (
-    Shizu_State* state,
-    GLuint programId,
-    char const* name,
-    Matrix4R32* value
-  )
-{
-  GLint location = glGetUniformLocation(programId, name);
-  if (-1 == location) {
-    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
-  } else {
-    glUniformMatrix4fv(location, 1, GL_TRUE, idlib_matrix_4x4_f32_get_data(&value->m));
-  }
-}
-
-static void
-bindVector3Uniform
-  (
-    Shizu_State* state,
-    GLuint programId,
-    char const* name,
-    Vector3R32* value
-  )
-{
-  GLint location = glGetUniformLocation(programId, name);
-  if (-1 == location) {
-    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
-  } else {
-    glUniform3fv(location, 1, &value->v.e[0]);
-  }
-}
-
-static void
-bindIntegerUniform
-  (
-    Shizu_State* state,
-    GLuint programId,
-    char const* name,
-    Shizu_Integer32 value
-  )
-{
-  GLint location = glGetUniformLocation(programId, name);
-  if (-1 == location) {
-    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
-  } else {
-    /// @todo Check bounds.
-    glUniform1i(location, value);
-  }
-}
-
-static void
-bindBooleanUniform
-  ( 
-    Shizu_State* state,
-    GLuint programId,
-    char const* name,
-    Shizu_Boolean value
-  )
-{
-  GLint location = glGetUniformLocation(programId, name);
-  if (-1 == location) {
-    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
-  } else {
-    glUniform1i(location, value ? 1 : 0);
-  }
-}
-
-static void
-bindInteger32Uniform
-  (
-    Shizu_State* state,
-    GLuint programId,
-    char const* name,
-    Shizu_Integer32 value
-  ) {
-  GLint location = glGetUniformLocation(programId, name);
-  if (-1 == location) {
-    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
-  } else {
-    // Both GLint and Shizu_Integer32 are two's complements integer hence should have the same maximal/minimal values.
-    glUniform1i(location, value);
-  }
-}
-
 #define LightModel_Phong (1)
 #define LightModel_BlinnPhong (2)
 static Shizu_Integer32 g_lightModel = LightModel_Phong;
@@ -199,63 +110,57 @@ Zeitgeist_Rendition_update
 
   Visuals_Context_clear(state, visualsContext, true, true);
 
-  glUseProgram(((Visuals_GlProgram*)g_program)->programId);
-
-  Matrix4R32* world = NULL;
-  world = Matrix4R32_createScale(state, Vector3R32_create(state, 0.75f, 0.75f, 1.f));
-  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "matrices.world", world);
+  Matrix4F32* world = NULL;
+  world = Matrix4F32_createScale(state, Vector3F32_create(state, 0.75f, 0.75f, 1.f));
+  Visuals_Program_bindMatrix4F32(state, g_program, "matrices.world", world);
   // (viewRotateY^-1 * viewTranslate^-1)
   // is equivalent to
   // (viewTranslate * viewRotateY)^-1
   // as in general
   // (AB)^-1 = (B^-1) * (A^-1)
   // for two square matrices A and B holds.
-  Matrix4R32* viewTranslate = NULL;
-  viewTranslate = Matrix4R32_createTranslate(state, Vector3R32_create(state, -g_world->player->position->v.e[0], -g_world->player->position->v.e[1], -g_world->player->position->v.e[2]));
-  Matrix4R32* viewRotateY = NULL;
-  viewRotateY = Matrix4R32_createRotateY(state, -g_world->player->rotationY);
-  Matrix4R32* view = NULL;
-  view = Matrix4R32_multiply(state, viewRotateY, viewTranslate);
-  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "matrices.view", view);
+  Matrix4F32* viewTranslate = NULL;
+  viewTranslate = Matrix4F32_createTranslate(state, Vector3F32_create(state, -g_world->player->position->v.e[0], -g_world->player->position->v.e[1], -g_world->player->position->v.e[2]));
+  Matrix4F32* viewRotateY = NULL;
+  viewRotateY = Matrix4F32_createRotateY(state, -g_world->player->rotationY);
+  Matrix4F32* view = NULL;
+  view = Matrix4F32_multiply(state, viewRotateY, viewTranslate);
+  Visuals_Program_bindMatrix4F32(state, g_program, "matrices.view", view);
 
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "viewer.position",
-                     Vector3R32_create(state, g_world->player->position->v.e[0], g_world->player->position->v.e[1], g_world->player->position->v.e[2]));
+  Visuals_Program_bindVector3F32(state, g_program, "viewer.position",
+                                 Vector3F32_create(state, g_world->player->position->v.e[0], g_world->player->position->v.e[1], g_world->player->position->v.e[2]));
   
   //
-  Matrix4R32* projection = NULL;
+  Matrix4F32* projection = NULL;
   //projection = Matrix4R32_createOrthographic(state, -1.f, +1.f, -1.f, +1.f, -100.f, +100.f);
-  projection = Matrix4R32_createPerspective(state, 90.f, canvasHeight > 0.f ? canvasWidth / canvasHeight : 16.f/9.f, 0.1f, 100.f);
-  bindMatrix4Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "matrices.projection", projection);
+  projection = Matrix4F32_createPerspective(state, 90.f, canvasHeight > 0.f ? canvasWidth / canvasHeight : 16.f/9.f, 0.1f, 100.f);
+  Visuals_Program_bindMatrix4F32(state, g_program, "matrices.projection", projection);
   
   // The color (255, 204, 51) is the websafe color "sunglow".
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "meshColor", Vector3R32_create(state, 1.0f, 0.8f, 0.2f));
+  Visuals_Program_bindVector3F32(state, g_program, "meshColor", Vector3F32_create(state, 1.0f, 0.8f, 0.2f));
 
-  bindIntegerUniform(state, ((Visuals_GlProgram*)g_program)->programId, "inputFragmentColorType", 1);
+  Visuals_Program_bindInteger32(state, g_program, "inputFragmentColorType", 1);
 
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "ambientLightInfo.color", Vector3R32_create(state, 0.2f, 0.2f, 0.2f));
+  Visuals_Program_bindVector3F32(state, g_program, "ambientLightInfo.color", Vector3F32_create(state, 0.2f, 0.2f, 0.2f));
 
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightInfo.direction", Vector3R32_create(state, -1.f, -1.f, -1.f));
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "diffuseLightInfo.color", Vector3R32_create(state, 0.4f, 0.4f, 0.4f));
+  Visuals_Program_bindVector3F32(state, g_program, "diffuseLightInfo.direction", Vector3F32_create(state, -1.f, -1.f, -1.f));
+  Visuals_Program_bindVector3F32(state, g_program, "diffuseLightInfo.color", Vector3F32_create(state, 0.4f, 0.4f, 0.4f));
 
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.direction", Vector3R32_create(state, -1.f, -1.f, -1.f));
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.color", Vector3R32_create(state, 0.8f, 0.8f, 0.8f));
-  bindVector3Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.position", Vector3R32_create(state, 0.f, 0.f, 0.f));
+  Visuals_Program_bindVector3F32(state, g_program, "specularLightInfo.direction", Vector3F32_create(state, -1.f, -1.f, -1.f));
+  Visuals_Program_bindVector3F32(state, g_program, "specularLightInfo.color", Vector3F32_create(state, 0.8f, 0.8f, 0.8f));
+  Visuals_Program_bindVector3F32(state, g_program, "specularLightInfo.position", Vector3F32_create(state, 0.f, 0.f, 0.f));
   static const Shizu_Integer32 LightType_Directional = 1;
   static const Shizu_Integer32 LightType_Point = 2;
-  bindInteger32Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.lightType", LightType_Point);
+  Visuals_Program_bindInteger32(state, g_program, "specularLightInfo.lightType", LightType_Point);
 
-  bindInteger32Uniform(state, ((Visuals_GlProgram*)g_program)->programId, "specularLightInfo.lightModel", g_lightModel);
+  Visuals_Program_bindInteger32(state, g_program, "specularLightInfo.lightModel", g_lightModel);
 
   Shizu_Value sizeValue = Shizu_List_getSize(state, g_world->geometries);
   for (Shizu_Integer32 i = 0, n = Shizu_Value_getInteger32(&sizeValue); i < n; ++i) {
     Shizu_Value elementValue = Shizu_List_getValue(state, g_world->geometries, i);
     StaticGeometryGl *element = (StaticGeometryGl*)Shizu_Value_getObject(&elementValue);
-    glBindVertexArray(((Visuals_GlVertexBuffer*)element->vertexBuffer)->vertexArrayId);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, element->numberOfVertices);
+    Visuals_Context_render(state, visualsContext, element->vertexBuffer, g_program);
   }
-
-  glBindVertexArray(0);
-  glUseProgram(0);
 
   ServiceGl_endFrame(state);
 }

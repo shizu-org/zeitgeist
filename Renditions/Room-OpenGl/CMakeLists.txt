@@ -10,6 +10,8 @@ begin_plugin_library()
 list(APPEND ${name}.source_files Sources/Main.c)
 list(APPEND ${name}.source_files Sources/World.c)
 list(APPEND ${name}.header_files Sources/World.h)
+list(APPEND ${name}.source_files Sources/Player.c)
+list(APPEND ${name}.header_files Sources/Player.h)
 
 end_plugin_library()
 

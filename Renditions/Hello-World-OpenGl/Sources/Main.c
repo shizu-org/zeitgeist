@@ -11,10 +11,8 @@
 
 #include "Visuals/DefaultPrograms.h"
 #include "Visuals/Program.h"
-#include "Visuals/Gl/Program.h"
 #include "Visuals/RenderBuffer.h"
 #include "Visuals/VertexBuffer.h"
-#include "Visuals/Gl/VertexBuffer.h"
 #include "Visuals/Gl/Context.h"
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -43,13 +41,7 @@ Zeitgeist_Rendition_getName
   return Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)"));
 }
 
-static GLint Positions_Index = 0;
-
-typedef struct VERTEX {
-  float x, y, z;
-} VERTEX;
-
-static VERTEX const SQUARE[] = {
+static idlib_vector_3_f32 const SQUARE[] = {
   { -1.0f,  1.0f, 0.f, },
   { -1.0f, -1.0f, 0.f, },
   {  1.0f,  1.0f, 0.f, },
@@ -80,37 +72,15 @@ Zeitgeist_Rendition_update
   ServiceGl_beginFrame(state);
 
   Visuals_Context_clear(state, visualsContext, true, true);
-  
-  glUseProgram(((Visuals_GlProgram*)g_program)->programId);
+    
+  Matrix4F32* m = Matrix4F32_createScale(state, Vector3F32_create(state, 0.75f, 0.75f, 1.f));
+  Visuals_Program_bindMatrix4F32(state, g_program, "scale", m);
 
-  GLint location;
-  
-  location = glGetUniformLocation(((Visuals_GlProgram*)g_program)->programId, "scale");
-  if (-1 == location) {
-    fprintf(stderr, "%s:%d: unable to get uniform location of `%s`\n", __FILE__, __LINE__, "scale");
-  } else {
-    GLfloat matrix[16] = {
-      .75f, 0.f,  0.f, 0.f,
-      0.f,  .75f, 0.f, 0.f,
-      0.f,  0.f,  1.f, 0.f,
-      0.f,  0.f,  0.f, 1.f,
-    };
-    glUniformMatrix4fv(location, 1, GL_FALSE, &matrix[0]);
-  }
-  
-  location = glGetUniformLocation(((Visuals_GlProgram*)g_program)->programId, "inputColor");
-  if (-1 == location) {
-    fprintf(stderr, "%s:%d: unable to get uniform location of `%s`\n", __FILE__, __LINE__, "inputColor");
-  } else {
-    // The color (255, 204, 51) is the websafe color "sunglow".
-    GLfloat vector[4] = { 1.0, 0.8, 0.2, 1.0 };
-    glUniform4fv(location, 1, &vector[0]);
-  }
+  // The color (255, 204, 51) is the websafe color "sunglow".
+  Vector4F32 *c = Vector4F32_create(state, 1.0, 0.8, 0.2, 1.0);
+  Visuals_Program_bindVector4F32(state, g_program, "inputColor", c);
 
-  glBindVertexArray(((Visuals_GlVertexBuffer*)g_vertexBuffer)->vertexArrayId);
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, g_vertexBuffer->numberOfVertices);
-  glBindVertexArray(0);
-  glUseProgram(0);
+  Visuals_Context_render(state, visualsContext, g_vertexBuffer, g_program);
 
   ServiceGl_endFrame(state);
 }
