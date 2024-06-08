@@ -1,6 +1,7 @@
 #include "World.h"
 
 #include "KeyboardKeyMessage.h"
+#include "Visuals/Gl/VertexBuffer.h"
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -12,9 +13,9 @@ Player_visit
 	);
 
 static Shizu_TypeDescriptor const Player_Type = {
-	.staticInitialize = NULL,
-	.staticFinalize = NULL,
-	.staticVisit = NULL,
+	.preDestroyType = NULL,
+	.postCreateType = NULL,
+	.visitType = NULL,
 	.size = sizeof(Player),
 	.finalize = NULL,
 	.visit = (Shizu_OnVisitCallback*) & Player_visit,
@@ -33,10 +34,10 @@ Player_visit
 	)
 {
 	if (self->position) {
-		Shizu_Gc_visitObject(state, (Shizu_Object*)self->position);
+		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->position);
 	}
 	if (self->positionSpeed) {
-		Shizu_Gc_visitObject(state, (Shizu_Object*)self->positionSpeed);
+		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->positionSpeed);
 	}
 }
 
@@ -46,7 +47,7 @@ Player_create
 		Shizu_State* state
 	)
 {
-	Player* self = (Player*)Shizu_Gc_allocate(state, sizeof(Player));
+	Player* self = (Player*)Shizu_Gc_allocateObject(state, sizeof(Player));
 	self->position = Vector3R32_create(state, 0.f, 0.f, 0.f);
 	self->positionSpeed = Vector3R32_create(state, 0.f, 0.f, 0.f);
 	self->rotationY = 0.f;
@@ -166,9 +167,9 @@ StaticGeometryGl_visit
 	);
 
 static Shizu_TypeDescriptor const StaticGeometryGl_Type = {
-	.staticInitialize = NULL,
-	.staticFinalize = NULL,
-	.staticVisit = NULL,
+	.postCreateType = NULL,
+	.preDestroyType = NULL,
+	.visitType = NULL,
 	.size = sizeof(StaticGeometryGl),
 	.finalize = (Shizu_OnFinalizeCallback*)&StaticGeometryGl_finalize,
 	.visit = (Shizu_OnVisitCallback*)&StaticGeometryGl_visit,
@@ -198,7 +199,7 @@ StaticGeometryGl_visit
 	)
 {
 	if (self->vertexBuffer) {
-		Shizu_Gc_visitObject(state, (Shizu_Object*)self->vertexBuffer);
+		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->vertexBuffer);
 	}
 }
 
@@ -224,7 +225,7 @@ StaticGeometryGl_create
 		Shizu_State* state
 	)
 {
-	StaticGeometryGl* self = (StaticGeometryGl*)Shizu_Gc_allocate(state, sizeof(StaticGeometryGl));
+	StaticGeometryGl* self = (StaticGeometryGl*)Shizu_Gc_allocateObject(state, sizeof(StaticGeometryGl));
 
 	self->vertexBuffer = (Visuals_VertexBuffer*)Visuals_GlVertexBuffer_create(state);
 	Visuals_Object_materialize(state, (Visuals_Object*)self->vertexBuffer);
@@ -252,7 +253,7 @@ StaticGeometryGl_setData
 		void const* bytes
 	)
 {
-	Visuals_VertexBuffer_setData(state, self->vertexBuffer, Visuals_VertexSemantics_Position3d_Normal3d_ColorRgb|Visuals_VertexSyntactics_Float3_Float3_Float3, bytes, numberOfBytes);
+	Visuals_VertexBuffer_setData(state, self->vertexBuffer, Visuals_VertexSemantics_PositionXyz_NormalXyz_ColorRgb|Visuals_VertexSyntactics_Float3_Float3_Float3, bytes, numberOfBytes);
 	self->numberOfVertices = numberOfVertices;
 }
 
@@ -529,9 +530,9 @@ World_visit
 	);
 
 static Shizu_TypeDescriptor const World_Type = {
-	.staticInitialize = NULL,
-	.staticFinalize = NULL,
-	.staticVisit = NULL,
+	.postCreateType = NULL,
+	.postCreateType = NULL,
+	.visitType = NULL,
 	.size = sizeof(World),
 	.finalize = NULL,
 	.visit = (Shizu_OnVisitCallback*)&World_visit,
@@ -550,10 +551,10 @@ World_visit
 	)
 {
 	if (self->geometries) {
-		Shizu_Gc_visitObject(state, (Shizu_Object*)self->geometries);
+		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->geometries);
 	}
 	if (self->player) {
-		Shizu_Gc_visitObject(state, (Shizu_Object*)self->player);
+		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->player);
 	}
 }
 
@@ -563,7 +564,7 @@ World_create
 		Shizu_State* state
 	)
 {
-	World* self = (World*)Shizu_Gc_allocate(state, sizeof(World));
+	World* self = (World*)Shizu_Gc_allocateObject(state, sizeof(World));
 	self->player = NULL;
 	self->geometries = NULL;
 

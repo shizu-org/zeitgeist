@@ -16,7 +16,7 @@
 #endif
 
 Shizu_Rendition_Export char const*
-Shizu_Module_getName
+Shizu_ModuleLibrary_getName
   (
   )
 {
