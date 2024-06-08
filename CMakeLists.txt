@@ -133,12 +133,12 @@ FetchContent_Declare(Shizu.Runtime
 #######################################################################################################################
 
 FetchContent_MakeAvailable(Shizu.Runtime idlib-math)
-
+ 
 # Copy the files of the rendition to the interpreter binary directory.
 # rendition_name The rendition name.
 macro(copy_zeitgeist_plugin interpreter_name rendition_name)
   get_target_property(source_dir ${rendition_name} SOURCE_DIR)
-  message(STATUS "copying ${rendition_name} to ${interpreter_name}")
+  message(STATUS " - ${rendition_name}: ${rendition_name} to ${interpreter_name}")
   
   if (WIN32)
     set(suffix ".dll")
@@ -156,6 +156,21 @@ macro(copy_zeitgeist_plugin interpreter_name rendition_name)
             $<TARGET_FILE:${rendition_name}>                                          # file to copy
             $<TARGET_FILE_DIR:${project_name}-Interpreter>/Renditions/${rendition_name}/library${suffix}
   )
+
+  # Get all assets relative to the asset directory.
+  file(GLOB_RECURSE assets_to_copy RELATIVE "${source_dir}/Assets" "${source_dir}/Assets/*.*" )
+  message(STATUS " - ${rendition_name} assets: ${assets_to_copy}")
+
+  foreach (asset_to_copy ${assets_to_copy})
+      add_custom_command(
+        TARGET ${rendition_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${interpreter_name}>/Renditions/${rendition_name}/Assets
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different                                     # which executes "cmake - E copy_if_different..."
+                ${source_dir}/Assets/${asset_to_copy}                                     # file to copy
+                $<TARGET_FILE_DIR:${interpreter_name}>/Renditions/${rendition_name}/Assets/${asset_to_copy}
+      )
+  endforeach()
+
 endmacro()
 
 add_subdirectory(Library)

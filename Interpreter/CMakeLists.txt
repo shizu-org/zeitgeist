@@ -29,3 +29,6 @@ if (${${name}.operating_system_id} EQUAL ${${name}.operating_system_id_linux})
   target_link_libraries(${name} dl)
   target_compile_definitions(${name} PUBLIC _GNU_SOURCE)
 endif()
+
+# Adjust the debugger working directory such that it is the output directory of the interpreters binary.
+set_target_properties(${name} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:${name}>)
