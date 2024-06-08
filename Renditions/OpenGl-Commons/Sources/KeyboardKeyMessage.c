@@ -3,9 +3,9 @@
 #include "Shizu/Runtime/debugAssert.h"
 
 Shizu_TypeDescriptor const KeyboardKeyMessage_Type = {
-	.staticInitialize = NULL,
-	.staticFinalize = NULL,
-	.staticVisit = NULL,
+	.postCreateType = NULL,
+	.preDestroyType = NULL,
+	.visitType = NULL,
 	.size = sizeof(KeyboardKeyMessage),
 	.finalize = NULL,
 	.visit = NULL,
@@ -24,11 +24,12 @@ KeyboardKeyMessage_create
 		Shizu_Integer32 key
 	)
 {
-	KeyboardKeyMessage* self = (KeyboardKeyMessage*)Shizu_Gc_allocate(state, sizeof(KeyboardKeyMessage));
-
+	Shizu_Type* type = KeyboardKeyMessage_getType(state);
+	KeyboardKeyMessage* self = (KeyboardKeyMessage*)Shizu_Gc_allocateObject(state, sizeof(KeyboardKeyMessage));
+ 	Shizu_Object_construct(state, (Shizu_Object*)self);
 	self->action = action;
 	self->key = key;
-
+	((Shizu_Object*)self)->type = type;
 	return self;
 }
 

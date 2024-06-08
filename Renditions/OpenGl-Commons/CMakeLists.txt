@@ -38,6 +38,9 @@ list(APPEND ${name}.header_files Sources/KeyboardKeyMessage.h)
 list(APPEND ${name}.source_files Sources/RenderBuffer.c)
 list(APPEND ${name}.header_files Sources/RenderBuffer.h)
 
+list(APPEND ${name}.source_files Sources/Visuals/Context.c)
+list(APPEND ${name}.header_files Sources/Visuals/Context.h)
+
 list(APPEND ${name}.source_files Sources/Visuals/Object.c)
 list(APPEND ${name}.header_files Sources/Visuals/Object.h)
 
@@ -52,6 +55,23 @@ list(APPEND ${name}.header_files Sources/Visuals/DefaultPrograms.h)
 
 list(APPEND ${name}.source_files Sources/Visuals/RenderBuffer.c)
 list(APPEND ${name}.header_files Sources/Visuals/RenderBuffer.h)
+
+list(APPEND ${name}.source_files Sources/Visuals/Material.c)
+list(APPEND ${name}.header_files Sources/Visuals/Material.h)
+list(APPEND ${name}.source_files Sources/Visuals/PhongMaterial.c)
+list(APPEND ${name}.header_files Sources/Visuals/PhongMaterial.h)
+list(APPEND ${name}.source_files Sources/Visuals/BlinnPhongMaterial.c)
+list(APPEND ${name}.header_files Sources/Visuals/BlinnPhongMaterial.h)
+
+
+list(APPEND ${name}.source_files Sources/Visuals/Gl/Context.c)
+list(APPEND ${name}.header_files Sources/Visuals/Gl/Context.h)
+list(APPEND ${name}.source_files Sources/Visuals/Gl/VertexBuffer.c)
+list(APPEND ${name}.header_files Sources/Visuals/Gl/VertexBuffer.h)
+list(APPEND ${name}.source_files Sources/Visuals/Gl/Program.c)
+list(APPEND ${name}.header_files Sources/Visuals/Gl/Program.h)
+list(APPEND ${name}.source_files Sources/Visuals/Gl/RenderBuffer.c)
+list(APPEND ${name}.header_files Sources/Visuals/Gl/RenderBuffer.h)
 
 end_library()
 

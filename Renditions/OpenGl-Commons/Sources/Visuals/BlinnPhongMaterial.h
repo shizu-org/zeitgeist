@@ -19,34 +19,39 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VISUALS_PROGRAM_H_INCLUDED)
-#define VISUALS_PROGRAM_H_INCLUDED
+#if !defined(VISUALS_BLINNPHONGMATERIAL_H_INCLUDED)
+#define VISUALS_BLINNPHONGMATERIAL_H_INCLUDED
 
-#include "Visuals/Object.h"
+#include "Visuals/Material.h"
 
-/**
- * @since 1.0
- * A program consists of a vertex program and a fragment program.
- */
-Shizu_declareType(Visuals_Program);
+Shizu_declareType(Visuals_BlinnPhongMaterial);
 
-struct Visuals_Program_Dispatch {
-  Visuals_Object_Dispatch _parent;
+struct Visuals_BlinnPhongMaterial {
+  Visuals_Material _parent;
+
+  /// [0,255].
+  Shizu_Integer32 specular;
+
+  /// [0,255].
+  Shizu_Integer32 diffuse;
+
+  /// [0,255].
+  Shizu_Integer32 ambient;
+
+  /// [0,255]
+  Shizu_Integer32 shininess;
+
 };
 
-struct Visuals_Program {
-  Visuals_Object _parent;
-  Shizu_String* vertexProgramSource;
-  Shizu_String* fragmentProgramSource;
+struct Visuals_BlinnPhongMaterial_Dispatch {
+  Visuals_Material_Dispatch _parent;
 };
 
 void
-Visuals_Program_construct
+Visuals_BlinnPhongMaterial_construct
   (
     Shizu_State* state,
-    Visuals_Program* self,
-    Shizu_String* vertexSource,
-    Shizu_String* fragmentSource
+    Visuals_BlinnPhongMaterial* self
   );
 
-#endif // VISUALS_PROGRAM_H_INCLUDED
+#endif // VISUALS_BLINNPHONGMATERIAL_H_INCLUDED

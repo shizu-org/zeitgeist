@@ -19,63 +19,45 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "Visuals/Object.h"
+#include "Visuals/BlinnPhongMaterial.h"
 
-static void
-dispatchInitialize
-  (
-    Shizu_State1* state1,
-    Visuals_Object_Dispatch* self
-  );
-
-static void
-notifyVisualsShutdownImpl
-  (
-    Shizu_State* state,
-    Visuals_Object* self
-  );
-
-static Shizu_TypeDescriptor const Visuals_Object_Type = {
+static Shizu_TypeDescriptor const Visuals_BlinnPhongMaterial_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
-  .size = sizeof(Visuals_Object),
+  .size = sizeof(Visuals_BlinnPhongMaterial),
   .finalize = NULL,
   .visit = NULL,
-  .dispatchSize = sizeof(Visuals_Object_Dispatch),
-  .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&dispatchInitialize,
+  .dispatchSize = sizeof(Visuals_BlinnPhongMaterial_Dispatch),
+  .dispatchInitialize = NULL,
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Object, Shizu_Object);
-
-static void
-dispatchInitialize
-  (
-    Shizu_State1* stat1e,
-    Visuals_Object_Dispatch* self
-  )
-{
-  self->notifyVisualsShutdown = &notifyVisualsShutdownImpl;
-}
-
-static void
-notifyVisualsShutdownImpl
-  (
-    Shizu_State* state,
-    Visuals_Object* self
-  )
-{ Visuals_Object_unmaterialize(state, self); }
+Shizu_defineType(Visuals_BlinnPhongMaterial, Visuals_Material);
 
 void
-Visuals_Object_construct
+Visuals_BlinnPhongMaterial_construct
   (
     Shizu_State* state,
-    Visuals_Object* self
+    Visuals_BlinnPhongMaterial* self
   )
 {
-  Shizu_Type* type = Visuals_Object_getType(state);
-  self->notifyVisualsShutdown = NULL;
-  SeviceGl_registerVisualsObject(state, self);
+  Shizu_Type* type = Visuals_BlinnPhongMaterial_getType(state);
+  Visuals_Material_construct(state, (Visuals_Material*)self);
+  self->diffuse = 85;
+  self->specular = 85;
+  self->ambient = 85;
+  self->shininess = 230;
   ((Shizu_Object*)self)->type = type;
+}
+
+Visuals_BlinnPhongMaterial*
+Visuals_BlinnPhongMaterial_create
+  (
+    Shizu_State* state
+  )
+{
+  Visuals_BlinnPhongMaterial* self = (Visuals_BlinnPhongMaterial*)Shizu_Gc_allocateObject(state, sizeof(Visuals_BlinnPhongMaterial));
+  Visuals_BlinnPhongMaterial_construct(state, self);
+  return self;
 }

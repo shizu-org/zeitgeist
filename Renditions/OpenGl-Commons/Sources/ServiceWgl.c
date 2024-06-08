@@ -375,29 +375,9 @@ mapKeyboardKey
 			Shizu_Value_setInteger32(&value, KeyboardKey_Escape);
 			return value;
 		} break;
-		case 0x51: /*Q*/ {
-			Shizu_Value value;
-			Shizu_Value_setInteger32(&value, KeyboardKey_Q);
-			return value;
-		} break;
-		case 0x45: /*E*/ {
-			Shizu_Value value;
-			Shizu_Value_setInteger32(&value, KeyboardKey_E);
-			return value;
-		} break;
-		case 0x57: /*W*/ {
-			Shizu_Value value;
-			Shizu_Value_setInteger32(&value, KeyboardKey_W);
-			return value;
-		} break;
 		case 0x41: /*A*/ {
 			Shizu_Value value;
 			Shizu_Value_setInteger32(&value, KeyboardKey_A);
-			return value;
-		} break;
-		case 0x53: /*S*/ {
-			Shizu_Value value;
-			Shizu_Value_setInteger32(&value, KeyboardKey_S);
 			return value;
 		} break;
 		case 0x44: /*D*/ {
@@ -405,7 +385,31 @@ mapKeyboardKey
 			Shizu_Value_setInteger32(&value, KeyboardKey_D);
 			return value;
 		} break;
-
+		case 0x45: /*E*/ {
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_E);
+			return value;
+		} break;
+		case 0x4C: /*L*/ {
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_L);
+			return value;
+		}	break;
+		case 0x51: /*Q*/ {
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_Q);
+			return value;
+		} break;
+		case 0x53: /*S*/ {
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_S);
+			return value;
+		} break;
+		case 0x57: /*W*/ {
+			Shizu_Value value;
+			Shizu_Value_setInteger32(&value, KeyboardKey_W);
+			return value;
+		} break;
 		default: {
 			Shizu_Value value;
 			Shizu_Value_setVoid(&value, Shizu_Void_Void);
@@ -1160,6 +1164,18 @@ startup
 		Shizu_State_setStatus(state, 1);
 		Shizu_State_jump(state);
 	}
+	// Default value. See Visuals_Context.
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Default value. See Visuals_Context.
+	glDisable(GL_CULL_FACE);
+	// Default value. See Visuals_Context.
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_ALWAYS);
+	// Default value. See Visuals_Context.
+	glClearDepth(1.f);
+	// Default value. See Visuals_Context.
+	glClearColor(0.f, 0.f, 0.f, 0.f);
 }
 
 void

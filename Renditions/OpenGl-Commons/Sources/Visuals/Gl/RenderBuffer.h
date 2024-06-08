@@ -19,34 +19,38 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VISUALS_PROGRAM_H_INCLUDED)
-#define VISUALS_PROGRAM_H_INCLUDED
+#if !defined(VISUALS_GL_RENDERBUFFER_H_INCLUDED)
+#define VISUALS_GL_RENDERBUFFER_H_INCLUDED
 
-#include "Visuals/Object.h"
+#include "Visuals/RenderBuffer.h"
 
-/**
- * @since 1.0
- * A program consists of a vertex program and a fragment program.
- */
-Shizu_declareType(Visuals_Program);
+Shizu_declareType(Visuals_GlRenderBuffer);
 
-struct Visuals_Program_Dispatch {
-  Visuals_Object_Dispatch _parent;
+struct Visuals_GlRenderBuffer_Dispatch {
+  Visuals_RenderBuffer_Dispatch _parent;
 };
 
-struct Visuals_Program {
-  Visuals_Object _parent;
-  Shizu_String* vertexProgramSource;
-  Shizu_String* fragmentProgramSource;
+struct Visuals_GlRenderBuffer {
+  Visuals_RenderBuffer _parent;
+  Shizu_Integer32 width;
+  Shizu_Integer32 height;
+  GLuint frameBufferId;
+  GLuint colorTextureId;
+  GLuint depthStencilTextureId;
 };
 
 void
-Visuals_Program_construct
+Visuals_GlRenderBuffer_construct
   (
     Shizu_State* state,
-    Visuals_Program* self,
-    Shizu_String* vertexSource,
-    Shizu_String* fragmentSource
+    Visuals_GlRenderBuffer* self
   );
 
-#endif // VISUALS_PROGRAM_H_INCLUDED
+Visuals_GlRenderBuffer*
+Visuals_GlRenderBuffer_create
+  (
+    Shizu_State* state
+  );
+
+
+#endif // VISUALS_GL_RENDERBUFFER_H_INCLUDED

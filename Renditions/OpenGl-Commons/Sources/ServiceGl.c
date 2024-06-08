@@ -90,11 +90,11 @@ ServiceGl_shutdown
 {
   if (0 == --g_referenceCount) {
     if (g_objects) {
-      Shizu_Object_unlock(state, (Shizu_Object*)g_objects);
+      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_objects);
       g_objects = NULL;
     }
     if (g_keyboardKeyListeners) {
-      Shizu_Object_unlock(state, (Shizu_Object*)g_keyboardKeyListeners);
+      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_keyboardKeyListeners);
       g_keyboardKeyListeners = NULL;
     }
   #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -260,7 +260,7 @@ SeviceGl_registerVisualsObject
     Shizu_JumpTarget jumpTarget;
     Shizu_State_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
-      Shizu_Object_lock(state, (Shizu_Object*)g_objects);
+      Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_objects);
       Shizu_State_popJumpTarget(state);
     } else {
       Shizu_State_popJumpTarget(state);
@@ -281,6 +281,9 @@ ServiceGl_emitKeyboardKeyMessage
     KeyboardKeyMessage* message
   )
 {
+  if (!g_keyboardKeyListeners) {
+    return;  
+  }
   Shizu_Value temporary = Shizu_List_getSize(state, g_keyboardKeyListeners);
   for (size_t i = 0, n = Shizu_Value_getInteger32(&temporary); i < n; ++i) {
     temporary = Shizu_List_getValue(state, g_keyboardKeyListeners, i);
@@ -308,7 +311,7 @@ ServiceGl_addKeyboardKeyCallback
     Shizu_JumpTarget jumpTarget;
     Shizu_State_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
-      Shizu_Object_lock(state, (Shizu_Object*)g_keyboardKeyListeners);
+      Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_keyboardKeyListeners);
       Shizu_State_popJumpTarget(state);
     } else {
       Shizu_State_popJumpTarget(state);

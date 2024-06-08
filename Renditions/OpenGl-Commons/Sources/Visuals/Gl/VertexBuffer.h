@@ -19,34 +19,43 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VISUALS_PROGRAM_H_INCLUDED)
-#define VISUALS_PROGRAM_H_INCLUDED
+#if !defined(VISUALS_GL_VERTEXBUFFER_H_INCLUDED)
+#define VISUALS_GL_VERTEXBUFFER_H_INCLUDED
 
-#include "Visuals/Object.h"
+#include "Visuals/VertexBuffer.h"
 
 /**
- * @since 1.0
- * A program consists of a vertex program and a fragment program.
+ * @brief The implementation of Visuals_RenderBuffer for OpenGL.
+ * @details
+ * bufferId and vertexArrayId are the OpenGL representation of the vertices.
+ * bytes and numberOfBytes are shadow copies of the current data.
+ * The initial values (until data is specified) bytes and numberOfBytes are a pointer to an array of zero Bytes.
  */
-Shizu_declareType(Visuals_Program);
+Shizu_declareType(Visuals_GlVertexBuffer);
 
-struct Visuals_Program_Dispatch {
-  Visuals_Object_Dispatch _parent;
+struct Visuals_GlVertexBuffer_Dispatch {
+  Visuals_VertexBuffer_Dispatch _parent;
 };
 
-struct Visuals_Program {
-  Visuals_Object _parent;
-  Shizu_String* vertexProgramSource;
-  Shizu_String* fragmentProgramSource;
+struct Visuals_GlVertexBuffer {
+  Visuals_VertexBuffer parent;
+  /// @brief The OpenGL ID of the vertex buffer.
+  GLuint bufferId;
+  /// @brief The OpenGL ID of the vertex array.
+  GLuint vertexArrayId;
 };
 
 void
-Visuals_Program_construct
+Visuals_GlVertexBuffer_construct
   (
     Shizu_State* state,
-    Visuals_Program* self,
-    Shizu_String* vertexSource,
-    Shizu_String* fragmentSource
+    Visuals_GlVertexBuffer* self
   );
 
-#endif // VISUALS_PROGRAM_H_INCLUDED
+Visuals_GlVertexBuffer*
+Visuals_GlVertexBuffer_create
+  (
+    Shizu_State* state
+  );
+
+#endif // VISUALS_GL_VERTEXBUFFER_H_INCLUDED

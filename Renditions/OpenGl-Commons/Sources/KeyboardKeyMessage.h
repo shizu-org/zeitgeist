@@ -18,6 +18,8 @@
 #define KeyboardKey_S (10)
 #define KeyboardKey_D (11)
 
+#define KeyboardKey_L (12)
+
 Shizu_declareType(KeyboardKeyMessage)
 
 struct KeyboardKeyMessage_Dispatch {

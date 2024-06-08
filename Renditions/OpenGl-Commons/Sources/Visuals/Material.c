@@ -19,56 +19,30 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "Visuals/Program.h"
+#include "Visuals/Material.h"
 
-static void
-Visuals_Program_visit
-  (
-    Shizu_State* state,
-    Visuals_Program* self
-  );
-
-Shizu_TypeDescriptor const Visuals_Program_Type = {
+static Shizu_TypeDescriptor const Visuals_Material_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
-  .size = sizeof(Visuals_Program),
+  .size = sizeof(Visuals_Material),
   .finalize = NULL,
-  .visit = (Shizu_OnVisitCallback*)&Visuals_Program_visit,
-  .dispatchSize = sizeof(Visuals_Program_Dispatch),
+  .visit = NULL,
+  .dispatchSize = sizeof(Visuals_Material_Dispatch),
   .dispatchInitialize = NULL,
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Program, Visuals_Object);
-
-static void
-Visuals_Program_visit
-  (
-    Shizu_State* state,
-    Visuals_Program* self
-  )
-{
-  if (self->vertexProgramSource) {
-    Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->vertexProgramSource);
-  }
-  if (self->fragmentProgramSource) {
-    Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->fragmentProgramSource);
-  }
-}
+Shizu_defineType(Visuals_Material, Shizu_Object);
 
 void
-Visuals_Program_construct
-  ( 
+Visuals_Material_construct
+  (
     Shizu_State* state,
-    Visuals_Program* self,
-    Shizu_String* vertexProgramSource,
-    Shizu_String* fragmentProgramSource
+    Visuals_Material* self
   )
 {
-  Shizu_Type* type = Visuals_Program_getType(state);
-  Visuals_Object_construct(state, (Visuals_Object*)self);
-  self->vertexProgramSource = vertexProgramSource;
-  self->fragmentProgramSource = fragmentProgramSource;
+  Shizu_Type* type = Visuals_Material_getType(state);
+  Shizu_Object_construct(state, (Shizu_Object*)self);
   ((Shizu_Object*)self)->type = type;
 }

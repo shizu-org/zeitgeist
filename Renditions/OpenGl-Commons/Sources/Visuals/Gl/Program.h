@@ -19,34 +19,39 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VISUALS_PROGRAM_H_INCLUDED)
-#define VISUALS_PROGRAM_H_INCLUDED
+#if !defined(VISUALS_GL_PROGRAM_H_INCLUDED)
+#define VISUALS_GL_PROGRAM_H_INCLUDED
 
-#include "Visuals/Object.h"
+#include "Visuals/Program.h"
 
-/**
- * @since 1.0
- * A program consists of a vertex program and a fragment program.
- */
-Shizu_declareType(Visuals_Program);
+Shizu_declareType(Visuals_GlProgram);
 
-struct Visuals_Program_Dispatch {
-  Visuals_Object_Dispatch _parent;
+struct Visuals_GlProgram_Dispatch {
+  Visuals_Program_Dispatch _parent;
 };
 
-struct Visuals_Program {
-  Visuals_Object _parent;
-  Shizu_String* vertexProgramSource;
-  Shizu_String* fragmentProgramSource;
+struct Visuals_GlProgram {
+  Visuals_Program _parent;
+  GLuint vertexProgramId;
+  GLuint fragmentProgramId;
+  GLuint programId;
 };
 
 void
-Visuals_Program_construct
+Visuals_GlProgram_construct
   (
     Shizu_State* state,
-    Visuals_Program* self,
+    Visuals_GlProgram* self,
     Shizu_String* vertexSource,
     Shizu_String* fragmentSource
   );
 
-#endif // VISUALS_PROGRAM_H_INCLUDED
+Visuals_GlProgram*
+Visuals_GlProgram_create
+  (
+    Shizu_State* state,
+    Shizu_String* vertexSource,
+    Shizu_String* fragmentSource
+  );
+
+#endif // VISUALS_GL_PROGRAM_H_INCLUDED

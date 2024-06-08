@@ -19,34 +19,26 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VISUALS_PROGRAM_H_INCLUDED)
-#define VISUALS_PROGRAM_H_INCLUDED
+#if !defined(VISUALS_MATERIAL_H_INCLUDED)
+#define VISUALS_MATERIAL_H_INCLUDED
 
-#include "Visuals/Object.h"
+#include "Shizu/Runtime/Include.h"
 
-/**
- * @since 1.0
- * A program consists of a vertex program and a fragment program.
- */
-Shizu_declareType(Visuals_Program);
+Shizu_declareType(Visuals_Material);
 
-struct Visuals_Program_Dispatch {
-  Visuals_Object_Dispatch _parent;
+struct Visuals_Material {
+  Shizu_Object _parent;
 };
 
-struct Visuals_Program {
-  Visuals_Object _parent;
-  Shizu_String* vertexProgramSource;
-  Shizu_String* fragmentProgramSource;
+struct Visuals_Material_Dispatch {
+  Shizu_Object_Dispatch _parent;
 };
 
 void
-Visuals_Program_construct
+Visuals_Material_construct
   (
     Shizu_State* state,
-    Visuals_Program* self,
-    Shizu_String* vertexSource,
-    Shizu_String* fragmentSource
+    Visuals_Material* self
   );
 
-#endif // VISUALS_PROGRAM_H_INCLUDED
+#endif // VISUALS_MATERIAL_H_INCLUDED

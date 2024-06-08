@@ -50,6 +50,9 @@ We implement diffuse lighting interface by the following uniforms:
 - `uniform vec3 diffuseLightColor`
 - `uniform vec3 diffuseLightDirection`
 
+## Specular lighting
+The specular light cast on a particular fragment depends on the fragments normal, the lights direction, the light color, and 
+
 ## ~~Point Lights~~
 ~~A point light consists of a point. It emits light from the point in every direction.~~
 

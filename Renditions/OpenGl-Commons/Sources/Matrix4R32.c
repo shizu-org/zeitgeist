@@ -13,9 +13,9 @@
 #endif
 
 Shizu_TypeDescriptor const Matrix4R32_Type = {
-  .staticInitialize = NULL,
-  .staticFinalize = NULL,
-  .staticVisit = NULL,
+  .postCreateType = NULL,
+  .preDestroyType = NULL,
+  .visitType = NULL,
   .size = sizeof(Matrix4R32),
   .finalize = NULL,
   .visit = NULL,
@@ -32,7 +32,7 @@ Matrix4R32_createIdentity
     Shizu_State* state
   )
 {
-  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocate(state, sizeof(Matrix4R32));
+  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocateObject(state, sizeof(Matrix4R32));
   idlib_matrix_4x4_f32_set_identity(&self->m);
   ((Shizu_Object*)self)->type = Matrix4R32_getType(state);
   return self;
@@ -45,7 +45,7 @@ Matrix4R32_createTranslate
     Vector3R32* translate
   )
 {
-  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocate(state, sizeof(Matrix4R32));
+  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocateObject(state, sizeof(Matrix4R32));
   idlib_matrix_4x4_f32_set_translate(&self->m, &translate->v);
   ((Shizu_Object*)self)->type = Matrix4R32_getType(state);
   return self;
@@ -58,7 +58,7 @@ Matrix4R32_createRotateY
     Shizu_Float32 degrees
   )
 {
-  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocate(state, sizeof(Matrix4R32));
+  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocateObject(state, sizeof(Matrix4R32));
   idlib_matrix_4x4_f32_set_rotation_y(&self->m, degrees);
   ((Shizu_Object*)self)->type = Matrix4R32_getType(state);
   return self;
@@ -74,7 +74,7 @@ Matrix4R32_createPerspective
     Shizu_Float32 far
   )
 {
-  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocate(state, sizeof(Matrix4R32));
+  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocateObject(state, sizeof(Matrix4R32));
   idlib_matrix_4x4_f32_set_perspective(&self->m, fieldOfViewY, aspectRatio, near, far);
   ((Shizu_Object*)self)->type = Matrix4R32_getType(state);
   return self;
@@ -92,7 +92,7 @@ Matrix4R32_createOrthographic
     Shizu_Float32 far
   )
 {
-  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocate(state, sizeof(Matrix4R32));
+  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocateObject(state, sizeof(Matrix4R32));
   idlib_matrix_4x4_f32_set_orthographic(&self->m, left, right, bottom, top, near, far);
   ((Shizu_Object*)self)->type = Matrix4R32_getType(state);
   return self;
@@ -107,7 +107,7 @@ Matrix4R32_createLookAt
     Vector3R32* up
   )
 {
-  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocate(state, sizeof(Matrix4R32));
+  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocateObject(state, sizeof(Matrix4R32));
   idlib_matrix_4x4_f32_set_look_at(&self->m, &source->v, &target->v, &up->v);
   ((Shizu_Object*)self)->type = Matrix4R32_getType(state);
   return self;
@@ -120,7 +120,7 @@ Matrix4R32_createScale
     Vector3R32* scale
   )
 {
-  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocate(state, sizeof(Matrix4R32));
+  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocateObject(state, sizeof(Matrix4R32));
   idlib_matrix_4x4_f32_set_scale(&self->m, &scale->v);
   ((Shizu_Object*)self)->type = Matrix4R32_getType(state);
   return self;
@@ -133,7 +133,7 @@ Matrix4R32_negate
     Matrix4R32* matrix
   )
 {
-  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocate(state, sizeof(Matrix4R32));
+  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocateObject(state, sizeof(Matrix4R32));
   idlib_matrix_4x4_f32_negate(&self->m, &matrix->m);
   ((Shizu_Object*)self)->type = Matrix4R32_getType(state);
   return self;
@@ -147,7 +147,7 @@ Matrix4R32_multiply
     Matrix4R32* operand2
   )
 {
-  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocate(state, sizeof(Matrix4R32));
+  Matrix4R32* self = (Matrix4R32*)Shizu_Gc_allocateObject(state, sizeof(Matrix4R32));
   idlib_matrix_4x4_f32_multiply(&self->m, &operand1->m, &operand2->m);
   ((Shizu_Object*)self)->type = Matrix4R32_getType(state);
   return self;

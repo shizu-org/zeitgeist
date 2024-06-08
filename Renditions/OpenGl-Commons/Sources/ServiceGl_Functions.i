@@ -1,3 +1,6 @@
+// blending
+Define(PFNGLBLENDEQUATIONSEPARATEPROC, glBlendEquationSeparate)
+
 // programs
 Define(PFNGLGETPROGRAMIVPROC, glGetProgramiv)
 Define(PFNGLGETPROGRAMINFOLOGPROC, glGetProgramInfoLog)

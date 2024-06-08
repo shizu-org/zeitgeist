@@ -65,32 +65,4 @@ Visuals_RenderBuffer_resize
   }
 }
 
-Shizu_declareType(Visuals_GlRenderBuffer);
-
-struct Visuals_GlRenderBuffer_Dispatch {
-  Visuals_RenderBuffer_Dispatch _parent;
-};
-
-struct Visuals_GlRenderBuffer {
-  Visuals_RenderBuffer _parent;
-  Shizu_Integer32 width;
-  Shizu_Integer32 height;
-  GLuint frameBufferId;
-  GLuint colorTextureId;
-  GLuint depthStencilTextureId;
-};
-
-void
-Visuals_GlRenderBuffer_construct
-  (
-    Shizu_State* state,
-    Visuals_GlRenderBuffer* self
-  );
-
-Visuals_GlRenderBuffer*
-Visuals_GlRenderBuffer_create
-  (
-    Shizu_State* state
-  );
-
 #endif // VISUALS_RENDERBUFFER_H_INCLUDED
