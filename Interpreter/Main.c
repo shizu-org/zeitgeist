@@ -137,7 +137,7 @@ onRendition
     }
     Zeitgeist_Rendition* loadedRendition = (Zeitgeist_Rendition*)Shizu_Value_getObject(&value);
     Shizu_String* loadedRenditionName = Zeitgeist_Rendition_getName(state, loadedRendition);
-    if (Shizu_String_isEqualTo(state, renditionName, loadedRenditionName)) {
+    if (Shizu_Object_isEqualTo(state, (Shizu_Object*)renditionName, (Shizu_Object*)loadedRenditionName)) {
       onRendition1(state, loadedRendition);
       return;
     }
@@ -177,7 +177,7 @@ main1
       fprintf(stderr, "error: command `%.*s` too long\n", (int)64, Shizu_String_getBytes(state, arg));
       Shizu_State_jump(state);
     }
-    if (Shizu_String_isEqualTo(state, arg, listRenditions)) {
+    if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, (Shizu_Object*)listRenditions)) {
       if (argc != 2) {
         fprintf(stderr, "error: unknown arguments to command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
         Shizu_State_jump(state);
@@ -185,7 +185,7 @@ main1
       fprintf(stdout, "listing renditions\n");
       onListRenditions(state);
       break;
-    } else if (Shizu_String_isEqualTo(state, arg, rendition)) {
+    } else if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, (Shizu_Object*)rendition)) {
       if (argc != 3) {
         fprintf(stderr, "error: missing argument for command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
         Shizu_State_jump(state);
@@ -193,7 +193,7 @@ main1
       fprintf(stdout, "executing rendition\n");
       onRendition(state, Shizu_String_create(state, argv[argi + 1], strlen(argv[argi + 1])));
       break;
-    } else if (Shizu_String_isEqualTo(state, arg, help)) {
+    } else if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, (Shizu_Object*)help)) {
       onHelp(state);
       Shizu_State_setProcessExitRequested(state, Shizu_Boolean_True);
     } else {

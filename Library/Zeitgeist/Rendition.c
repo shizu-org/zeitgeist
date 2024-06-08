@@ -28,9 +28,9 @@ Zeitgeist_Rendition_visit
   );
 
 static Shizu_TypeDescriptor const Zeitgeist_Rendition_Type = {
-  .staticInitialize = NULL,
-  .staticFinalize = NULL,
-  .staticVisit = NULL,
+  .postCreateType = NULL,
+  .preDestroyType = NULL,
+  .visitType = NULL,
   .size = sizeof(Zeitgeist_Rendition),
   .finalize = (Shizu_OnFinalizeCallback*)&Zeitgeist_Rendition_finalize,
   .visit = (Shizu_OnVisitCallback*)&Zeitgeist_Rendition_visit,
@@ -62,7 +62,7 @@ Zeitgeist_Rendition_visit
   )
 {
   if (self->folderPath) {
-    Shizu_Gc_visitObject(state, (Shizu_Object*)self->folderPath);
+    Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->folderPath);
   }
 }
 
@@ -94,7 +94,7 @@ Zeitgeist_createRendition
     Shizu_String* folderPath
   )
 {
-  Zeitgeist_Rendition* self = (Zeitgeist_Rendition*)Shizu_Gc_allocate(state, sizeof(Zeitgeist_Rendition));
+  Zeitgeist_Rendition* self = (Zeitgeist_Rendition*)Shizu_Gc_allocateObject(state, sizeof(Zeitgeist_Rendition));
   self->folderPath = folderPath;
   self->dl = NULL;
   ((Shizu_Object*)self)->type = Zeitgeist_Rendition_getType(state);

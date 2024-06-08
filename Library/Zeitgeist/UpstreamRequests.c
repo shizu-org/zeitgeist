@@ -8,9 +8,9 @@
 #include <malloc.h>
 
 static Shizu_TypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
-  .staticInitialize = NULL,
-  .staticFinalize = NULL,
-  .staticVisit = NULL,
+  .preDestroyType = NULL,
+  .postCreateType = NULL,
+  .visitType = NULL,
   .size = sizeof(Zeitgeist_UpstreamRequest),
   .finalize = NULL,
   .visit = NULL,
@@ -27,7 +27,7 @@ Zeitgeist_UpstreamRequest_createExitProcessRequest
     Shizu_State* state
   )
 {
-  Zeitgeist_UpstreamRequest* self = (Zeitgeist_UpstreamRequest*)Shizu_Gc_allocate(state, sizeof(Zeitgeist_UpstreamRequest));
+  Zeitgeist_UpstreamRequest* self = (Zeitgeist_UpstreamRequest*)Shizu_Gc_allocateObject(state, sizeof(Zeitgeist_UpstreamRequest));
   self->type = Zeitgeist_UpstreamRequestType_ExitProcessRequest;
   ((Shizu_Object*)self)->type = Zeitgeist_UpstreamRequest_getType(state);
   return self;
