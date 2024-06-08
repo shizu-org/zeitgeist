@@ -23,6 +23,7 @@
 #define VISUALS_GL_RENDERBUFFER_H_INCLUDED
 
 #include "Visuals/RenderBuffer.h"
+#include "ServiceGl.h"
 
 Shizu_declareType(Visuals_GlRenderBuffer);
 

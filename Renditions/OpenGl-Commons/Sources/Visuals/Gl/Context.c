@@ -105,6 +105,15 @@ Visuals_Gl_Context_clearImpl
     Shizu_Boolean depthBuffer
   );
 
+static inline void
+Visuals_Gl_Context_renderImpl
+  (
+    Shizu_State* state,
+    Visuals_Gl_Context* self,
+    Visuals_GlVertexBuffer* vertexBuffer,
+    Visuals_GlProgram* program
+  );
+
 static Shizu_TypeDescriptor const Visuals_Gl_Context_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
@@ -144,6 +153,7 @@ Visuals_Gl_Context_dispatchInitialize
   ((Visuals_Context_Dispatch*)self)->setDepthFunction = (void (*)(Shizu_State*, Visuals_Context*, Visuals_DepthFunction)) & Visuals_Gl_Context_setDepthFunctionImpl;
   ((Visuals_Context_Dispatch*)self)->setViewport = (void (*)(Shizu_State*, Visuals_Context*, Shizu_Float32, Shizu_Float32, Shizu_Float32, Shizu_Float32)) & Visuals_Gl_Context_setViewportImpl;
   ((Visuals_Context_Dispatch*)self)->clear = (void (*)(Shizu_State*, Visuals_Context*, bool, bool)) & Visuals_Gl_Context_clearImpl;
+  ((Visuals_Context_Dispatch*)self)->render = (void (*)(Shizu_State*, Visuals_Context*, Visuals_VertexBuffer*, Visuals_Program*)) & Visuals_Gl_Context_renderImpl;
 
 }
 
@@ -361,6 +371,20 @@ Visuals_Gl_Context_clearImpl
   glScissor(self->viewport.left * clientWidth, self->viewport.bottom * clientHeight, self->viewport.width * clientWidth, self->viewport.height * clientHeight);
   
   glClear(mask);
+}
+
+static inline void
+Visuals_Gl_Context_renderImpl
+  (
+    Shizu_State* state,
+    Visuals_Gl_Context* self,
+    Visuals_GlVertexBuffer* vertexBuffer,
+    Visuals_GlProgram* program
+  )
+{
+  glUseProgram(program->programId);
+  glBindVertexArray(vertexBuffer->vertexArrayId);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, ((Visuals_VertexBuffer*)vertexBuffer)->numberOfVertices);
 }
 
 void

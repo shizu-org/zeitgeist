@@ -1,7 +1,7 @@
 #if !defined(VISUALS_CONTEXT_H_INCLUDED)
 #define VISUALS_CONTEXT_H_INCLUDED
 
-#include "Shizu/Runtime/Include.h"
+#include "Commons.h"
 typedef struct Visuals_Program Visuals_Program;
 typedef struct Visuals_RenderBuffer Visuals_RenderBuffer;
 typedef struct Visuals_VertexBuffer Visuals_VertexBuffer;
@@ -45,6 +45,7 @@ struct Visuals_Context_Dispatch {
   void (*setDepthFunction)(Shizu_State*, Visuals_Context*, Visuals_DepthFunction);
   void (*setViewport)(Shizu_State*, Visuals_Context*, Shizu_Float32 left, Shizu_Float32 bottom, Shizu_Float32 width, Shizu_Float32 height);
   void (*clear)(Shizu_State*, Visuals_Context*, bool colorBuffer, bool depthBuffer);
+  void (*render)(Shizu_State*, Visuals_Context*, Visuals_VertexBuffer* vertexBuffer, Visuals_Program* program);
 };
 
 struct Visuals_Context {
@@ -57,30 +58,6 @@ Visuals_Context_construct
     Shizu_State* state,
     Visuals_Context* self
   );
-
-#define Shizu_VirtualCall(TYPE, METHOD, ...) \
-  TYPE##_Dispatch* dispatch = (TYPE##_Dispatch*)Shizu_State_getObjectDispatch(state, (Shizu_Object*)self); \
-  if (!dispatch) { \
-    fprintf(stderr, "%s:%d: fatal error (unreachable code reached): dispatch not created\n", __FILE__, __LINE__); \
-    exit(EXIT_FAILURE); \
-  } \
-  if (!dispatch->METHOD) { \
-    fprintf(stderr, "%s:%d: fatal error (unreachable code reached): pure virtual method call\n", __FILE__, __LINE__); \
-    exit(EXIT_FAILURE); \
-  } \
-  dispatch->METHOD(state, __VA_ARGS__);
-
-#define Shizu_VirtualCallWithReturn(TYPE, METHOD, ...) \
-  TYPE##_Dispatch* dispatch = (TYPE##_Dispatch*)Shizu_State_getObjectDispatch(state, (Shizu_Object*)self); \
-  if (!dispatch) { \
-    fprintf(stderr, "%s:%d: fatal error (unreachable code reached): dispatch not created\n", __FILE__, __LINE__); \
-    exit(EXIT_FAILURE); \
-  } \
-  if (!dispatch->METHOD) { \
-    fprintf(stderr, "%s:%d: fatal error (unreachable code reached): pure virtual method call\n", __FILE__, __LINE__); \
-    exit(EXIT_FAILURE); \
-  } \
-  return dispatch->METHOD(state, __VA_ARGS__);
 
 static inline Visuals_Program*
 Visuals_Context_createProgram
@@ -184,5 +161,15 @@ Visuals_Context_clear
     bool depthBuffer
   )
 { Shizu_VirtualCall(Visuals_Context, clear, self, colorBuffer, depthBuffer); }
+
+static inline void
+Visuals_Context_render
+  (
+    Shizu_State* state,
+    Visuals_Context* self,
+    Visuals_VertexBuffer* vertexBuffer,
+    Visuals_Program* program
+  )
+{ Shizu_VirtualCall(Visuals_Context, render, self, vertexBuffer, program); }
 
 #endif // VISUALS_CONTEXT_H_INCLUDED

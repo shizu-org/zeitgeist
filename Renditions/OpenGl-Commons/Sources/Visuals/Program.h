@@ -23,6 +23,9 @@
 #define VISUALS_PROGRAM_H_INCLUDED
 
 #include "Visuals/Object.h"
+#include "Matrix4F32.h"
+#include "Vector3F32.h"
+#include "Vector4F32.h"
 
 /**
  * @since 1.0
@@ -32,6 +35,12 @@ Shizu_declareType(Visuals_Program);
 
 struct Visuals_Program_Dispatch {
   Visuals_Object_Dispatch _parent;
+  void (*bindMatrix4F32)(Shizu_State* state, Visuals_Program* self, char const* name, Matrix4F32* value);
+  void (*bindVector3F32)(Shizu_State* state, Visuals_Program* self, char const* name, Vector3F32* value);
+  void (*bindVector4F32)(Shizu_State* state, Visuals_Program* self, char const* name, Vector4F32* value);
+  void (*bindInteger32)(Shizu_State* state, Visuals_Program* self, char const* name, Shizu_Integer32 value);
+  void (*bindFloat32)(Shizu_State* state, Visuals_Program* self, char const* name, Shizu_Float32 value);
+  void (*bindBoolean)(Shizu_State* state, Visuals_Program* self, char const* name, Shizu_Boolean value);
 };
 
 struct Visuals_Program {
@@ -48,5 +57,65 @@ Visuals_Program_construct
     Shizu_String* vertexSource,
     Shizu_String* fragmentSource
   );
+
+static inline void
+Visuals_Program_bindMatrix4F32
+  (
+    Shizu_State* state,
+    Visuals_Program* self,
+    char const* name,
+    Matrix4F32* value
+  )
+{ Shizu_VirtualCall(Visuals_Program, bindMatrix4F32, self, name, value); }
+
+static inline void
+Visuals_Program_bindVector3F32
+  (
+    Shizu_State* state,
+    Visuals_Program* self,
+    char const* name,
+    Vector3F32* value
+  )
+{ Shizu_VirtualCall(Visuals_Program, bindVector3F32, self, name, value); }
+
+static inline void
+Visuals_Program_bindVector4F32
+  (
+    Shizu_State* state,
+    Visuals_Program* self,
+    char const* name,
+    Vector4F32* value
+  )
+{ Shizu_VirtualCall(Visuals_Program, bindVector4F32, self, name, value); }
+
+static inline void
+Visuals_Program_bindInteger32
+  (
+    Shizu_State* state,
+    Visuals_Program* self,
+    char const* name,
+    Shizu_Integer32 value
+  )
+{ Shizu_VirtualCall(Visuals_Program, bindInteger32, self, name, value); }
+
+static inline void
+Visuals_Program_bindFloat32
+  (
+    Shizu_State* state,
+    Visuals_Program* self,
+    char const* name,
+    Shizu_Float32 value
+  )
+{ Shizu_VirtualCall(Visuals_Program, bindFloat32, self, name, value); }
+
+static inline void
+Visuals_Program_bindBoolean
+  (
+    Shizu_State* state,
+    Visuals_Program* self,
+    char const* name,
+    Shizu_Boolean value
+  )
+{ Shizu_VirtualCall(Visuals_Program, bindBoolean, self, name, value); }
 
 #endif // VISUALS_PROGRAM_H_INCLUDED

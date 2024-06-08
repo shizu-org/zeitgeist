@@ -1,5 +1,7 @@
 #include "Visuals/VertexBuffer.h"
 
+#include <string.h>
+
 static void
 Visuals_VertexBuffer_finalize
   (
@@ -81,7 +83,7 @@ Visuals_VertexBuffer_setDataImpl
     case (Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3): {
       newVertexSize = sizeof(float) * 3;
     } break;
-    case (Visuals_VertexSemantics_PositionXyz_NormalXyz_ColorRgb | Visuals_VertexSyntactics_Float3_Float3_Float3): {
+    case (Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb | Visuals_VertexSyntactics_Float3_Float3_Float3): {
       newVertexSize = sizeof(float) * 9;
     } break;
     default: {

@@ -150,13 +150,16 @@ Visuals_GlVertexBuffer_setDataImpl
   static const GLint POSITION_INDEX = 0;
   static const GLint NORMAL_INDEX = 1;
   static const GLint AMBIENT_COLOR_INDEX = 2;
+  static const GLint DIFFUSE_COLOR_INDEX = 3;
+  static const GLint SPECULAR_COLOR_INDEX = 4;
+  static const GLint SHININESSS_INDEX = 5;
 
   size_t vertexSize = 0;
   switch (((Visuals_VertexBuffer*)self)->flags) {
     case (Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3): {
       vertexSize = sizeof(float) * 3;
     } break;
-    case (Visuals_VertexSemantics_PositionXyz_NormalXyz_ColorRgb | Visuals_VertexSyntactics_Float3_Float3_Float3): {
+    case (Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb | Visuals_VertexSyntactics_Float3_Float3_Float3): {
       vertexSize = sizeof(float) * 9;
     } break;
     default: {
@@ -189,7 +192,7 @@ Visuals_GlVertexBuffer_setDataImpl
                             vertexSize,
                             (void*)(uintptr_t)0);
     } break;
-    case (Visuals_VertexSemantics_PositionXyz_NormalXyz_ColorRgb | Visuals_VertexSyntactics_Float3_Float3_Float3): {
+    case (Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb | Visuals_VertexSyntactics_Float3_Float3_Float3): {
       glEnableVertexAttribArray(POSITION_INDEX);
       glVertexAttribPointer(POSITION_INDEX,
                             3,
@@ -213,6 +216,55 @@ Visuals_GlVertexBuffer_setDataImpl
                             GL_TRUE,
                             vertexSize,
                             (void*)(uintptr_t)(sizeof(float) * 6));
+    } break;
+    case (Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float): {
+      glEnableVertexAttribArray(POSITION_INDEX);
+      glVertexAttribPointer(POSITION_INDEX,
+                            3,
+                            GL_FLOAT,
+                            GL_FALSE,
+                            vertexSize,
+                            (void*)(uintptr_t)0);
+
+      glEnableVertexAttribArray(NORMAL_INDEX);
+      glVertexAttribPointer(NORMAL_INDEX,
+                            3,
+                            GL_FLOAT,
+                            GL_FALSE,
+                            vertexSize,
+                            (void*)(uintptr_t)(sizeof(float) * 3));
+
+      glEnableVertexAttribArray(AMBIENT_COLOR_INDEX);
+      glVertexAttribPointer(AMBIENT_COLOR_INDEX,
+                            3,
+                            GL_FLOAT,
+                            GL_TRUE,
+                            vertexSize,
+                            (void*)(uintptr_t)(sizeof(float) * 6));
+
+      glEnableVertexAttribArray(DIFFUSE_COLOR_INDEX);
+      glVertexAttribPointer(DIFFUSE_COLOR_INDEX,
+                            3,
+                            GL_FLOAT,
+                            GL_TRUE,
+                            vertexSize,
+                            (void*)(uintptr_t)(sizeof(float) * 9));
+
+      glEnableVertexAttribArray(SPECULAR_COLOR_INDEX);
+      glVertexAttribPointer(SPECULAR_COLOR_INDEX,
+                            3,
+                            GL_FLOAT,
+                            GL_TRUE,
+                            vertexSize,
+                            (void*)(uintptr_t)(sizeof(float) * 12));
+
+      glEnableVertexAttribArray(SHININESSS_INDEX);
+      glVertexAttribPointer(SHININESSS_INDEX,
+                            1,
+                            GL_FLOAT,
+                            GL_TRUE,
+                            vertexSize,
+                            (void*)(uintptr_t)(sizeof(float) * 15));
     } break;
     default: {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);

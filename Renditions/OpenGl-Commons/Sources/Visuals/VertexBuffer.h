@@ -8,19 +8,24 @@
  */
 #define Visuals_VertexSemantics_PositionXyz (1)
 /**
- * @brief Vertices representing a position xyz, a normal xyz, and a color rgb (in that order).
+ * @brief Vertices representing a position xyz, a normal xyz, and an ambient rgb color (in that order).
  */
-#define Visuals_VertexSemantics_PositionXyz_NormalXyz_ColorRgb (2)
+#define Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb (2)
+/// @brief Vertices representing a position xyz, a normal xyz, an ambient rgb, a diffuse rgb, a specular rgb, and  shininess.
+#define Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess (4)
 
 /**
  * @brief A vertex is one vertex element consisting of three float values. 
  */
-#define Visuals_VertexSyntactics_Float3 (4)
+#define Visuals_VertexSyntactics_Float3 (8)
 
 /** 
  * @brief A vertex is three vertex elements each consisting of three float values.
  */
-#define Visuals_VertexSyntactics_Float3_Float3_Float3 (8)
+#define Visuals_VertexSyntactics_Float3_Float3_Float3 (16)
+
+/// @brief A vertex is 6 vertex elements. The first five vertex element each consist of three float values. The last vertex element consists of a single float value.
+#define Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float (32)
 
 /**
  * @since 1.0
@@ -73,15 +78,6 @@ Visuals_VertexBuffer_setData
     void const* bytes,
     size_t numberOfBytes
   )
-{
-  Visuals_VertexBuffer_Dispatch* dispatch = (Visuals_VertexBuffer_Dispatch*)Shizu_State_getObjectDispatch(state, (Shizu_Object*)self);
-  if (!dispatch) {
-    fprintf(stderr, "%s:%d: fatal error (unreachable code reached): dispatch not created\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-  }
-  if (dispatch->setData) {
-    dispatch->setData(state, self, flags, bytes, numberOfBytes);
-  }
-}
+{ Shizu_VirtualCall(Visuals_VertexBuffer, setData, self, flags, bytes, numberOfBytes); }
 
 #endif // VISUALS_VERTEXBUFFER_H_INCLUDED

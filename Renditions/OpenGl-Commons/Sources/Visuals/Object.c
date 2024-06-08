@@ -21,6 +21,8 @@
 
 #include "Visuals/Object.h"
 
+#include "ServiceGl.h"
+
 static void
 dispatchInitialize
   (

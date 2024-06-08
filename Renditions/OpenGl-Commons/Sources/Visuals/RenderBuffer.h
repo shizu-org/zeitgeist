@@ -54,15 +54,6 @@ Visuals_RenderBuffer_resize
     Shizu_Integer32 width,
     Shizu_Integer32 height
   )
-{
-  Visuals_RenderBuffer_Dispatch* dispatch = (Visuals_RenderBuffer_Dispatch*)Shizu_State_getObjectDispatch(state, (Shizu_Object*)self);
-  if (!dispatch) {
-    fprintf(stderr, "%s:%d: fatal error (unreachable code reached): dispatch not created\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-  }
-  if (dispatch->resize) {
-    dispatch->resize(state, self, width, height);
-  }
-}
+{ Shizu_VirtualCall(Visuals_RenderBuffer, resize, self, width, height); }
 
 #endif // VISUALS_RENDERBUFFER_H_INCLUDED

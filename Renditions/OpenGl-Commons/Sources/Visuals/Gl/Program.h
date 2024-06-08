@@ -23,6 +23,7 @@
 #define VISUALS_GL_PROGRAM_H_INCLUDED
 
 #include "Visuals/Program.h"
+#include "ServiceGl.h"
 
 Shizu_declareType(Visuals_GlProgram);
 

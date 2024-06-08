@@ -21,16 +21,20 @@ else()
   endif()
 endif()
 
+list(APPEND ${name}.source_files Sources/Commons.c)
+list(APPEND ${name}.header_files Sources/Commons.h)
+
 list(APPEND ${name}.source_files Sources/ServiceGl.c)
 list(APPEND ${name}.header_files Sources/ServiceGl.h)
 
 list(APPEND ${name}.source_files Sources/ServiceGl_Functions.i)
 
-list(APPEND ${name}.source_files Sources/Matrix4R32.c)
-list(APPEND ${name}.header_files Sources/Matrix4R32.h)
-
-list(APPEND ${name}.source_files Sources/Vector3R32.c)
-list(APPEND ${name}.header_files Sources/Vector3R32.h)
+list(APPEND ${name}.source_files Sources/Matrix4F32.c)
+list(APPEND ${name}.header_files Sources/Matrix4F32.h)
+list(APPEND ${name}.source_files Sources/Vector3F32.c)
+list(APPEND ${name}.header_files Sources/Vector3F32.h)
+list(APPEND ${name}.source_files Sources/Vector4F32.c)
+list(APPEND ${name}.header_files Sources/Vector4F32.h)
 
 list(APPEND ${name}.source_files Sources/KeyboardKeyMessage.c)
 list(APPEND ${name}.header_files Sources/KeyboardKeyMessage.h)

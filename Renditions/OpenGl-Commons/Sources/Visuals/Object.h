@@ -22,7 +22,7 @@
 #if !defined(VISUALS_OBJECT_H_INCLUDED)
 #define VISUALS_OBJECT_H_INCLUDED
 
-#include "ServiceGl.h"
+#include "Commons.h"
 
 Shizu_declareType(Visuals_Object);
 

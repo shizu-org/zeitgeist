@@ -11,16 +11,18 @@ Provides OpenGL 3.x windowing & context creation/destruction:
 - (6) Relinquish the two linked functions.
 - (7) Destroy the OpenGL 3.x context and the OpenGL 3.x window.
 
-# Coordinate Systems
-*OpenGL Commons* uses a *right handed coordinate system*.
+## Coordinate Systems
+*Visuals* uses a *right handed coordinate system*.
 The positive x axis is pointing from the left side of the canvas to the right side,
 The positive y axis is pointing from the bottom side of the canvas to the top side.
 The negative z axis is pointing into the screen.
 
-# Lighting
-*OpenGL Commons* knows various kinds of lighting a scene.
+## Lighting
+*Visuals* knows various kinds of lighting a scene.
 
-## Ambient lighting
+### Ambient lighting
+*Visuals* supports a single ambient light.
+
 The ambient light cast on particular fragment only depends on the light color.
 Let
 - `c_f = (c_f.r, c_f.g, c_f.b)` be the fragment color
@@ -32,8 +34,10 @@ c'_f = c_l * c_f
 We implement diffuse lighting interface by the following uniforms:
 - `uniform vec3 ambientLightColor`
 
-## Diffuse lighting
-The diffuse light cast on a particular fragment depends on the fragments normal, the lights direction and the light color.
+### Diffuse lighting
+*Visuals* supports a single diffuse light.
+
+The diffuse light cast on a particular fragment depends on the fragments normal, the light direction and the light color.
 Let
 - `c_f = (c_f.r, c_f.g, c_f.b)` be the fragment color
 - `c_l = (c_l.r, c_l.g, c_l.b)` be the light color
@@ -50,14 +54,49 @@ We implement diffuse lighting interface by the following uniforms:
 - `uniform vec3 diffuseLightColor`
 - `uniform vec3 diffuseLightDirection`
 
-## Specular lighting
-The specular light cast on a particular fragment depends on the fragments normal, the lights direction, the light color, and 
+### Specular lighting
+*Visuals* supports a single specular light.
 
-## ~~Point Lights~~
-~~A point light consists of a point. It emits light from the point in every direction.~~
+The specular light cast on a particular fragment depends on
+- the fragments normal,
+- the light direction, the light position, the light color,
+- the viewer direction, the viewer position.
 
-## ~~Directional Lights~~
-~~A directional light consists of a plane at infinity. Every point in the plane emits a light into the direction of the plane normal.~~
+If the light is a directional specular light, then the cast does not depend on the light position.
+```
+fragmentToViewerDirection = normalize(viewer.position - fragment.position);
+fragmentToLightDirection = light.direction;
+```
 
-## ~~Spot Lights~~
-~~A spot light consists of a point which emits a cone of light into a direction.~~
+If the light is a point specular light, then the cast does depend on the light position.
+```
+fragmentToViewerDirection = normalize(viewer.position - fragment.position);
+fragmentToLightDirection = normalize(light.position - fragment.position);
+```
+
+In the case of Phong lighting model
+```
+reflectDirection = normalize(reflect(lightToFragmentDirection, fragment.normal);
+```
+to compute the intensity
+```
+intensity = pow(max(dot(fragmentToViewerDirection, reflectDirection), 0), fragment.phong.shininess);
+```
+or by
+```
+intensity = pow(smoothstep(0, 1, dot(fragmentToViewerDirection, reflectDirection)), fragment.phong.shininess);
+```
+
+In the case of Blinn-Phong lighting model
+```
+halfWay = normalize(fragmentToViewerDirection + fragmentToLightDirection);
+blinnTerm = dot(fragment.normal, halfWay);
+```
+to compute the intensity
+```
+intensity = pow(max(blinnTerm, 0), fragment.blinnPhong.shininess);
+```
+or by
+```
+intensity = pow(smoothstep(0, 1, blinnTerm), fragment.blinnPhong.shininess);
+```

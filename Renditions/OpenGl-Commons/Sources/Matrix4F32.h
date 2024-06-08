@@ -2,42 +2,42 @@
 #define MATRIX4R32_H_INCLUDED
 
 #include "Zeitgeist.h"
-#include "idlib-math.h"
-typedef struct Vector3R32 Vector3R32;
+#include "idlib/math.h"
+typedef struct Vector3F32 Vector3F32;
 
-Shizu_declareType(Matrix4R32)
+Shizu_declareType(Matrix4F32)
 
-struct Matrix4R32_Dispatch {
+struct Matrix4F32_Dispatch {
   Shizu_Object_Dispatch _parent;
 };
 
-struct Matrix4R32 {
+struct Matrix4F32 {
   Shizu_Object _parent;
   idlib_matrix_4x4_f32 m;
 };
 
-Matrix4R32*
-Matrix4R32_createIdentity
+Matrix4F32*
+Matrix4F32_createIdentity
   (
     Shizu_State* state
   );
 
-Matrix4R32*
-Matrix4R32_createTranslate
+Matrix4F32*
+Matrix4F32_createTranslate
   (
     Shizu_State* state,
-    Vector3R32* translation
+    Vector3F32* translation
   );
 
-Matrix4R32*
-Matrix4R32_createRotateY
+Matrix4F32*
+Matrix4F32_createRotateY
   (
     Shizu_State* state,
     Shizu_Float32 degrees
   );
 
-Matrix4R32*
-Matrix4R32_createPerspective
+Matrix4F32*
+Matrix4F32_createPerspective
   (
     Shizu_State* state,
     Shizu_Float32 fieldOfViewY,
@@ -46,8 +46,8 @@ Matrix4R32_createPerspective
     Shizu_Float32 far
   );
 
-Matrix4R32*
-Matrix4R32_createOrthographic
+Matrix4F32*
+Matrix4F32_createOrthographic
   (
     Shizu_State* state,
     Shizu_Float32 left,
@@ -58,35 +58,35 @@ Matrix4R32_createOrthographic
     Shizu_Float32 far
   );
 
-Matrix4R32*
-Matrix4R32_createLookAt
+Matrix4F32*
+Matrix4F32_createLookAt
   (
     Shizu_State* state,
-    Vector3R32* source,
-    Vector3R32* target,
-    Vector3R32* up
+    Vector3F32* source,
+    Vector3F32* target,
+    Vector3F32* up
   );
 
-Matrix4R32*
-Matrix4R32_createScale
+Matrix4F32*
+Matrix4F32_createScale
   (
     Shizu_State* state,
-    Vector3R32* scale
+    Vector3F32* scale
   );
 
-Matrix4R32*
-Matrix4R32_negate
+Matrix4F32*
+Matrix4F32_negate
   (
     Shizu_State* state,
-    Matrix4R32* matrix
+    Matrix4F32* matrix
   );
 
-Matrix4R32*
-Matrix4R32_multiply
+Matrix4F32*
+Matrix4F32_multiply
   (
     Shizu_State* state,
-    Matrix4R32* operand1,
-    Matrix4R32* operand2
+    Matrix4F32* operand1,
+    Matrix4F32* operand2
   );
 
 #endif // MATRIX4R32_H_INCLUDED

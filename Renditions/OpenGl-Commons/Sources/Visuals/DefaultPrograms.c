@@ -79,7 +79,7 @@ static const GLchar* Programs_Pbr1_vertexProgram =
   "};\n"
 
   "out FRAGMENT {\n"
-  "  vec3 position;\n"
+  "  vec3 worldPosition;\n"
   "  vec3 color;\n"
   "  vec3 normal;\n"
   "  PhongInfo phong;\n"
@@ -99,7 +99,7 @@ static const GLchar* Programs_Pbr1_vertexProgram =
   "  mat4 modelToProjectionMatrix = matrices.projection * matrices.view * matrices.world;\n"
   "  mat3 normalMatrix = mat3(transpose(inverse(matrices.world)));"
   "  gl_Position = modelToProjectionMatrix * vec4(vertexPosition, 1.);\n"
-  "  _fragment.position = (modelToProjectionMatrix * vec4(vertexPosition, 1.)).xyz;\n"
+  "  _fragment.worldPosition = (matrices.world * vec4(vertexPosition, 1.)).xyz;\n"
   "  _fragment.normal = normalMatrix * vertexNormal;\n"
   "  _fragment.phong.shininess = 0.3;\n"
   "  _fragment.blinnPhong.shininess = 0.3;\n"
@@ -136,6 +136,7 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "#version 330 core\n"
   "out vec4 outputFragmentColor;\n"
 
+  // Information on the ambient, diffuse, specular, and emissive properties of a fragment.
   "struct PhongInfo {\n"
   // The ambient factor per channel.
   "  vec3 ambient;\n"
@@ -146,15 +147,19 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "  float shininess;\n"
   "};\n"
 
+  // Information on the ambient, diffuse, specular, and emissive properties of a fragment.
   "struct BlinnPhongInfo {\n"
+  // The ambient factor per channel.
   "  vec3 ambient;\n"
+  // The diffuse factor per channel.
   "  vec3 diffuse;\n"
+  // The specular factor per channel.
   "  vec3 specular;\n"
   "  float shininess;\n"
   "};\n"
 
   "in FRAGMENT {\n"
-  "  vec3 position;\n"
+  "  vec3 worldPosition;\n"
   "  vec3 color;\n"
   "  vec3 normal;\n"
   "  PhongInfo phong;\n"
@@ -206,7 +211,7 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "uniform SpecularLightInfo specularLightInfo;\n"
 
   "struct FragmentInfo {\n"
-  "  vec3 position;\n"
+  "  vec3 worldPosition;\n"
   "  vec3 color;\n"
   "  vec3 normal;\n"
   "  PhongInfo phong;\n"
@@ -217,8 +222,7 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
    * The ambient light.
    */
   "vec3 onAmbient(in FragmentInfo fragment, in AmbientLightInfo ambient) {\n"
-  "  fragment.normal = normalize(fragment.normal);\n"
-  "  vec3 ambientColor = ambient.color;\n"
+  "  vec3 ambientColor = fragment.phong.ambient * ambient.color;\n"
   "  return ambientColor;\n"
   "}\n"
 
@@ -230,7 +234,7 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
   "  diffuse.direction = normalize(diffuse.direction);\n"
   /* dot(x,cy) = c dot(x,y)*/
   "  float diffuseIntensity = max(dot(fragment.normal, -diffuse.direction), 0.0);\n"
-  "  vec3 diffuseColor = diffuseIntensity * diffuse.color;\n"
+  "  vec3 diffuseColor = diffuseIntensity * fragment.phong.diffuse * diffuse.color;\n"
   "  return diffuseColor;\n"
   "}\n"
 
@@ -238,48 +242,46 @@ static const GLchar* Programs_Pbr1_fragmentProgram =
    * The specular light: point light (origin but no direction) or directional light (direction but no origin).
    */
   "vec3 onSpecular(in FragmentInfo fragment, in ViewerInfo viewer, in SpecularLightInfo specular) {\n"
-  "  vec3 viewerDirection = normalize(viewer.position - fragment.position);\n"
+  "  vec3 fragmentToViewerDirection = normalize(viewer.position - fragment.worldPosition);\n"
   "  vec3 lightDirection;\n"
   "  if (specular.lightType == LightType_Point) {\n"
   /* Specular point light. */
-  "    lightDirection = normalize(fragment.position - specular.position);\n"
+  "    lightDirection = normalize(fragment.worldPosition - specular.position);\n"
   "  } else if (specular.lightType == LightType_Directional) {\n"
   /* Specular directional light. */
   "    lightDirection = normalize(specular.direction);\n"
   "  } else {\n"
-  "    return vec3(1.f, 1.f, 1.f); \n"
+  "    return vec3(1); \n"
   "  }\n"
   "  vec3 surfaceToLightDirection = -lightDirection;\n;"
   "  float intensity = 0;"
   "  if (specular.lightModel == LightModel_Phong) {\n"
   "   vec3 reflectionDirection = normalize(reflect(lightDirection, fragment.normal));\n"
-  "   intensity = pow(max(dot(viewerDirection, reflectionDirection), 0.0), fragment.phong.shininess);"
-  "   intensity = pow(smoothstep(0.0, 1.0, dot(viewerDirection, reflectionDirection)), fragment.phong.shininess);\n"
+  "   float term = dot(fragmentToViewerDirection, reflectionDirection);\n"
+  "   intensity = pow(max(term, 0.0), fragment.phong.shininess);"
+  "   intensity = pow(smoothstep(0.0, 1.0, term), fragment.phong.shininess);\n"
+  "   return intensity * fragment.phong.specular * specular.color;\n"
   "  } else if (specular.lightModel == LightModel_BlinnPhong) {\n"
-  "   vec3 halfWay = normalize(viewerDirection + surfaceToLightDirection);\n"
-  "   float blinnTerm =  dot(fragment.normal, halfWay);\n"
-  //"   float cosAngIncidence = dot(fragment.normal, lightDirection)\n;"
-  //"   cosAngIncidence = clamp(cosAngIncidence, 0, 1)\n;"
-  //"   blinnTerm = cosAngIncidence != 0.f ? blinnTerm : 0.f;\n"
-  "   intensity = pow(max(blinnTerm, 0.0), fragment.phong.shininess);"
-  
-  "   intensity = pow(smoothstep(0.0, 1.0, dot(fragment.normal, halfWay)), fragment.phong.shininess);\n"
+  "   vec3 halfWay = normalize(fragmentToViewerDirection + surfaceToLightDirection);\n"
+  "   float term =  dot(fragment.normal, halfWay);\n"
+  "   intensity = pow(max(term, 0.0), fragment.phong.shininess);"
+  "   intensity = pow(smoothstep(0.0, 1.0, term), fragment.blinnPhong.shininess);\n"
+  "   return intensity * fragment.blinnPhong.specular * specular.color;\n"
+  "  } else {\n"
+  "   return vec3(1);\n"
   "  }\n"
-  "  return intensity * specular.color;\n"
   "}\n"
  
   "vec3 light(in FragmentInfo fragment, in ViewerInfo viewer, in AmbientLightInfo ambient, in DiffuseLightInfo diffuse, in SpecularLightInfo specular) {\n"
   "  vec3 ambientColor = onAmbient(fragment, ambient);\n"
   "  vec3 diffuseColor = onDiffuse(fragment, diffuse);\n"
   "  vec3 specularColor = onSpecular(fragment, viewer, specular);\n"
-  "  return (0.1f * fragment.phong.ambient * ambientColor +\n"
-  "          0.1f * fragment.phong.diffuse * diffuseColor +\n"
-  "          0.5f * fragment.phong.specular * specularColor)* fragment.color; \n"
+  "  return (0.3f * ambientColor + 0.3f * diffuseColor + 0.3f * specularColor);\n"
   "}\n"
 
   "void main() {\n"
   "  FragmentInfo fragmentInfo;\n"
-  "  fragmentInfo.position = _fragment.position;\n"
+  "  fragmentInfo.worldPosition = _fragment.worldPosition;\n"
   "  fragmentInfo.color = _fragment.color;\n"
   "  fragmentInfo.normal = _fragment.normal;\n"
   "  fragmentInfo.phong = _fragment.phong;\n"

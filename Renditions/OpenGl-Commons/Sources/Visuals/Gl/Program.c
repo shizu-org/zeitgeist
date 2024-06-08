@@ -41,6 +41,60 @@ Visuals_GlProgram_unmaterializeImpl
     Shizu_State* state,
     Visuals_GlProgram* self
   );
+  
+static void
+Visuals_GlProgram_bindMatrix4R32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Matrix4F32* value
+  );
+
+static void
+Visuals_GlProgram_bindVector3R32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Vector3F32* value
+  );
+
+static void
+Visuals_GlProgram_bindVector4R32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Vector4F32* value
+  );
+
+static void
+Visuals_GlProgram_bindInteger32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Shizu_Integer32 value
+  );
+
+static void
+Visuals_GlProgram_bindBooleanImpl
+  ( 
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Shizu_Boolean value
+  );
+
+static void
+Visuals_GlProgram_bindFloat32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Shizu_Float32 value
+  );
 
 Shizu_TypeDescriptor const Visuals_GlProgram_Type = {
   .preDestroyType = NULL,
@@ -96,6 +150,114 @@ Visuals_GlProgram_unmaterializeImpl
 }
 
 static void
+Visuals_GlProgram_bindMatrix4R32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Matrix4F32* value
+  )
+{
+  GLint location = glGetUniformLocation(self->programId, name);
+  if (-1 == location) {
+    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
+  } else {
+    glUseProgram(self->programId);
+    glUniformMatrix4fv(location, 1, GL_TRUE, idlib_matrix_4x4_f32_get_data(&value->m));
+  }
+}
+
+static void
+Visuals_GlProgram_bindVector3R32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Vector3F32* value
+  )
+{
+  GLint location = glGetUniformLocation(self->programId, name);
+  if (-1 == location) {
+    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
+  } else {
+    glUseProgram(self->programId);
+    glUniform3fv(location, 1, &value->v.e[0]);
+  }
+}
+
+static void
+Visuals_GlProgram_bindVector4R32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Vector4F32* value
+  )
+{
+  GLint location = glGetUniformLocation(self->programId, name);
+  if (-1 == location) {
+    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
+  } else {
+    glUseProgram(self->programId);
+    glUniform4fv(location, 1, &value->v.e[0]);
+  }
+}
+
+static void
+Visuals_GlProgram_bindInteger32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Shizu_Integer32 value
+  )
+{
+  GLint location = glGetUniformLocation(self->programId, name);
+  if (-1 == location) {
+    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
+  } else {
+    glUseProgram(self->programId);
+    glUniform1i(location, value);
+  }
+}
+
+static void
+Visuals_GlProgram_bindBooleanImpl
+  ( 
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Shizu_Boolean value
+  )
+{
+  GLint location = glGetUniformLocation(self->programId, name);
+  if (-1 == location) {
+    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
+  } else {
+    glUseProgram(self->programId);
+    glUniform1i(location, value ? 1 : 0);
+  }
+}
+
+static void
+Visuals_GlProgram_bindFloat32Impl
+  (
+    Shizu_State* state,
+    Visuals_GlProgram* self,
+    char const* name,
+    Shizu_Float32 value
+  )
+{
+  GLint location = glGetUniformLocation(self->programId, name);
+  if (-1 == location) {
+    fprintf(stderr, "%s:%d: unable to get uniform location of uniform `%s`\n", __FILE__, __LINE__, name);
+  } else {
+    glUseProgram(self->programId);
+    glUniform1f(location, value);
+  }
+}
+
+static void
 Visuals_GlProgram_dispatchInitialize
   (            
     Shizu_State1* state1,
@@ -104,6 +266,12 @@ Visuals_GlProgram_dispatchInitialize
 {
   ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*, Visuals_Object*)) & Visuals_GlProgram_materializeImpl;
   ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*, Visuals_Object*)) & Visuals_GlProgram_unmaterializeImpl;
+  ((Visuals_Program_Dispatch*)self)->bindBoolean = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Boolean)) &Visuals_GlProgram_bindBooleanImpl;
+  ((Visuals_Program_Dispatch*)self)->bindFloat32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Float32)) & Visuals_GlProgram_bindFloat32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindInteger32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Integer32)) & Visuals_GlProgram_bindInteger32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindMatrix4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Matrix4F32 const*)) & Visuals_GlProgram_bindMatrix4R32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindVector3F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector3F32 const*)) & Visuals_GlProgram_bindVector3R32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindVector4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector4F32 const*)) & Visuals_GlProgram_bindVector4R32Impl;
 }
 
 void

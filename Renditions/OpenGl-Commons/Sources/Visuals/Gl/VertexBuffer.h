@@ -23,6 +23,7 @@
 #define VISUALS_GL_VERTEXBUFFER_H_INCLUDED
 
 #include "Visuals/VertexBuffer.h"
+#include "ServiceGl.h"
 
 /**
  * @brief The implementation of Visuals_RenderBuffer for OpenGL.
