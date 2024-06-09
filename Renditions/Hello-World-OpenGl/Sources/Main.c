@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include "Zeitgeist/UpstreamRequests.h"
-#include "ServiceGl.h"
+#include "Visuals/Gl/ServiceGl.h"
 
 #include "Visuals/DefaultPrograms.h"
 #include "Visuals/Program.h"
@@ -58,9 +58,9 @@ Zeitgeist_Rendition_update
     Shizu_State* state
   )
 {
-  ServiceGl_update(state);
+  Visuals_ServiceGl_update(state);
 
-  if (ServiceGl_quitRequested(state)) {
+  if (Visuals_ServiceGl_quitRequested(state)) {
     Zeitgeist_UpstreamRequest* request = Zeitgeist_UpstreamRequest_createExitProcessRequest(state);
     Zeitgeist_sendUpstreamRequest(state, request);
   }
@@ -68,8 +68,8 @@ Zeitgeist_Rendition_update
   Visuals_Context* visualsContext = (Visuals_Context*)Visuals_Gl_Context_create(state);
 
   Shizu_Integer32 canvasWidth, canvasHeight;
-  ServiceGl_getClientSize(state, &canvasWidth, &canvasHeight);
-  ServiceGl_beginFrame(state);
+  Visuals_ServiceGl_getClientSize(state, &canvasWidth, &canvasHeight);
+  Visuals_ServiceGl_beginFrame(state);
 
   Visuals_Context_clear(state, visualsContext, true, true);
     
@@ -82,7 +82,7 @@ Zeitgeist_Rendition_update
 
   Visuals_Context_render(state, visualsContext, g_vertexBuffer, g_program);
 
-  ServiceGl_endFrame(state);
+  Visuals_ServiceGl_endFrame(state);
 }
 
 Shizu_Rendition_Export void
@@ -93,12 +93,12 @@ Zeitgeist_Rendition_load
 {
   Shizu_JumpTarget jumpTarget;
 
-  ServiceGl_startup(state);
+  Visuals_ServiceGl_startup(state);
 
   Shizu_State_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
     Visuals_Context* visualsContext = (Visuals_Context*)Visuals_Gl_Context_create(state);
-    ServiceGl_setTitle(state, Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)")));
+    Visuals_ServiceGl_setTitle(state, Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)")));
     Visuals_Program* program = Visuals_getProgram(state, "simple");
     Visuals_Object_materialize(state, (Visuals_Object*)program);
     Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)program);
@@ -128,7 +128,7 @@ Zeitgeist_Rendition_load
       Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_program);
       g_program = NULL;
     }
-    ServiceGl_shutdown(state);
+    Visuals_ServiceGl_shutdown(state);
     Shizu_State_jump(state);
   }
 }
@@ -154,5 +154,5 @@ Zeitgeist_Rendition_unload
     Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_program);
     g_program = NULL;
   }
-  ServiceGl_shutdown(state);
+  Visuals_ServiceGl_shutdown(state);
 }

@@ -1,6 +1,7 @@
 #include "World.h"
 
-#include "Visuals/Gl/VertexBuffer.h"
+#include "Visuals/VertexBuffer.h"
+#include "Visuals/Context.h"
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -39,8 +40,8 @@ StaticGeometryGl_finalize
 		StaticGeometryGl* self
 	)
 {
-	self->vertexBuffer = NULL; 
-	StaticGeometryGl_unmaterialize(state, self);
+	self->colorTexture = NULL;
+	self->vertexBuffer = NULL;
 }
 
 static void
@@ -52,6 +53,9 @@ StaticGeometryGl_visit
 {
 	if (self->vertexBuffer) {
 		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->vertexBuffer);
+	}
+	if (self->colorTexture) {
+		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->colorTexture);
 	}
 }
 
@@ -65,32 +69,24 @@ StaticGeometryGl_unmaterialize
 	if (self->vertexBuffer) {
 		Visuals_Object_unmaterialize(state, (Visuals_Object*)self->vertexBuffer);
 	}
-	if (self->colorTextureId) {
-		glDeleteTextures(1, &self->colorTextureId);
-		self->colorTextureId = 0;
+	if (self->colorTexture) {
+		Visuals_Object_unmaterialize(state, (Visuals_Object*)self->colorTexture);
 	}
 }
 
 StaticGeometryGl*
 StaticGeometryGl_create
 	(
-		Shizu_State* state
+		Shizu_State* state,
+		Visuals_Context* visualsContext
 	)
 {
 	Shizu_Type* type = StaticGeometryGl_getType(state);
 	StaticGeometryGl* self = (StaticGeometryGl*)Shizu_Gc_allocateObject(state, sizeof(StaticGeometryGl));
-
-	self->vertexBuffer = (Visuals_VertexBuffer*)Visuals_GlVertexBuffer_create(state);
-	Visuals_Object_materialize(state, (Visuals_Object*)self->vertexBuffer);
+	self->vertexBuffer = (Visuals_VertexBuffer*)Visuals_Context_createVertexBuffer(state, visualsContext);
 	self->numberOfVertices = 0;
-	glGenTextures(1, &self->colorTextureId);
-	if (glGetError()) {
-		Visuals_Object_unmaterialize(state, (Visuals_Object*)self->vertexBuffer);
-		self->vertexBuffer = NULL;
-		fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
-	}
+	self->colorTexture = NULL;
+	Visuals_Object_materialize(state, (Visuals_Object*)self->vertexBuffer);
 	((Shizu_Object*)self)->type = type;
 	return self;
 }
@@ -100,19 +96,23 @@ StaticGeometryGl_setData
 	(
 		Shizu_State* state,
 		StaticGeometryGl* self,
+		uint8_t flags,
 		size_t numberOfVertices,
 		size_t numberOfBytes,
 		void const* bytes
 	)
 {
-	Visuals_VertexBuffer_setData(state, self->vertexBuffer, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb|Visuals_VertexSyntactics_Float3_Float3_Float3, bytes, numberOfBytes);
+	Visuals_VertexBuffer_setData(state, self->vertexBuffer, flags, bytes, numberOfBytes);
 	self->numberOfVertices = numberOfVertices;
 }
 
 struct VERTEX {
 	idlib_vector_3_f32 position;
 	idlib_vector_3_f32 normal;
-	idlib_color_3_f32 ambientColor;
+	idlib_color_3_f32 ambient;
+	idlib_color_3_f32 diffuse;
+	idlib_color_3_f32 specular;
+	idlib_f32 shininess;
 };
 
 #if defined(_DEBUG)
@@ -174,13 +174,16 @@ StaticGeometryGl_setDataNorthWall
 		Shizu_Float32 height
 	)
 {
-	idlib_color_3_f32 ambientColor;
-	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
+	idlib_color_3_f32 ambient, diffuse, specular;
+	idlib_color_3_f32_set(&ambient, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&diffuse, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&specular, 0.3f, 0.3f, 0.3f);
+	idlib_f32 shininess = 0.9;
 	struct VERTEX vertices[] = {
-		{.position = { -0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor },
-		{.position = { -0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { -0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = {  0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = {  0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, 1.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
@@ -195,7 +198,7 @@ StaticGeometryGl_setDataNorthWall
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = NORTH_WALL;
 }
 
@@ -209,13 +212,16 @@ StaticGeometryGl_setDataSouthWall
 		Shizu_Float32 height
 	)
 {
-	idlib_color_3_f32 ambientColor;
-	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
+	idlib_color_3_f32 ambient, diffuse, specular;
+	idlib_color_3_f32_set(&ambient, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&diffuse, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&specular, 0.3f, 0.3f, 0.3f);
+	idlib_f32 shininess = 0.9;
 	struct VERTEX vertices[] = {
-		{.position = {  0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
-		{.position = { -0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
-		{.position = { -0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambientColor = ambientColor, },
+		{.position = {  0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = {  0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { -0.5f,  0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { -0.5f, -0.5f, 0.f, }, .normal = { 0.f, 0.f, -1.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
@@ -230,7 +236,7 @@ StaticGeometryGl_setDataSouthWall
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = SOUTH_WALL;
 }
 
@@ -244,13 +250,16 @@ StaticGeometryGl_setDataEastWall
 		Shizu_Float32 height
 	)
 {
-	idlib_color_3_f32 ambientColor;
-	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
+	idlib_color_3_f32 ambient, diffuse, specular;
+	idlib_color_3_f32_set(&ambient, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&diffuse, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&specular, 0.3f, 0.3f, 0.3f);
+	idlib_f32 shininess = 0.9;
 	struct VERTEX vertices[] = {
-		{.position = { 0.f,  0.5f, -0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { 0.f, -0.5f, -0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { 0.f,  0.5f, +0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { 0.f, -0.5f, +0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { 0.f,  0.5f, -0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { 0.f, -0.5f, -0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { 0.f,  0.5f, +0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { 0.f, -0.5f, +0.5f, }, .normal = { -1.f, 0.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
@@ -265,7 +274,7 @@ StaticGeometryGl_setDataEastWall
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = EAST_WALL;
 }
 
@@ -279,13 +288,16 @@ StaticGeometryGl_setDataWestWall
 		Shizu_Float32 height
 	)
 {
-	idlib_color_3_f32 ambientColor;
-	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
+	idlib_color_3_f32 ambient, diffuse, specular;
+	idlib_color_3_f32_set(&ambient, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&diffuse, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&specular, 0.3f, 0.3f, 0.3f);
+	idlib_f32 shininess = 0.9;
 	struct VERTEX vertices[] = {
-		{.position = { 0.f,  0.5f, +0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor },
-		{.position = { 0.f, -0.5f, +0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { 0.f,  0.5f, -0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { 0.f, -0.5f, -0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { 0.f,  0.5f, +0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { 0.f, -0.5f, +0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { 0.f,  0.5f, -0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { 0.f, -0.5f, -0.5f, }, .normal = { +1.f, 0.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
@@ -300,7 +312,7 @@ StaticGeometryGl_setDataWestWall
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = WEST_WALL;
 }
 
@@ -314,13 +326,16 @@ StaticGeometryGl_setDataFloor
 		Shizu_Float32 length
 	)
 {
-	idlib_color_3_f32 ambientColor;
-	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
+	idlib_color_3_f32 ambient, diffuse, specular;
+	idlib_color_3_f32_set(&ambient, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&diffuse, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&specular, 0.3f, 0.3f, 0.3f);
+	idlib_f32 shininess = 0.9;
 	struct VERTEX vertices[] = {
-		{.position = { -0.5f, 0.f, -0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { -0.5f, 0.f,  0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, 0.f, -0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, 0.f,  0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f, 0.f, -0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { -0.5f, 0.f,  0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = {  0.5f, 0.f, -0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = {  0.5f, 0.f,  0.5f, }, .normal = { 0.f, 1.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
@@ -335,7 +350,7 @@ StaticGeometryGl_setDataFloor
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = FLOOR;
 }
 
@@ -349,13 +364,16 @@ StaticGeometryGl_setDataCeiling
 		Shizu_Float32 length
 	)
 {
-	idlib_color_3_f32 ambientColor;
-	idlib_color_convert_3_u8_to_3_f32(&ambientColor, &idlib_colors_lightgray_3_u8);
+	idlib_color_3_f32 ambient, diffuse, specular;
+	idlib_color_3_f32_set(&ambient, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&diffuse, 0.3f, 0.3f, 0.3f);
+	idlib_color_3_f32_set(&specular, 0.3f, 0.3f, 0.3f);
+	idlib_f32 shininess = 0.9;
 	struct VERTEX vertices[] = {
-		{.position = { -0.5f, 0.f,  0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = { -0.5f, 0.f, -0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, 0.f,  0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
-		{.position = {  0.5f, 0.f, -0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambientColor = ambientColor, },
+		{.position = { -0.5f, 0.f,  0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = { -0.5f, 0.f, -0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = {  0.5f, 0.f,  0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
+		{.position = {  0.5f, 0.f, -0.5f, }, .normal = { 0.f, -1.f, 0.f, }, .ambient = ambient, .diffuse = diffuse, .specular = specular, .shininess = shininess, },
 	};
 
 	for (size_t i = 0; i < 4; ++i) {
@@ -370,7 +388,7 @@ StaticGeometryGl_setDataCeiling
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = CEILING;
 }
 
@@ -413,7 +431,8 @@ World_visit
 World*
 World_create
 	(
-		Shizu_State* state
+		Shizu_State* state,
+		Visuals_Context* visualsContext
 	)
 {
 	Shizu_Type* type = World_getType(state);
@@ -432,27 +451,27 @@ World_create
 	// Extend along the y-axis in metres.
 	static const Shizu_Float32 height = 4.f;
 
-	geometry = StaticGeometryGl_create(state);
+	geometry = StaticGeometryGl_create(state, visualsContext);
 	StaticGeometryGl_setDataFloor(state, geometry, Vector3F32_create(state, 0.f, -height / 2.f, 0.f), breadth, length);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state);
+	geometry = StaticGeometryGl_create(state, visualsContext);
 	StaticGeometryGl_setDataCeiling(state, geometry, Vector3F32_create(state, 0.f, +height / 2.f, 0.f), breadth, length);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state);
+	geometry = StaticGeometryGl_create(state, visualsContext);
 	StaticGeometryGl_setDataWestWall(state, geometry, Vector3F32_create(state, -breadth / 2.f, 0.f, 0.f), length, height);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state);
+	geometry = StaticGeometryGl_create(state, visualsContext);
 	StaticGeometryGl_setDataNorthWall(state, geometry, Vector3F32_create(state, 0.f, 0.f, -length / 2.f), breadth, height);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state);
+	geometry = StaticGeometryGl_create(state, visualsContext);
 	StaticGeometryGl_setDataEastWall(state, geometry, Vector3F32_create(state, +breadth / 2.f, 0.f, 0.f), length, height);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state);
+	geometry = StaticGeometryGl_create(state, visualsContext);
 	StaticGeometryGl_setDataSouthWall(state, geometry, Vector3F32_create(state, 0.f, 0.f, +length / 2.f), breadth, height);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 

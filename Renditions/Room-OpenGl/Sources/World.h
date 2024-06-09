@@ -3,8 +3,9 @@
 
 #include "Player.h"
 #include "Vector3F32.h"
+#include "Visuals/Context.h"
+#include "Visuals/Texture.h"
 #include "Visuals/VertexBuffer.h"
-#include "ServiceGl.h"
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -110,7 +111,7 @@ struct StaticGeometryGl {
 	/**
 	 * @brief The OpenGL ID of the color texture.
 	 */
-	GLuint colorTextureId;
+	Visuals_Texture* colorTexture;
 	
 	/**
 	 * @brief The vertex buffer.
@@ -154,6 +155,7 @@ StaticGeometryGl_setData
 	(
 		Shizu_State* state,
 		StaticGeometryGl* self,
+		uint8_t flags,
 		size_t numberOfVertices,
 		size_t numberOfBytes,
 		void const* bytes
@@ -270,7 +272,8 @@ StaticGeometryGl_setDataCeiling
 StaticGeometryGl*
 StaticGeometryGl_create
 	(
-		Shizu_State* state
+		Shizu_State* state,
+		Visuals_Context* visualsContext
 	);
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -292,7 +295,8 @@ struct World {
 World*
 World_create
 	(
-		Shizu_State* state
+		Shizu_State* state,
+		Visuals_Context* visualsContext
 	);
 
 void
