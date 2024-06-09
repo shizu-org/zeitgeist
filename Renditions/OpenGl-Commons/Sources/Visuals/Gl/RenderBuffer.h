@@ -25,13 +25,13 @@
 #include "Visuals/RenderBuffer.h"
 #include "ServiceGl.h"
 
-Shizu_declareType(Visuals_GlRenderBuffer);
+Shizu_declareType(Visuals_Gl_RenderBuffer);
 
-struct Visuals_GlRenderBuffer_Dispatch {
+struct Visuals_Gl_RenderBuffer_Dispatch {
   Visuals_RenderBuffer_Dispatch _parent;
 };
 
-struct Visuals_GlRenderBuffer {
+struct Visuals_Gl_RenderBuffer {
   Visuals_RenderBuffer _parent;
   Shizu_Integer32 width;
   Shizu_Integer32 height;
@@ -41,17 +41,16 @@ struct Visuals_GlRenderBuffer {
 };
 
 void
-Visuals_GlRenderBuffer_construct
+Visuals_Gl_RenderBuffer_construct
   (
     Shizu_State* state,
-    Visuals_GlRenderBuffer* self
+    Visuals_Gl_RenderBuffer* self
   );
 
-Visuals_GlRenderBuffer*
-Visuals_GlRenderBuffer_create
+Visuals_Gl_RenderBuffer*
+Visuals_Gl_RenderBuffer_create
   (
     Shizu_State* state
   );
-
 
 #endif // VISUALS_GL_RENDERBUFFER_H_INCLUDED

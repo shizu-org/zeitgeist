@@ -29,15 +29,37 @@ Shizu_declareType(Visuals_BlinnPhongMaterial);
 struct Visuals_BlinnPhongMaterial {
   Visuals_Material _parent;
 
+  /// The specular reflectance for the red component of light.
   /// [0,255].
-  Shizu_Integer32 specular;
-
+  Shizu_Integer32 specularR;
+  /// The specular reflectance for the green component of light.
   /// [0,255].
-  Shizu_Integer32 diffuse;
-
+  Shizu_Integer32 specularG;
+  /// The specular reflectance for the blue component of light.
   /// [0,255].
-  Shizu_Integer32 ambient;
+  Shizu_Integer32 specularB;
 
+  /// The diffuse reflectance for the red component of light.
+  /// [0,255].
+  Shizu_Integer32 diffuseR;
+  /// The diffuse reflectance for the green component of light.
+  /// [0,255].
+  Shizu_Integer32 diffuseG;
+  /// The diffuse reflectance for the blue component of light.
+  /// [0,255].
+  Shizu_Integer32 diffuseB;
+
+  /// The ambient reflectance for the red component of light.
+  /// [0,255].
+  Shizu_Integer32 ambientR;
+  /// The ambient reflectance for the green component of light.
+  /// [0,255].
+  Shizu_Integer32 ambientG;
+  /// The ambient reflectance for the blue component of light.
+  /// [0,255].
+  Shizu_Integer32 ambientB;
+
+  /// The shininesss.
   /// [0,255]
   Shizu_Integer32 shininess;
 
@@ -47,11 +69,24 @@ struct Visuals_BlinnPhongMaterial_Dispatch {
   Visuals_Material_Dispatch _parent;
 };
 
+/// @brief Construct this Blinn-Phong material with default values.
+/// @param state A pointer to a Shizu_State object.
+/// @param self A pointer to this Blinn-Phong material.
+/// @remarks
+/// The default values are
+/// diffuse = ambient = specular = (85,85,85)
+/// shininess = 230
 void
 Visuals_BlinnPhongMaterial_construct
   (
     Shizu_State* state,
     Visuals_BlinnPhongMaterial* self
+  );
+
+Visuals_BlinnPhongMaterial*
+Visuals_BlinnPhongMaterial_create
+  (
+    Shizu_State* state
   );
 
 #endif // VISUALS_BLINNPHONGMATERIAL_H_INCLUDED

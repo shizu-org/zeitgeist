@@ -1,5 +1,5 @@
 /*
-  Shizu Visuals
+  Zeitgeist
   Copyright (C) 2024 Michael Heilmann. All rights reserved.
 
   This software is provided 'as-is', without any express or implied
@@ -19,40 +19,18 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VISUALS_GL_VERTEXBUFFER_H_INCLUDED)
-#define VISUALS_GL_VERTEXBUFFER_H_INCLUDED
+#if !defined(VISUALS_SERVICE_PACKAGE_H_INCLUDED)
+#define VISUALS_SERVICE_PACKAGE_H_INCLUDED
 
-#include "Visuals/VertexBuffer.h"
-#include "Visuals/Gl/ServiceGl.h"
+#include "Visuals/Service.h"
+typedef struct Visuals_Object Visuals_Object;
 
-/// @brief The implementation of Visuals_VertexBuffer for OpenGL.
-/// @details
-/// bufferId and vertexArrayId are the OpenGL representation of the vertices.
-Shizu_declareType(Visuals_Gl_VertexBuffer);
-
-struct Visuals_Gl_VertexBuffer_Dispatch {
-  Visuals_VertexBuffer_Dispatch _parent;
-};
-
-struct Visuals_Gl_VertexBuffer {
-  Visuals_VertexBuffer parent;
-  /// @brief The OpenGL ID of the vertex buffer.
-  GLuint bufferId;
-  /// @brief The OpenGL ID of the vertex array.
-  GLuint vertexArrayId;
-};
-
+/// @param state A pointer to a Shizu_State object.
 void
-Visuals_Gl_VertexBuffer_construct
+Visuals_Service_registerVisualsObject
   (
     Shizu_State* state,
-    Visuals_Gl_VertexBuffer* self
+    Visuals_Object* object
   );
 
-Visuals_Gl_VertexBuffer*
-Visuals_Gl_VertexBuffer_create
-  (
-    Shizu_State* state
-  );
-
-#endif // VISUALS_GL_VERTEXBUFFER_H_INCLUDED
+#endif // VISUALS_SERVICE_PACKAGE_H_INCLUED

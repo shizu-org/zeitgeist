@@ -22,66 +22,66 @@
 #include "Visuals/Gl/RenderBuffer.h"
 
 static void
-Visuals_GlRenderBuffer_dispatchInitialize
+Visuals_Gl_RenderBuffer_dispatchInitialize
   (
     Shizu_State* state,
-    Visuals_GlRenderBuffer_Dispatch* self
+    Visuals_Gl_RenderBuffer_Dispatch* self
   );
 
 static void
-Visuals_GlRenderBuffer_materializeImpl
+Visuals_Gl_RenderBuffer_materializeImpl
   (
     Shizu_State* state,
-    Visuals_GlRenderBuffer* self
+    Visuals_Gl_RenderBuffer* self
   );
 
 static void
-Visuals_GlRenderBuffer_unmaterializeImpl
+Visuals_Gl_RenderBuffer_unmaterializeImpl
   (
     Shizu_State* state,
-    Visuals_GlRenderBuffer* self
+    Visuals_Gl_RenderBuffer* self
   );
 
 static void
-Visuals_GlRenderBuffer_resizeImpl
+Visuals_Gl_RenderBuffer_resizeImpl
   (   
     Shizu_State* state,
-    Visuals_GlRenderBuffer* self,
+    Visuals_Gl_RenderBuffer* self,
     Shizu_Integer32 width,
     Shizu_Integer32 height
   );
 
-static Shizu_TypeDescriptor const Visuals_GlRenderBuffer_Type = {
+static Shizu_TypeDescriptor const Visuals_Gl_RenderBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
-  .size = sizeof(Visuals_GlRenderBuffer),
+  .size = sizeof(Visuals_Gl_RenderBuffer),
   .finalize = NULL,
   .visit = NULL,
-  .dispatchSize = sizeof(Visuals_GlRenderBuffer_Dispatch),
-  .dispatchInitialize = NULL,
+  .dispatchSize = sizeof(Visuals_Gl_RenderBuffer_Dispatch),
+  .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&Visuals_Gl_RenderBuffer_dispatchInitialize,
   .dispatchUninitialize = NULL, 
 };
 
-Shizu_defineType(Visuals_GlRenderBuffer, Visuals_RenderBuffer);
+Shizu_defineType(Visuals_Gl_RenderBuffer, Visuals_RenderBuffer);
 
 static void
-Visuals_GlRenderBuffer_dispatchInitialize
+Visuals_Gl_RenderBuffer_dispatchInitialize
   (
     Shizu_State* state,
-    Visuals_GlRenderBuffer_Dispatch* self
+    Visuals_Gl_RenderBuffer_Dispatch* self
   )
 { 
-  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_GlRenderBuffer_materializeImpl;
-  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_GlRenderBuffer_unmaterializeImpl;
-  ((Visuals_RenderBuffer_Dispatch*)self)->resize = (void(*)(Shizu_State*,Visuals_RenderBuffer*,Shizu_Integer32,Shizu_Integer32)) & Visuals_GlRenderBuffer_resizeImpl;
+  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_materializeImpl;
+  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_unmaterializeImpl;
+  ((Visuals_RenderBuffer_Dispatch*)self)->resize = (void(*)(Shizu_State*,Visuals_RenderBuffer*,Shizu_Integer32,Shizu_Integer32)) & Visuals_Gl_RenderBuffer_resizeImpl;
 }
 
 static void
-Visuals_GlRenderBuffer_materializeImpl
+Visuals_Gl_RenderBuffer_materializeImpl
   (
     Shizu_State* state,
-    Visuals_GlRenderBuffer* self
+    Visuals_Gl_RenderBuffer* self
   )
 {
   // Create the color attachment texture.
@@ -147,10 +147,10 @@ Visuals_GlRenderBuffer_materializeImpl
 }
 
 static void
-Visuals_GlRenderBuffer_unmaterializeImpl
+Visuals_Gl_RenderBuffer_unmaterializeImpl
   (
     Shizu_State* state,
-    Visuals_GlRenderBuffer* self
+    Visuals_Gl_RenderBuffer* self
   )
 {
   // Destroy the framebuffer.
@@ -172,10 +172,10 @@ Visuals_GlRenderBuffer_unmaterializeImpl
 }
 
 static void
-Visuals_GlRenderBuffer_resizeImpl
+Visuals_Gl_RenderBuffer_resizeImpl
   (
     Shizu_State* state,
-    Visuals_GlRenderBuffer* self,
+    Visuals_Gl_RenderBuffer* self,
     Shizu_Integer32 width,
     Shizu_Integer32 height
   )
@@ -189,23 +189,23 @@ Visuals_GlRenderBuffer_resizeImpl
 }
 
 void
-Visuals_GlRenderBuffer_construct
+Visuals_Gl_RenderBuffer_construct
   (
     Shizu_State* state,
-    Visuals_GlRenderBuffer* self
+    Visuals_Gl_RenderBuffer* self
   )
 {
-  Shizu_Type* type = Visuals_GlRenderBuffer_getType(state);
+  Shizu_Type* type = Visuals_Gl_RenderBuffer_getType(state);
   ((Shizu_Object*)self)->type = type;
 }
 
-Visuals_GlRenderBuffer*
-Visuals_GlRenderBuffer_create
+Visuals_Gl_RenderBuffer*
+Visuals_Gl_RenderBuffer_create
   (
     Shizu_State* state
   )
 {
-  Visuals_GlRenderBuffer* self = (Visuals_GlRenderBuffer*)Shizu_Gc_allocateObject(state, sizeof(Visuals_GlRenderBuffer));
-  Visuals_GlRenderBuffer_construct(state, self);
+  Visuals_Gl_RenderBuffer* self = (Visuals_Gl_RenderBuffer*)Shizu_Gc_allocateObject(state, sizeof(Visuals_Gl_RenderBuffer));
+  Visuals_Gl_RenderBuffer_construct(state, self);
   return self;  
 }

@@ -12,12 +12,12 @@
 #include <stdlib.h>
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-  #include "ServiceWgl.h"
+  #include "Visuals/Gl/Wgl/ServiceWgl.h"
   #define WIN32_LEAN_AND_MEAN
   #include <Windows.h>
   #include <GL/gl.h>
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-  #include "ServiceGlx.h"
+  #include "Visuals/Gl/Glx/ServiceGlx.h"
   #include <GL/gl.h>
 #else
   #error("operating system not (yet) supported")
@@ -61,7 +61,7 @@ link
 }
 
 void
-ServiceGl_startup
+Visuals_ServiceGl_startup
   (
     Shizu_State* state
   )
@@ -83,7 +83,7 @@ ServiceGl_startup
 }
 
 void
-ServiceGl_shutdown
+Visuals_ServiceGl_shutdown
   (
     Shizu_State* state
   )
@@ -108,7 +108,7 @@ ServiceGl_shutdown
 }
 
 void
-ServiceGl_setTitle
+Visuals_ServiceGl_setTitle
   (
     Shizu_State* state,
     Shizu_String* title
@@ -124,7 +124,7 @@ ServiceGl_setTitle
 }
 
 void
-ServiceGl_getClientSize
+Visuals_ServiceGl_getClientSize
   (
     Shizu_State* state,
     Shizu_Integer32* width,
@@ -141,7 +141,7 @@ ServiceGl_getClientSize
 }
 
 void
-ServiceGl_beginFrame
+Visuals_ServiceGl_beginFrame
   (
     Shizu_State* state
   )
@@ -156,7 +156,7 @@ ServiceGl_beginFrame
 }
 
 void
-ServiceGl_endFrame
+Visuals_ServiceGl_endFrame
   (
     Shizu_State* state
   )
@@ -171,7 +171,7 @@ ServiceGl_endFrame
 }
 
 void
-ServiceGl_update
+Visuals_ServiceGl_update
   (
     Shizu_State* state
   )
@@ -186,7 +186,7 @@ ServiceGl_update
 }
 
 Shizu_Boolean
-ServiceGl_quitRequested
+Visuals_ServiceGl_quitRequested
   (
     Shizu_State* state
   )
@@ -201,7 +201,7 @@ ServiceGl_quitRequested
 }
 
 GLuint
-ServiceGl_compileShader
+Visuals_ServiceGl_compileShader
   (
     Shizu_State* state,
     GLenum type,
@@ -225,7 +225,7 @@ ServiceGl_compileShader
 }
 
 GLuint
-ServiceGl_linkProgram
+Visuals_ServiceGl_linkProgram
   (
     Shizu_State* state,
     GLuint vert,
@@ -249,7 +249,7 @@ ServiceGl_linkProgram
 }
 
 void
-SeviceGl_registerVisualsObject
+Visuals_ServiceGl_registerVisualsObject
   (
     Shizu_State* state,
     Visuals_Object* object
@@ -273,9 +273,8 @@ SeviceGl_registerVisualsObject
   Shizu_List_appendValue(state, g_objects, &temporary);
 }
 
-
 void
-ServiceGl_emitKeyboardKeyMessage
+Visuals_ServiceGl_emitKeyboardKeyMessage
   (
     Shizu_State* state,
     KeyboardKeyMessage* message
@@ -300,7 +299,7 @@ ServiceGl_emitKeyboardKeyMessage
 }
 
 void
-ServiceGl_addKeyboardKeyCallback
+Visuals_ServiceGl_addKeyboardKeyCallback
   (
     Shizu_State* state,
     Shizu_Value* value

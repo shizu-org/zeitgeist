@@ -25,13 +25,13 @@
 #include "Visuals/Program.h"
 #include "ServiceGl.h"
 
-Shizu_declareType(Visuals_GlProgram);
+Shizu_declareType(Visuals_Gl_Program);
 
-struct Visuals_GlProgram_Dispatch {
+struct Visuals_Gl_Program_Dispatch {
   Visuals_Program_Dispatch _parent;
 };
 
-struct Visuals_GlProgram {
+struct Visuals_Gl_Program {
   Visuals_Program _parent;
   GLuint vertexProgramId;
   GLuint fragmentProgramId;
@@ -39,16 +39,16 @@ struct Visuals_GlProgram {
 };
 
 void
-Visuals_GlProgram_construct
+Visuals_Gl_Program_construct
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     Shizu_String* vertexSource,
     Shizu_String* fragmentSource
   );
 
-Visuals_GlProgram*
-Visuals_GlProgram_create
+Visuals_Gl_Program*
+Visuals_Gl_Program_create
   (
     Shizu_State* state,
     Shizu_String* vertexSource,

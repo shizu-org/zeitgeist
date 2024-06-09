@@ -22,117 +22,117 @@
 #include "Visuals/Gl/Program.h"
 
 static void
-Visuals_GlProgram_dispatchInitialize
+Visuals_Gl_Program_dispatchInitialize
   (
     Shizu_State1* state1,
-    Visuals_GlProgram_Dispatch* self
+    Visuals_Gl_Program_Dispatch* self
   );
 
 static void
-Visuals_GlProgram_materializeImpl
+Visuals_Gl_Program_materializeImpl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self
+    Visuals_Gl_Program* self
   );
 
 static void
-Visuals_GlProgram_unmaterializeImpl
+Visuals_Gl_Program_unmaterializeImpl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self
+    Visuals_Gl_Program* self
   );
   
 static void
-Visuals_GlProgram_bindMatrix4R32Impl
+Visuals_Gl_Program_bindMatrix4R32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Matrix4F32* value
   );
 
 static void
-Visuals_GlProgram_bindVector3R32Impl
+Visuals_Gl_Program_bindVector3R32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Vector3F32* value
   );
 
 static void
-Visuals_GlProgram_bindVector4R32Impl
+Visuals_Gl_Program_bindVector4R32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Vector4F32* value
   );
 
 static void
-Visuals_GlProgram_bindInteger32Impl
+Visuals_Gl_Program_bindInteger32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Shizu_Integer32 value
   );
 
 static void
-Visuals_GlProgram_bindBooleanImpl
+Visuals_Gl_Program_bindBooleanImpl
   ( 
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Shizu_Boolean value
   );
 
 static void
-Visuals_GlProgram_bindFloat32Impl
+Visuals_Gl_Program_bindFloat32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Shizu_Float32 value
   );
 
-Shizu_TypeDescriptor const Visuals_GlProgram_Type = {
+Shizu_TypeDescriptor const Visuals_Gl_Program_Type = {
   .preDestroyType = NULL,
   .postCreateType = NULL,
   .visitType = NULL,
-  .size = sizeof(Visuals_GlProgram),
+  .size = sizeof(Visuals_Gl_Program),
   .finalize = NULL,
   .visit = NULL,
-  .dispatchSize = sizeof(Visuals_GlProgram_Dispatch),
-  .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&Visuals_GlProgram_dispatchInitialize,
+  .dispatchSize = sizeof(Visuals_Gl_Program_Dispatch),
+  .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&Visuals_Gl_Program_dispatchInitialize,
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_GlProgram, Visuals_Program);
+Shizu_defineType(Visuals_Gl_Program, Visuals_Program);
 
 static void
-Visuals_GlProgram_materializeImpl
+Visuals_Gl_Program_materializeImpl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self
+    Visuals_Gl_Program* self
   ) 
 { 
   Shizu_String* temporary = NULL;
 
   temporary = Shizu_String_concatenate(state, ((Visuals_Program*)self)->vertexProgramSource, Shizu_String_create(state, "", 1));
-  self->vertexProgramId = ServiceGl_compileShader(state, GL_VERTEX_SHADER, Shizu_String_getBytes(state, temporary));
+  self->vertexProgramId = Visuals_ServiceGl_compileShader(state, GL_VERTEX_SHADER, Shizu_String_getBytes(state, temporary));
 
   temporary = Shizu_String_concatenate(state, ((Visuals_Program*)self)->fragmentProgramSource, Shizu_String_create(state, "", 1));
-  self->fragmentProgramId = ServiceGl_compileShader(state, GL_FRAGMENT_SHADER, Shizu_String_getBytes(state, temporary));
+  self->fragmentProgramId = Visuals_ServiceGl_compileShader(state, GL_FRAGMENT_SHADER, Shizu_String_getBytes(state, temporary));
 
-  self->programId = ServiceGl_linkProgram(state, self->vertexProgramId, self->fragmentProgramId);
+  self->programId = Visuals_ServiceGl_linkProgram(state, self->vertexProgramId, self->fragmentProgramId);
 }
 
 static void
-Visuals_GlProgram_unmaterializeImpl
+Visuals_Gl_Program_unmaterializeImpl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self
+    Visuals_Gl_Program* self
   )
 {
   if (self->vertexProgramId) {
@@ -150,10 +150,10 @@ Visuals_GlProgram_unmaterializeImpl
 }
 
 static void
-Visuals_GlProgram_bindMatrix4R32Impl
+Visuals_Gl_Program_bindMatrix4R32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Matrix4F32* value
   )
@@ -168,10 +168,10 @@ Visuals_GlProgram_bindMatrix4R32Impl
 }
 
 static void
-Visuals_GlProgram_bindVector3R32Impl
+Visuals_Gl_Program_bindVector3R32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Vector3F32* value
   )
@@ -186,10 +186,10 @@ Visuals_GlProgram_bindVector3R32Impl
 }
 
 static void
-Visuals_GlProgram_bindVector4R32Impl
+Visuals_Gl_Program_bindVector4R32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Vector4F32* value
   )
@@ -204,10 +204,10 @@ Visuals_GlProgram_bindVector4R32Impl
 }
 
 static void
-Visuals_GlProgram_bindInteger32Impl
+Visuals_Gl_Program_bindInteger32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Shizu_Integer32 value
   )
@@ -222,10 +222,10 @@ Visuals_GlProgram_bindInteger32Impl
 }
 
 static void
-Visuals_GlProgram_bindBooleanImpl
+Visuals_Gl_Program_bindBooleanImpl
   ( 
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Shizu_Boolean value
   )
@@ -240,10 +240,10 @@ Visuals_GlProgram_bindBooleanImpl
 }
 
 static void
-Visuals_GlProgram_bindFloat32Impl
+Visuals_Gl_Program_bindFloat32Impl
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     char const* name,
     Shizu_Float32 value
   )
@@ -258,32 +258,32 @@ Visuals_GlProgram_bindFloat32Impl
 }
 
 static void
-Visuals_GlProgram_dispatchInitialize
+Visuals_Gl_Program_dispatchInitialize
   (            
     Shizu_State1* state1,
-    Visuals_GlProgram_Dispatch* self
+    Visuals_Gl_Program_Dispatch* self
   )
 {
-  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*, Visuals_Object*)) & Visuals_GlProgram_materializeImpl;
-  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*, Visuals_Object*)) & Visuals_GlProgram_unmaterializeImpl;
-  ((Visuals_Program_Dispatch*)self)->bindBoolean = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Boolean)) &Visuals_GlProgram_bindBooleanImpl;
-  ((Visuals_Program_Dispatch*)self)->bindFloat32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Float32)) & Visuals_GlProgram_bindFloat32Impl;
-  ((Visuals_Program_Dispatch*)self)->bindInteger32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Integer32)) & Visuals_GlProgram_bindInteger32Impl;
-  ((Visuals_Program_Dispatch*)self)->bindMatrix4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Matrix4F32 const*)) & Visuals_GlProgram_bindMatrix4R32Impl;
-  ((Visuals_Program_Dispatch*)self)->bindVector3F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector3F32 const*)) & Visuals_GlProgram_bindVector3R32Impl;
-  ((Visuals_Program_Dispatch*)self)->bindVector4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector4F32 const*)) & Visuals_GlProgram_bindVector4R32Impl;
+  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*, Visuals_Object*)) & Visuals_Gl_Program_materializeImpl;
+  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*, Visuals_Object*)) & Visuals_Gl_Program_unmaterializeImpl;
+  ((Visuals_Program_Dispatch*)self)->bindBoolean = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Boolean)) &Visuals_Gl_Program_bindBooleanImpl;
+  ((Visuals_Program_Dispatch*)self)->bindFloat32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Float32)) & Visuals_Gl_Program_bindFloat32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindInteger32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Integer32)) & Visuals_Gl_Program_bindInteger32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindMatrix4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Matrix4F32 const*)) & Visuals_Gl_Program_bindMatrix4R32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindVector3F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector3F32 const*)) & Visuals_Gl_Program_bindVector3R32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindVector4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector4F32 const*)) & Visuals_Gl_Program_bindVector4R32Impl;
 }
 
 void
-Visuals_GlProgram_construct
+Visuals_Gl_Program_construct
   (
     Shizu_State* state,
-    Visuals_GlProgram* self,
+    Visuals_Gl_Program* self,
     Shizu_String* vertexProgramSource,
     Shizu_String* fragmentProgramSource
   )
 {
-  Shizu_Type* type = Visuals_GlProgram_getType(state);
+  Shizu_Type* type = Visuals_Gl_Program_getType(state);
   Visuals_Program_construct(state, (Visuals_Program*)self, vertexProgramSource, fragmentProgramSource);
   self->vertexProgramId = 0;
   self->fragmentProgramId = 0;
@@ -291,15 +291,15 @@ Visuals_GlProgram_construct
   ((Shizu_Object*)self)->type = type;
 }
 
-Visuals_GlProgram*
-Visuals_GlProgram_create
+Visuals_Gl_Program*
+Visuals_Gl_Program_create
   (
     Shizu_State* state,
     Shizu_String* vertexProgramSource,
     Shizu_String* fragmentProgramSource
   )
 {
-  Visuals_GlProgram* self = (Visuals_GlProgram*)Shizu_Gc_allocateObject(state, sizeof(Visuals_GlProgram));
-  Visuals_GlProgram_construct(state, self, vertexProgramSource, fragmentProgramSource);
+  Visuals_Gl_Program* self = (Visuals_Gl_Program*)Shizu_Gc_allocateObject(state, sizeof(Visuals_Gl_Program));
+  Visuals_Gl_Program_construct(state, self, vertexProgramSource, fragmentProgramSource);
   return self;
 }

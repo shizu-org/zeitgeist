@@ -20,7 +20,7 @@
 #define Define(Type, Name) \
   extern Type Name;
 
-#include "ServiceGl_Functions.i"
+#include "Visuals/Gl/ServiceGl_Functions.i"
 
 #undef Define
 

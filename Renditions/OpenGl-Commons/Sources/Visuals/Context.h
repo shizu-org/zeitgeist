@@ -1,9 +1,10 @@
 #if !defined(VISUALS_CONTEXT_H_INCLUDED)
 #define VISUALS_CONTEXT_H_INCLUDED
 
-#include "Commons.h"
+#include "Shizu/Runtime/Include.h"
 typedef struct Visuals_Program Visuals_Program;
 typedef struct Visuals_RenderBuffer Visuals_RenderBuffer;
+typedef struct Visuals_Texture Visuals_Texture;
 typedef struct Visuals_VertexBuffer Visuals_VertexBuffer;
 
 typedef enum Visuals_BlendFactor {
@@ -37,6 +38,7 @@ struct Visuals_Context_Dispatch {
   Shizu_Object_Dispatch _parent;
   Visuals_Program* (*createProgram)(Shizu_State*, Visuals_Context*, Shizu_String* vertexSource, Shizu_String* fragmentSource);
   Visuals_RenderBuffer* (*createRenderBuffer)(Shizu_State*, Visuals_Context*);
+  Visuals_Texture* (*createTexture)(Shizu_State*, Visuals_Context*);
   Visuals_VertexBuffer* (*createVertexBuffer)(Shizu_State*, Visuals_Context*);
   void (*setClearColor)(Shizu_State*, Visuals_Context*, Shizu_Float32 r, Shizu_Float32 g, Shizu_Float32 b, Shizu_Float32 a);
   void (*setClearDepth)(Shizu_State*, Visuals_Context*, Shizu_Float32 z);
@@ -76,6 +78,14 @@ Visuals_Context_createRenderBuffer
     Visuals_Context* self
   )
 { Shizu_VirtualCallWithReturn(Visuals_Context, createRenderBuffer, self); }
+
+static inline Visuals_Texture*
+Visuals_Context_createTexture
+  (
+    Shizu_State* state,
+    Visuals_Context* self
+  )
+{ Shizu_VirtualCallWithReturn(Visuals_Context, createTexture, self); }
 
 static inline Visuals_VertexBuffer*
 Visuals_Context_createVertexBuffer

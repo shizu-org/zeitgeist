@@ -6,6 +6,9 @@
 #include "Zeitgeist.h"
 
 /* Forward declaration. */
+typedef struct KeyboardKeyMessage KeyboardKeyMessage;
+
+/* Forward declaration. */
 typedef struct Visuals_Object Visuals_Object;
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -36,26 +39,26 @@ typedef struct Visuals_Object Visuals_Object;
  * If the reference count decrements from one to zero, the service is destroyed.
  */
 void
-ServiceGl_startup
+Visuals_ServiceGl_startup
   (
     Shizu_State* state
   );
 
 void
-ServiceGl_shutdown
+Visuals_ServiceGl_shutdown
   (
     Shizu_State* state
   );
 
 void
-ServiceGl_setTitle
+Visuals_ServiceGl_setTitle
   (
     Shizu_State* state,
     Shizu_String* title
   );
 
 void
-ServiceGl_getClientSize
+Visuals_ServiceGl_getClientSize
   (
     Shizu_State* state,
     Shizu_Integer32* width,
@@ -63,31 +66,31 @@ ServiceGl_getClientSize
   );
 
 void
-ServiceGl_beginFrame
+Visuals_ServiceGl_beginFrame
   (
     Shizu_State* state
   );
 
 void
-ServiceGl_endFrame
+Visuals_ServiceGl_endFrame
   (
     Shizu_State* state
   );
 
 void
-ServiceGl_update
+Visuals_ServiceGl_update
   (
     Shizu_State* state
   );
 
 Shizu_Boolean
-ServiceGl_quitRequested
+Visuals_ServiceGl_quitRequested
   (
     Shizu_State* state
   );
 
 GLuint
-ServiceGl_compileShader
+Visuals_ServiceGl_compileShader
   (
     Shizu_State* state,
     GLenum type,
@@ -95,7 +98,7 @@ ServiceGl_compileShader
   );
 
 GLuint
-ServiceGl_linkProgram
+Visuals_ServiceGl_linkProgram
   (
     Shizu_State* state,
     GLuint vert,
@@ -103,53 +106,21 @@ ServiceGl_linkProgram
   );
 
 void
-SeviceGl_registerVisualsObject
+Visuals_ServiceGl_registerVisualsObject
   (
     Shizu_State* state,
     Visuals_Object* object
   );
 
-/* Forward declaration. */
-typedef struct KeyboardKeyMessage KeyboardKeyMessage;
-
-/**
- * @since 0.1
- * @brief Emit a keyboard key message.
- * @param message A pointer to the KeyboardKeyMessage object.
- */
 void
-ServiceGl_emitKeyboardKeyMessage
+Visuals_ServiceGl_emitKeyboardKeyMessage
   (
     Shizu_State* state,
     KeyboardKeyMessage* message
   );
 
-/**
- * @since 0.1
- * @brief Add a keyboard key callback.
- * @param state A pointer to the Shizu_State.
- * @param value The value to be used as a callback.
- * @remarks
- * - If the value stores a Shizu_CxxFunction* value,
- *   then this Shizu_CxxFunction* is added to the callback list.
- *   If Zeitgeist_KeyboardKeyMessage is dispatched,
- *   then the Shizu_CxxFunction* is invoked with the KeyboardKeyMessage* value as its single argument.
- * - If the value stores a Shizu_Object value,
- *   then this object is wrapped into a weak reference and the weak reference is added to the callback list.
- *   If a Zeitgeist_KeyboardKeyMessage is dispatched,
- *   then the the Shizu_Object value in the weak reference is retrieved.
- *   If it expired, then the weak reference is removed from the callback list.
- *   Otherwise the Shizu_Object's "call" metamethod is invoked with
- *   the Shizu_Object as the first argument
- *   and
- *   the KeyboardKeyMessage object as the second argument.
- * - If the value stores a Shizu_Void value,
- *   then nothing is added to the callback list.
- * - If value stores any other value than the above,
- *   an error is raised.
- */
 void
-ServiceGl_addKeyboardKeyCallback
+Visuals_ServiceGl_addKeyboardKeyCallback
   (
     Shizu_State* state,
     Shizu_Value* value

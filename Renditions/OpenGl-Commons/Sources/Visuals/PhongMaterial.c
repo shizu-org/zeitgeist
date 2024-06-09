@@ -44,10 +44,21 @@ Visuals_PhongMaterial_construct
 {
   Shizu_Type* type = Visuals_PhongMaterial_getType(state);
   Visuals_Material_construct(state, (Visuals_Material*)self);
-  self->diffuse = 85;
-  self->specular = 85;
-  self->ambient = 85;
+
+  self->ambientR = 85;
+  self->ambientG = 85;
+  self->ambientB = 85;
+
+  self->diffuseR = 85;
+  self->diffuseG = 85;
+  self->diffuseB = 85;
+
+  self->specularR = 85;
+  self->specularG = 85;
+  self->specularB = 85;
+
   self->shininess = 230;
+
   ((Shizu_Object*)self)->type = type;
 }
 

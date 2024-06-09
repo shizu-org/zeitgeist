@@ -3,6 +3,7 @@
 #include "Visuals/Gl/Program.h"
 #include "Visuals/Gl/RenderBuffer.h"
 #include "Visuals/Gl/VertexBuffer.h"
+#include "Visuals/Service.package.h"
 
 static void
 Visuals_Gl_Context_finalize
@@ -110,8 +111,8 @@ Visuals_Gl_Context_renderImpl
   (
     Shizu_State* state,
     Visuals_Gl_Context* self,
-    Visuals_GlVertexBuffer* vertexBuffer,
-    Visuals_GlProgram* program
+    Visuals_Gl_VertexBuffer* vertexBuffer,
+    Visuals_Gl_Program* program
   );
 
 static Shizu_TypeDescriptor const Visuals_Gl_Context_Type = {
@@ -154,7 +155,6 @@ Visuals_Gl_Context_dispatchInitialize
   ((Visuals_Context_Dispatch*)self)->setViewport = (void (*)(Shizu_State*, Visuals_Context*, Shizu_Float32, Shizu_Float32, Shizu_Float32, Shizu_Float32)) & Visuals_Gl_Context_setViewportImpl;
   ((Visuals_Context_Dispatch*)self)->clear = (void (*)(Shizu_State*, Visuals_Context*, bool, bool)) & Visuals_Gl_Context_clearImpl;
   ((Visuals_Context_Dispatch*)self)->render = (void (*)(Shizu_State*, Visuals_Context*, Visuals_VertexBuffer*, Visuals_Program*)) & Visuals_Gl_Context_renderImpl;
-
 }
 
 static Visuals_Program*
@@ -165,7 +165,20 @@ Visuals_Gl_Context_createProgramImpl
     Shizu_String* vertexSource,
     Shizu_String* fragmentSource
   )
-{ return (Visuals_Program*)Visuals_GlProgram_create(state, vertexSource, fragmentSource); }
+{
+  Visuals_Program* p = (Visuals_Program*)Visuals_Gl_Program_create(state, vertexSource, fragmentSource);
+  Shizu_JumpTarget jumpTarget;
+  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  if (!setjmp(jumpTarget.environment)) {
+    Visuals_Service_registerVisualsObject(state, (Visuals_Object*)p);
+    Shizu_State_popJumpTarget(state);
+  } else {
+    Shizu_State_popJumpTarget(state);
+    Visuals_Object_unmaterialize(state, (Visuals_Object*)p);
+    Shizu_State_jump(state);
+  }
+  return p;
+}
 
 static Visuals_RenderBuffer*
 Visuals_Gl_Context_createRenderBufferImpl
@@ -173,7 +186,20 @@ Visuals_Gl_Context_createRenderBufferImpl
     Shizu_State* state,
     Visuals_Gl_Context* self
   )
-{ return (Visuals_RenderBuffer*)Visuals_GlRenderBuffer_create(state); }
+{
+  Visuals_RenderBuffer* p = (Visuals_RenderBuffer*)Visuals_Gl_RenderBuffer_create(state);
+  Shizu_JumpTarget jumpTarget;
+  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  if (!setjmp(jumpTarget.environment)) {
+    Visuals_Service_registerVisualsObject(state, (Visuals_Object*)p);
+    Shizu_State_popJumpTarget(state);
+  } else {
+    Shizu_State_popJumpTarget(state);
+    Visuals_Object_unmaterialize(state, (Visuals_Object*)p);
+    Shizu_State_jump(state);
+  }
+  return p;
+}
 
 static Visuals_VertexBuffer*
 Visuals_Gl_Context_createVertexBufferImpl
@@ -181,7 +207,20 @@ Visuals_Gl_Context_createVertexBufferImpl
     Shizu_State* state,
     Visuals_Gl_Context* self
   )
-{ return (Visuals_VertexBuffer*)Visuals_GlVertexBuffer_create(state); }
+{
+  Visuals_VertexBuffer* p = (Visuals_VertexBuffer*)Visuals_Gl_VertexBuffer_create(state);
+  Shizu_JumpTarget jumpTarget;
+  Shizu_State_pushJumpTarget(state,&jumpTarget);
+  if (!setjmp(jumpTarget.environment)) {
+    Visuals_Service_registerVisualsObject(state, (Visuals_Object*)p);
+    Shizu_State_popJumpTarget(state);
+  } else {
+    Shizu_State_popJumpTarget(state);
+    Visuals_Object_unmaterialize(state, (Visuals_Object*)p);
+    Shizu_State_jump(state);
+  }
+  return p;
+}
 
 static void
 Visuals_Gl_Context_setClearColorImpl
@@ -336,7 +375,7 @@ Visuals_Gl_Context_setViewportImpl
   )
 {
   Shizu_Integer32 clientWidth, clientHeight;
-  ServiceGl_getClientSize(state, &clientWidth, &clientHeight);
+  Visuals_ServiceGl_getClientSize(state, &clientWidth, &clientHeight);
   self->viewport.left = left;
   self->viewport.bottom = bottom;
   self->viewport.width = width;
@@ -363,7 +402,7 @@ Visuals_Gl_Context_clearImpl
     mask |= GL_DEPTH_BUFFER_BIT;
   }
   Shizu_Integer32 clientWidth, clientHeight;
-  ServiceGl_getClientSize(state, &clientWidth, &clientHeight);
+  Visuals_ServiceGl_getClientSize(state, &clientWidth, &clientHeight);
   
   glViewport(self->viewport.left * clientWidth, self->viewport.bottom * clientHeight, self->viewport.width * clientWidth, self->viewport.height * clientHeight);
 
@@ -378,8 +417,8 @@ Visuals_Gl_Context_renderImpl
   (
     Shizu_State* state,
     Visuals_Gl_Context* self,
-    Visuals_GlVertexBuffer* vertexBuffer,
-    Visuals_GlProgram* program
+    Visuals_Gl_VertexBuffer* vertexBuffer,
+    Visuals_Gl_Program* program
   )
 {
   glUseProgram(program->programId);

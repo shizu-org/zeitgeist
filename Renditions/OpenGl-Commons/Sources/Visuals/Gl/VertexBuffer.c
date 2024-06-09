@@ -22,62 +22,62 @@
 #include "Visuals/Gl/VertexBuffer.h"
 
 static void
-Visuals_GlVertexBuffer_finalize
+Visuals_Gl_VertexBuffer_finalize
   (
     Shizu_State* state,
-    Visuals_GlVertexBuffer* self
+    Visuals_Gl_VertexBuffer* self
   );
   
 static void
-Visuals_GlVertexBuffer_materializeImpl
+Visuals_Gl_VertexBuffer_materializeImpl
   (
     Shizu_State* state,
-    Visuals_GlVertexBuffer* self
+    Visuals_Gl_VertexBuffer* self
   );
 
 static void
-Visuals_GlVertexBuffer_unmaterializeImpl
+Visuals_Gl_VertexBuffer_unmaterializeImpl
   (
     Shizu_State* state,
-    Visuals_GlVertexBuffer* self
+    Visuals_Gl_VertexBuffer* self
   );
 
 static void
-Visuals_GlVertexBuffer_setDataImpl
+Visuals_Gl_VertexBuffer_setDataImpl
   (
     Shizu_State* state,
-    Visuals_GlVertexBuffer* self,
+    Visuals_Gl_VertexBuffer* self,
     uint8_t flags,
     void const* bytes,
     size_t numberOfBytes
   );
 
 static void
-Visuals_GlVertexBuffer_dispatchInitialize
+Visuals_Gl_VertexBuffer_dispatchInitialize
   (
     Shizu_State1* state1,
-    Visuals_GlVertexBuffer_Dispatch* self
+    Visuals_Gl_VertexBuffer_Dispatch* self
   );
 
-static Shizu_TypeDescriptor const Visuals_GlVertexBuffer_Type = {
+static Shizu_TypeDescriptor const Visuals_Gl_VertexBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
-  .size = sizeof(Visuals_GlVertexBuffer),
-  .finalize = (Shizu_OnFinalizeCallback*)&Visuals_GlVertexBuffer_finalize,
+  .size = sizeof(Visuals_Gl_VertexBuffer),
+  .finalize = (Shizu_OnFinalizeCallback*)&Visuals_Gl_VertexBuffer_finalize,
   .visit = NULL,
-  .dispatchSize = sizeof(Visuals_GlVertexBuffer_Dispatch),
-  .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*) & Visuals_GlVertexBuffer_dispatchInitialize,
+  .dispatchSize = sizeof(Visuals_Gl_VertexBuffer_Dispatch),
+  .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*) & Visuals_Gl_VertexBuffer_dispatchInitialize,
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_GlVertexBuffer, Visuals_VertexBuffer);
+Shizu_defineType(Visuals_Gl_VertexBuffer, Visuals_VertexBuffer);
 
 static void
-Visuals_GlVertexBuffer_finalize
+Visuals_Gl_VertexBuffer_finalize
   (
     Shizu_State* state,
-    Visuals_GlVertexBuffer* self
+    Visuals_Gl_VertexBuffer* self
   )
 {
 	if (self->vertexArrayId) {
@@ -91,10 +91,10 @@ Visuals_GlVertexBuffer_finalize
 }
 
 static void
-Visuals_GlVertexBuffer_materializeImpl
+Visuals_Gl_VertexBuffer_materializeImpl
   (
     Shizu_State* state,
-    Visuals_GlVertexBuffer* self
+    Visuals_Gl_VertexBuffer* self
   )
 {
   if (!self->bufferId) {
@@ -117,10 +117,10 @@ Visuals_GlVertexBuffer_materializeImpl
 }
 
 static void
-Visuals_GlVertexBuffer_unmaterializeImpl
+Visuals_Gl_VertexBuffer_unmaterializeImpl
   (
     Shizu_State* state,
-    Visuals_GlVertexBuffer* self
+    Visuals_Gl_VertexBuffer* self
   )
 {
   if (self->vertexArrayId) {
@@ -133,11 +133,20 @@ Visuals_GlVertexBuffer_unmaterializeImpl
   }
 }
 
+#define VertexElementSyntax_Float32_1 (1)
+#define VertexElementSyntax_Float32_3 (2)
+#define VertexElementSemantics_Position (4)
+#define VertexElementSemantics_Normal (8)
+#define VertexElementSemantics_Ambient (16)
+#define VertexElementSemantics_Diffuse (32)
+#define VertexElementSemantics_Specular (64)
+#define VertexElementSemantics_Shininess (128)
+
 static void
-Visuals_GlVertexBuffer_setDataImpl
+Visuals_Gl_VertexBuffer_setDataImpl
   (
     Shizu_State* state,
-    Visuals_GlVertexBuffer* self,
+    Visuals_Gl_VertexBuffer* self,
     uint8_t flags,
     void const* bytes,
     size_t numberOfBytes
@@ -162,6 +171,9 @@ Visuals_GlVertexBuffer_setDataImpl
     case (Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb | Visuals_VertexSyntactics_Float3_Float3_Float3): {
       vertexSize = sizeof(float) * 9;
     } break;
+    case (Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float): {
+      vertexSize = sizeof(float) * 3 + sizeof(float) * 3 + sizeof(float) * 3 + sizeof(float) * 3 + sizeof(float) * 3 + sizeof(float);
+    } break;
     default: {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
       Shizu_State_setStatus(state, 1);
@@ -182,24 +194,64 @@ Visuals_GlVertexBuffer_setDataImpl
   glBindVertexArray(self->vertexArrayId);
   glBindBuffer(GL_ARRAY_BUFFER, self->bufferId);
 
+  typedef struct VertexElementDesc {
+    uint8_t flags;
+    size_t size; // The size in Bytes.
+    size_t offset; // The offset in Bytes.
+  } VertexElementDesc;
+
   switch (flags) {
     case (Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3): {
+      static const VertexElementDesc vertexElements[] =
+      {
+        {
+          .flags = VertexElementSyntax_Float32_3,
+          .offset = 0,
+          .size = sizeof(float) * 3,
+        },
+      };
+
+      size_t offset = 0;
+
       glEnableVertexAttribArray(POSITION_INDEX);
       glVertexAttribPointer(POSITION_INDEX,
                             3,
                             GL_FLOAT,
                             GL_FALSE,
                             vertexSize,
-                            (void*)(uintptr_t)0);
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 3;
     } break;
     case (Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb | Visuals_VertexSyntactics_Float3_Float3_Float3): {
+      static const VertexElementDesc vertexElements[] =
+      {
+        {
+          .flags = VertexElementSyntax_Float32_3,
+          .offset = 0,
+          .size = sizeof(float) * 3,
+        },
+        {
+          .flags = VertexElementSyntax_Float32_3,
+          .offset = sizeof(float) * 3,
+          .size = sizeof(float) * 3,
+        },
+        {
+          .flags = VertexElementSyntax_Float32_3,
+          .offset = sizeof(float) * 6,
+          .size = sizeof(float) * 3,
+        },
+      };
+
+      size_t offset = 0;
+
       glEnableVertexAttribArray(POSITION_INDEX);
       glVertexAttribPointer(POSITION_INDEX,
                             3,
                             GL_FLOAT,
                             GL_FALSE,
                             vertexSize,
-                            (void*)(uintptr_t)0);
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 3;
 
       glEnableVertexAttribArray(NORMAL_INDEX);
       glVertexAttribPointer(NORMAL_INDEX,
@@ -207,7 +259,8 @@ Visuals_GlVertexBuffer_setDataImpl
                             GL_FLOAT,
                             GL_FALSE,
                             vertexSize,
-                            (void*)(uintptr_t)(sizeof(float) * 3));
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 3;
 
       glEnableVertexAttribArray(AMBIENT_COLOR_INDEX);
       glVertexAttribPointer(AMBIENT_COLOR_INDEX,
@@ -215,16 +268,54 @@ Visuals_GlVertexBuffer_setDataImpl
                             GL_FLOAT,
                             GL_TRUE,
                             vertexSize,
-                            (void*)(uintptr_t)(sizeof(float) * 6));
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 3;
     } break;
     case (Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float): {
+      static const VertexElementDesc vertexElements[] =
+      {
+        {
+          .flags = VertexElementSemantics_Position | VertexElementSyntax_Float32_3,
+          .offset = 0,
+          .size = sizeof(float) * 3,
+        },
+        {
+          .flags = VertexElementSemantics_Normal | VertexElementSyntax_Float32_3,
+          .offset = sizeof(float) * 3,
+          .size = sizeof(float) * 3,
+        },
+        {
+          .flags = VertexElementSemantics_Ambient | VertexElementSyntax_Float32_3,
+          .offset = sizeof(float) * 6,
+          .size = sizeof(float) * 3,
+        },
+        {
+          .flags = VertexElementSemantics_Diffuse | VertexElementSyntax_Float32_3,
+          .offset = sizeof(float) * 9,
+          .size = sizeof(float) * 3,
+        },
+        {
+          .flags = VertexElementSemantics_Specular | VertexElementSyntax_Float32_3,
+          .offset = sizeof(float) * 12,
+          .size = sizeof(float) * 3,
+        },
+        {
+          .flags = VertexElementSemantics_Shininess | VertexElementSyntax_Float32_3,
+          .offset = sizeof(float) * 15,
+          .size = sizeof(float) * 1,
+        },
+      };
+
+      size_t offset = 0;
+
       glEnableVertexAttribArray(POSITION_INDEX);
       glVertexAttribPointer(POSITION_INDEX,
                             3,
                             GL_FLOAT,
                             GL_FALSE,
                             vertexSize,
-                            (void*)(uintptr_t)0);
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 3;
 
       glEnableVertexAttribArray(NORMAL_INDEX);
       glVertexAttribPointer(NORMAL_INDEX,
@@ -232,7 +323,8 @@ Visuals_GlVertexBuffer_setDataImpl
                             GL_FLOAT,
                             GL_FALSE,
                             vertexSize,
-                            (void*)(uintptr_t)(sizeof(float) * 3));
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 3;
 
       glEnableVertexAttribArray(AMBIENT_COLOR_INDEX);
       glVertexAttribPointer(AMBIENT_COLOR_INDEX,
@@ -240,7 +332,8 @@ Visuals_GlVertexBuffer_setDataImpl
                             GL_FLOAT,
                             GL_TRUE,
                             vertexSize,
-                            (void*)(uintptr_t)(sizeof(float) * 6));
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 3;
 
       glEnableVertexAttribArray(DIFFUSE_COLOR_INDEX);
       glVertexAttribPointer(DIFFUSE_COLOR_INDEX,
@@ -248,7 +341,8 @@ Visuals_GlVertexBuffer_setDataImpl
                             GL_FLOAT,
                             GL_TRUE,
                             vertexSize,
-                            (void*)(uintptr_t)(sizeof(float) * 9));
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 3;
 
       glEnableVertexAttribArray(SPECULAR_COLOR_INDEX);
       glVertexAttribPointer(SPECULAR_COLOR_INDEX,
@@ -256,7 +350,8 @@ Visuals_GlVertexBuffer_setDataImpl
                             GL_FLOAT,
                             GL_TRUE,
                             vertexSize,
-                            (void*)(uintptr_t)(sizeof(float) * 12));
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 3;
 
       glEnableVertexAttribArray(SHININESSS_INDEX);
       glVertexAttribPointer(SHININESSS_INDEX,
@@ -264,7 +359,8 @@ Visuals_GlVertexBuffer_setDataImpl
                             GL_FLOAT,
                             GL_TRUE,
                             vertexSize,
-                            (void*)(uintptr_t)(sizeof(float) * 15));
+                            (void*)(uintptr_t)offset);
+      offset += sizeof(float) * 1;
     } break;
     default: {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
@@ -278,53 +374,38 @@ Visuals_GlVertexBuffer_setDataImpl
 }
 
 static void
-Visuals_GlVertexBuffer_dispatchInitialize
+Visuals_Gl_VertexBuffer_dispatchInitialize
   (
     Shizu_State1* state1,
-    Visuals_GlVertexBuffer_Dispatch* self
+    Visuals_Gl_VertexBuffer_Dispatch* self
   )
 {
-  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_GlVertexBuffer_materializeImpl;
-  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_GlVertexBuffer_unmaterializeImpl;
-  ((Visuals_VertexBuffer_Dispatch*)self)->setData = (void(*)(Shizu_State*, Visuals_VertexBuffer*, uint8_t,void const*,size_t)) & Visuals_GlVertexBuffer_setDataImpl;
+  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_VertexBuffer_materializeImpl;
+  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_VertexBuffer_unmaterializeImpl;
+  ((Visuals_VertexBuffer_Dispatch*)self)->setData = (void(*)(Shizu_State*, Visuals_VertexBuffer*, uint8_t,void const*,size_t)) & Visuals_Gl_VertexBuffer_setDataImpl;
 }
 
 void
-Visuals_GlVertexBuffer_construct
+Visuals_Gl_VertexBuffer_construct
   (
     Shizu_State* state,
-    Visuals_GlVertexBuffer* self
+    Visuals_Gl_VertexBuffer* self
   )
 {
-  Shizu_Type* type = Visuals_GlVertexBuffer_getType(state);
+  Shizu_Type* type = Visuals_Gl_VertexBuffer_getType(state);
   Visuals_VertexBuffer_construct(state, (Visuals_VertexBuffer*)self);
   self->bufferId = 0;
   self->vertexArrayId = 0;
-  while (glGetError()) { }
-  glGenBuffers(1, &self->bufferId);
-  if (glGetError()) {
-    fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenBuffers");
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
-  }
-  glGenVertexArrays(1, &self->vertexArrayId);
-  if (glGetError()) {
-    glDeleteBuffers(1, &self->bufferId);
-    self->bufferId = 0;
-    fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
-  }
   ((Shizu_Object*)self)->type = type;
 }
 
-Visuals_GlVertexBuffer*
-Visuals_GlVertexBuffer_create
+Visuals_Gl_VertexBuffer*
+Visuals_Gl_VertexBuffer_create
   (
     Shizu_State* state
   )
 {
-  Visuals_GlVertexBuffer* self = (Visuals_GlVertexBuffer*)Shizu_Gc_allocateObject(state, sizeof(Visuals_GlVertexBuffer));
-  Visuals_GlVertexBuffer_construct(state, self);
+  Visuals_Gl_VertexBuffer* self = (Visuals_Gl_VertexBuffer*)Shizu_Gc_allocateObject(state, sizeof(Visuals_Gl_VertexBuffer));
+  Visuals_Gl_VertexBuffer_construct(state, self);
   return self;
 }
