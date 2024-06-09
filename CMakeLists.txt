@@ -17,7 +17,7 @@ endif()
 
 set(idlib-math.tag CACHE STRING "IdLib Math: The Git tag to check out")
 if (NOT idlib-math.tag)
-  set(idlib-math.tag 1.6)
+  set(idlib-math.tag 1.9)
 endif()
 
 set(idlib-math.source-dir CACHE STRING "IdLib Math: Path to the source directory")
