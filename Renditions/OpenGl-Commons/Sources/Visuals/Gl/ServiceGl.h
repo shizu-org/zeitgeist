@@ -26,39 +26,37 @@ typedef struct Visuals_Object Visuals_Object;
 #include "ServiceGl_Functions.i"
 #undef Define
 
-/**
- * @since 0.1
- * @brief Initialize the GL service.
- * @remarks The GL service is shared between renditions.
- * The service is reference counted.
- * Each time a rendition calls ServiceGL_startup successfully,
- * the reference count of the service is incremented by @a 1.
- * Each time a rendition calls ServiceGL_shutdown successfully,
- * the reference count of the service is decremented by @a 1.
- * If the reference count increments from zero to one, the service is created.
- * If the reference count decrements from one to zero, the service is destroyed.
- */
+/// @since 0.1
+/// @brief Initialize the GL service.
+/// @remarks The GL service is shared between renditions.
+/// The service is reference counted.
+/// Each time a rendition calls ServiceGL_startup successfully,
+/// the reference count of the service is incremented by @a 1.
+/// Each time a rendition calls ServiceGL_shutdown successfully,
+/// the reference count of the service is decremented by @a 1.
+/// If the reference count increments from zero to one, the service is created.
+/// If the reference count decrements from one to zero, the service is destroyed.
 void
-Visuals_ServiceGl_startup
+Visuals_Gl_Service_startup
   (
     Shizu_State* state
   );
 
 void
-Visuals_ServiceGl_shutdown
+Visuals_Gl_Service_shutdown
   (
     Shizu_State* state
   );
 
 void
-Visuals_ServiceGl_setTitle
+Visuals_Gl_Service_setTitle
   (
     Shizu_State* state,
     Shizu_String* title
   );
 
 void
-Visuals_ServiceGl_getClientSize
+Visuals_Gl_Service_getClientSize
   (
     Shizu_State* state,
     Shizu_Integer32* width,
@@ -66,31 +64,31 @@ Visuals_ServiceGl_getClientSize
   );
 
 void
-Visuals_ServiceGl_beginFrame
+Visuals_Gl_Service_beginFrame
   (
     Shizu_State* state
   );
 
 void
-Visuals_ServiceGl_endFrame
+Visuals_Gl_Service_endFrame
   (
     Shizu_State* state
   );
 
 void
-Visuals_ServiceGl_update
+Visuals_Gl_Service_update
   (
     Shizu_State* state
   );
 
 Shizu_Boolean
-Visuals_ServiceGl_quitRequested
+Visuals_Gl_Service_quitRequested
   (
     Shizu_State* state
   );
 
 GLuint
-Visuals_ServiceGl_compileShader
+Visuals_Gl_Service_compileShader
   (
     Shizu_State* state,
     GLenum type,
@@ -98,7 +96,7 @@ Visuals_ServiceGl_compileShader
   );
 
 GLuint
-Visuals_ServiceGl_linkProgram
+Visuals_Gl_Service_linkProgram
   (
     Shizu_State* state,
     GLuint vert,
@@ -106,24 +104,34 @@ Visuals_ServiceGl_linkProgram
   );
 
 void
-Visuals_ServiceGl_registerVisualsObject
+Visuals_Gl_Service_registerVisualsObject
   (
     Shizu_State* state,
     Visuals_Object* object
   );
 
-void
-Visuals_ServiceGl_emitKeyboardKeyMessage
+Shizu_String*
+Visuals_Gl_Service_getBackendVendorName
   (
-    Shizu_State* state,
-    KeyboardKeyMessage* message
+    Shizu_State* state
   );
 
-void
-Visuals_ServiceGl_addKeyboardKeyCallback
+Shizu_String*
+Visuals_Gl_Service_getBackendRendererName
   (
-    Shizu_State* state,
-    Shizu_Value* value
+    Shizu_State* state
+  );
+
+Shizu_Integer32
+Visuals_Gl_Service_getBackendMajorVersion
+  (
+    Shizu_State* state
+  );
+
+Shizu_Integer32
+Visuals_Gl_Service_getBackendMinorVersion
+  (
+    Shizu_State* state
   );
 
 #endif // SERVICEGL_H_INCLUDED

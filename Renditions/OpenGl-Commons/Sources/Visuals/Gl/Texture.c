@@ -49,7 +49,12 @@ Visuals_Gl_Texture_finalize
     Shizu_State* state,
     Visuals_Gl_Texture* self
   )
-{ }
+{
+  if (self->textureId) {
+    glDeleteTextures(1, &self->textureId);
+    self->textureId = 0;
+  }
+}
 
 static void
 Visuals_Gl_Texture_materializeImpl
@@ -66,7 +71,6 @@ Visuals_Gl_Texture_materializeImpl
       Shizu_State_setStatus(state, 1);
       Shizu_State_jump(state);
     }
-    
   }
 }
 

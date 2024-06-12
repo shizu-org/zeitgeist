@@ -196,6 +196,11 @@ Visuals_Gl_RenderBuffer_construct
   )
 {
   Shizu_Type* type = Visuals_Gl_RenderBuffer_getType(state);
+  self->width = 640;
+  self->height = 480;
+  self->frameBufferId = 0; 
+  self->colorTextureId = 0;
+  self->depthStencilTextureId = 0;
   ((Shizu_Object*)self)->type = type;
 }
 

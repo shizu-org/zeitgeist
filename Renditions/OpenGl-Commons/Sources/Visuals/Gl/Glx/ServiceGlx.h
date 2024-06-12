@@ -5,34 +5,28 @@
 
 #include "Zeitgeist.h"
 
-/**
- * @since 0.1
- * @brief Startup the GLX service.
- * @param state A pointer to the Shizu_State object.
- */
+/// @since 0.1
+/// @brief Startup the GLX service.
+/// @param state A pointer to the Shizu_State object.
 void
 ServiceGlx_startup
   (
     Shizu_State* state
   );
 
-/**
- * @since 0.1
- * @brief Shutdown the GLX service.
- * @param state A pointer to the Shizu_State object.
- */
+/// @since 0.1
+/// @brief Shutdown the GLX service.
+/// @param state A pointer to the Shizu_State object.
 void
 ServiceGlx_shutdown
   (
     Shizu_State* state
   );
 
-/**
- * @since 0.1
- * @brief Set the window title.
- * @param state A pointer to the Shizu_State object.
- * @param title A pointer to the title.
- */
+/// @since 0.1
+/// @brief Set the window title.
+/// @param state A pointer to the Shizu_State object.
+/// @param title A pointer to the title.
 void
 ServiceGlx_setTitle
   (

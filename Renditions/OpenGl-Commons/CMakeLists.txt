@@ -44,14 +44,6 @@ list(APPEND ${name}.header_files Sources/Visuals/DefaultPrograms.h)
 list(APPEND ${name}.source_files Sources/Visuals/RenderBuffer.c)
 list(APPEND ${name}.header_files Sources/Visuals/RenderBuffer.h)
 
-list(APPEND ${name}.source_files Sources/Visuals/Material.c)
-list(APPEND ${name}.header_files Sources/Visuals/Material.h)
-list(APPEND ${name}.source_files Sources/Visuals/PhongMaterial.c)
-list(APPEND ${name}.header_files Sources/Visuals/PhongMaterial.h)
-list(APPEND ${name}.source_files Sources/Visuals/BlinnPhongMaterial.c)
-list(APPEND ${name}.header_files Sources/Visuals/BlinnPhongMaterial.h)
-
-
 list(APPEND ${name}.source_files Sources/Visuals/Gl/Context.c)
 list(APPEND ${name}.header_files Sources/Visuals/Gl/Context.h)
 list(APPEND ${name}.source_files Sources/Visuals/Gl/VertexBuffer.c)

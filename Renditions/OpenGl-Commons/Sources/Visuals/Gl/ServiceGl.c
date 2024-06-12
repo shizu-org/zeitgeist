@@ -30,18 +30,18 @@
 #include "ServiceGl_Functions.i"
 #undef Define
 
-/**
- * @brief A list of weak references to Visuals.Object values.
- * Before this Visuals.Service shuts down, it notifies all these objects to release their resources.
- */
-static Shizu_List* g_objects = NULL;
+typedef struct Visuals_Gl_Service {
+  /// The reference count.
+  Shizu_Integer32 referenceCount;
+  /// List of weak references to Visuals.Object values.
+  /// Used to notify the Visuals.Object values to release their resources before this service shuts down.
+  Shizu_List* objects;
+} Visuals_Gl_Service;
 
-/**
- * @brief A list of Shizu_CxxFunction values.
- */
-static Shizu_List* g_keyboardKeyListeners = NULL;
-
-static Shizu_Integer32 g_referenceCount = 0;
+static Visuals_Gl_Service g_service = {
+    .referenceCount = 0,
+    .objects = NULL,
+  };
 
 static void*
 link
@@ -61,12 +61,12 @@ link
 }
 
 void
-Visuals_ServiceGl_startup
+Visuals_Gl_Service_startup
   (
     Shizu_State* state
   )
 {
-  if (g_referenceCount == 0) {
+  if (g_service.referenceCount == 0) {
   #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
     ServiceWgl_startup(state);
   #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
@@ -79,23 +79,19 @@ Visuals_ServiceGl_startup
   #include "ServiceGl_Functions.i"
   #undef Define
   }
-  g_referenceCount++;
+  g_service.referenceCount++;
 }
 
 void
-Visuals_ServiceGl_shutdown
+Visuals_Gl_Service_shutdown
   (
     Shizu_State* state
   )
 {
-  if (0 == --g_referenceCount) {
-    if (g_objects) {
-      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_objects);
-      g_objects = NULL;
-    }
-    if (g_keyboardKeyListeners) {
-      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_keyboardKeyListeners);
-      g_keyboardKeyListeners = NULL;
+  if (0 == --g_service.referenceCount) {
+    if (g_service.objects) {
+      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_service.objects);
+      g_service.objects = NULL;
     }
   #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
     ServiceWgl_shutdown(state);
@@ -108,7 +104,7 @@ Visuals_ServiceGl_shutdown
 }
 
 void
-Visuals_ServiceGl_setTitle
+Visuals_Gl_Service_setTitle
   (
     Shizu_State* state,
     Shizu_String* title
@@ -124,7 +120,7 @@ Visuals_ServiceGl_setTitle
 }
 
 void
-Visuals_ServiceGl_getClientSize
+Visuals_Gl_Service_getClientSize
   (
     Shizu_State* state,
     Shizu_Integer32* width,
@@ -141,7 +137,7 @@ Visuals_ServiceGl_getClientSize
 }
 
 void
-Visuals_ServiceGl_beginFrame
+Visuals_Gl_Service_beginFrame
   (
     Shizu_State* state
   )
@@ -156,7 +152,7 @@ Visuals_ServiceGl_beginFrame
 }
 
 void
-Visuals_ServiceGl_endFrame
+Visuals_Gl_Service_endFrame
   (
     Shizu_State* state
   )
@@ -171,7 +167,7 @@ Visuals_ServiceGl_endFrame
 }
 
 void
-Visuals_ServiceGl_update
+Visuals_Gl_Service_update
   (
     Shizu_State* state
   )
@@ -186,7 +182,7 @@ Visuals_ServiceGl_update
 }
 
 Shizu_Boolean
-Visuals_ServiceGl_quitRequested
+Visuals_Gl_Service_quitRequested
   (
     Shizu_State* state
   )
@@ -201,7 +197,7 @@ Visuals_ServiceGl_quitRequested
 }
 
 GLuint
-Visuals_ServiceGl_compileShader
+Visuals_Gl_Service_compileShader
   (
     Shizu_State* state,
     GLenum type,
@@ -225,7 +221,7 @@ Visuals_ServiceGl_compileShader
 }
 
 GLuint
-Visuals_ServiceGl_linkProgram
+Visuals_Gl_Service_linkProgram
   (
     Shizu_State* state,
     GLuint vert,
@@ -249,85 +245,77 @@ Visuals_ServiceGl_linkProgram
 }
 
 void
-Visuals_ServiceGl_registerVisualsObject
+Visuals_Gl_Service_registerVisualsObject
   (
     Shizu_State* state,
     Visuals_Object* object
   )
 {
-  if (!g_objects) {
-    g_objects = Shizu_List_create(state);
+  if (!g_service.objects) {
+    g_service.objects = Shizu_List_create(state);
     Shizu_JumpTarget jumpTarget;
     Shizu_State_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
-      Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_objects);
+      Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_service.objects);
       Shizu_State_popJumpTarget(state);
     } else {
       Shizu_State_popJumpTarget(state);
-      g_objects = NULL;
+      g_service.objects = NULL;
       Shizu_State_jump(state);
     }   
   }
   Shizu_Value temporary;
   Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)object));
-  Shizu_List_appendValue(state, g_objects, &temporary);
+  Shizu_List_appendValue(state, g_service.objects, &temporary);
 }
 
-void
-Visuals_ServiceGl_emitKeyboardKeyMessage
+
+Shizu_String*
+Visuals_Gl_Service_getBackendVendorName
   (
-    Shizu_State* state,
-    KeyboardKeyMessage* message
+    Shizu_State* state
   )
 {
-  if (!g_keyboardKeyListeners) {
-    return;  
-  }
-  Shizu_Value temporary = Shizu_List_getSize(state, g_keyboardKeyListeners);
-  for (size_t i = 0, n = Shizu_Value_getInteger32(&temporary); i < n; ++i) {
-    temporary = Shizu_List_getValue(state, g_keyboardKeyListeners, i);
-    if (Shizu_Value_isCxxFunction(&temporary)) {
-      Shizu_CxxFunction* cxxFunction = Shizu_Value_getCxxFunction(&temporary);
-      Shizu_Stack_pushObject(state, (Shizu_Object*)message);
-      Shizu_Stack_pushInteger32(state, 1);
-      (*cxxFunction)(state);
-    } else {
-      fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
-      exit(EXIT_FAILURE);
-    }
-  }
+  GLubyte const* p = glGetString(GL_VENDOR);
+  return Shizu_String_create(state, p, strlen(p));
 }
 
-void
-Visuals_ServiceGl_addKeyboardKeyCallback
+Shizu_String*
+Visuals_Gl_Service_getBackendRendererName
   (
-    Shizu_State* state,
-    Shizu_Value* value
+    Shizu_State* state
   )
 {
-  if (!g_keyboardKeyListeners) {
-    g_keyboardKeyListeners = Shizu_List_create(state);
-    Shizu_JumpTarget jumpTarget;
-    Shizu_State_pushJumpTarget(state, &jumpTarget);
-    if (!setjmp(jumpTarget.environment)) {
-      Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_keyboardKeyListeners);
-      Shizu_State_popJumpTarget(state);
-    } else {
-      Shizu_State_popJumpTarget(state);
-      g_keyboardKeyListeners = NULL;
-      Shizu_State_jump(state);
-    }
-  }
-  if (Shizu_Value_isVoid(value)) {
-    return;
-  } else if (Shizu_Value_isCxxFunction(value)) {
-    Shizu_List_appendValue(state, g_keyboardKeyListeners, value);
-  } else if (Shizu_Value_isObject(value)) {
-    Shizu_Value temporary;
-    Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)Shizu_Value_getObject(value)));
-    Shizu_List_appendValue(state, g_keyboardKeyListeners, &temporary);
-  } else {
-    Shizu_State_setStatus(state, 1);
+  GLubyte const* p = glGetString(GL_RENDERER);
+  return Shizu_String_create(state, p, strlen(p));
+}
+
+Shizu_Integer32
+Visuals_Gl_Service_getBackendMajorVersion
+  (
+    Shizu_State* state
+  )
+{
+  GLint v;
+  glGetIntegerv(GL_MAJOR_VERSION, &v);
+  if (v < Shizu_Integer32_Minimum || v > Shizu_Integer32_Maximum) {
+    Shizu_State_setStatus(state, Shizu_Status_EnvironmentFailed);
     Shizu_State_jump(state);
   }
+  return v;
+}
+
+Shizu_Integer32
+Visuals_Gl_Service_getBackendMinorVersion
+  (
+    Shizu_State* state
+  )
+{
+  GLint v;
+  glGetIntegerv(GL_MINOR_VERSION, &v);
+  if (v < Shizu_Integer32_Minimum || v > Shizu_Integer32_Maximum) {
+    Shizu_State_setStatus(state, Shizu_Status_EnvironmentFailed);
+    Shizu_State_jump(state);
+  }
+  return v;
 }

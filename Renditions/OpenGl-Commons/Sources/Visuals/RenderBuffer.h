@@ -24,10 +24,8 @@
 
 #include "Visuals/Object.h"
 
-/**
- * @since 1.0
- * A render buffer.
- */
+/// @since 1.0
+/// A render buffer.
 Shizu_declareType(Visuals_RenderBuffer);
 
 struct Visuals_RenderBuffer_Dispatch {

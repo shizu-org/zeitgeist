@@ -22,6 +22,13 @@
 #include "Visuals/Gl/Program.h"
 
 static void
+Visuals_Gl_Program_finalize
+  (
+    Shizu_State1* state1,
+    Visuals_Gl_Program* self
+  );
+
+static void
 Visuals_Gl_Program_dispatchInitialize
   (
     Shizu_State1* state1,
@@ -101,7 +108,7 @@ Shizu_TypeDescriptor const Visuals_Gl_Program_Type = {
   .postCreateType = NULL,
   .visitType = NULL,
   .size = sizeof(Visuals_Gl_Program),
-  .finalize = NULL,
+  .finalize = (Shizu_OnFinalizeCallback*)&Visuals_Gl_Program_finalize,
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_Gl_Program_Dispatch),
   .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&Visuals_Gl_Program_dispatchInitialize,
@@ -109,6 +116,27 @@ Shizu_TypeDescriptor const Visuals_Gl_Program_Type = {
 };
 
 Shizu_defineType(Visuals_Gl_Program, Visuals_Program);
+
+static void
+Visuals_Gl_Program_finalize
+  (
+    Shizu_State1* state1,
+    Visuals_Gl_Program* self
+  )
+{
+  if (self->vertexProgramId) {
+    glDeleteShader(self->vertexProgramId);
+    self->vertexProgramId = 0;
+  }
+  if (self->fragmentProgramId) {
+    glDeleteShader(self->fragmentProgramId);
+    self->fragmentProgramId = 0;
+  }
+  if (self->programId) {
+    glDeleteProgram(self->programId);
+    self->programId = 0;
+  }
+}
 
 static void
 Visuals_Gl_Program_materializeImpl
@@ -120,12 +148,12 @@ Visuals_Gl_Program_materializeImpl
   Shizu_String* temporary = NULL;
 
   temporary = Shizu_String_concatenate(state, ((Visuals_Program*)self)->vertexProgramSource, Shizu_String_create(state, "", 1));
-  self->vertexProgramId = Visuals_ServiceGl_compileShader(state, GL_VERTEX_SHADER, Shizu_String_getBytes(state, temporary));
+  self->vertexProgramId = Visuals_Gl_Service_compileShader(state, GL_VERTEX_SHADER, Shizu_String_getBytes(state, temporary));
 
   temporary = Shizu_String_concatenate(state, ((Visuals_Program*)self)->fragmentProgramSource, Shizu_String_create(state, "", 1));
-  self->fragmentProgramId = Visuals_ServiceGl_compileShader(state, GL_FRAGMENT_SHADER, Shizu_String_getBytes(state, temporary));
+  self->fragmentProgramId = Visuals_Gl_Service_compileShader(state, GL_FRAGMENT_SHADER, Shizu_String_getBytes(state, temporary));
 
-  self->programId = Visuals_ServiceGl_linkProgram(state, self->vertexProgramId, self->fragmentProgramId);
+  self->programId = Visuals_Gl_Service_linkProgram(state, self->vertexProgramId, self->fragmentProgramId);
 }
 
 static void

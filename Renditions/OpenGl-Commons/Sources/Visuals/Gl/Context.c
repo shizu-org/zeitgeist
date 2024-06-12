@@ -375,7 +375,7 @@ Visuals_Gl_Context_setViewportImpl
   )
 {
   Shizu_Integer32 clientWidth, clientHeight;
-  Visuals_ServiceGl_getClientSize(state, &clientWidth, &clientHeight);
+  Visuals_Gl_Service_getClientSize(state, &clientWidth, &clientHeight);
   self->viewport.left = left;
   self->viewport.bottom = bottom;
   self->viewport.width = width;
@@ -402,7 +402,7 @@ Visuals_Gl_Context_clearImpl
     mask |= GL_DEPTH_BUFFER_BIT;
   }
   Shizu_Integer32 clientWidth, clientHeight;
-  Visuals_ServiceGl_getClientSize(state, &clientWidth, &clientHeight);
+  Visuals_Gl_Service_getClientSize(state, &clientWidth, &clientHeight);
   
   glViewport(self->viewport.left * clientWidth, self->viewport.bottom * clientHeight, self->viewport.width * clientWidth, self->viewport.height * clientHeight);
 

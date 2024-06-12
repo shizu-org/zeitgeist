@@ -80,6 +80,7 @@ Visuals_Service_getClientSize
     Shizu_Integer32* height
   );
 
+/// @brief Must be invoked to begin rendering a frame.
 /// @param state A pointer to a Shizu_State object.
 void
 Visuals_Service_beginFrame
@@ -87,6 +88,7 @@ Visuals_Service_beginFrame
     Shizu_State* state
   );
 
+/// @brief Must be invoked to end rendering a frame.
 /// @param state A pointer to a Shizu_State object.
 void
 Visuals_Service_endFrame
@@ -94,6 +96,7 @@ Visuals_Service_endFrame
     Shizu_State* state
   );
 
+/// @brief Must be invoked in intervals.
 /// @param state A pointer to a Shizu_State object.
 void
 Visuals_Service_update
@@ -136,6 +139,68 @@ Visuals_Service_addKeyboardKeyCallback
   (
     Shizu_State* state,
     Shizu_Value* value
+  );
+
+/// @since 0.1
+/// @brief Add a mouse button callback.
+/// @param state A pointer to a Shizu_State object.
+/// @param value The value to be used as a callback.
+/// @remarks
+/// - If the value stores a Shizu_CxxFunction* value, then this Shizu_CxxFunction* is added to the callback list.
+///   If a KeyboardKeyMessage/MouseButtonMessage/MousePointerMessage is dispatched, then the Shizu_CxxFunction* is invoked with the message object as its single argument.
+/// - If the value stores a Shizu_Object value, then this object is wrapped into a weak reference and the weak reference is added to the callback list.
+///   If a KeyboardKeyMessage/MouseButtonMessage/MousePointerMessage is dispatched, then the the Shizu_Object value in the weak reference is retrieved.
+///   If it expired, then the weak reference is removed from the callback list.  Otherwise the Shizu_Object's "call" metamethod is invoked with the object as the first argument and the message object as the second argument.
+/// - If the value stores a Shizu_Void value, then nothing is added to the callback list.
+/// - If value stores any other value than the above, an error is raised.
+void
+Visuals_Service_addMouseButtonCallback
+  (
+    Shizu_State* state,
+    Shizu_Value* value
+  );
+
+/// @since 0.1
+/// @brief Add a mouse pointer callback.
+/// @param state A pointer to a Shizu_State object.
+/// @param value The value to be used as a callback.
+/// @remarks
+/// - If the value stores a Shizu_CxxFunction* value, then this Shizu_CxxFunction* is added to the callback list.
+///   If a KeyboardKeyMessage/MouseButtonMessage/MousePointerMessage is dispatched, then the Shizu_CxxFunction* is invoked with the message object as its single argument.
+/// - If the value stores a Shizu_Object value, then this object is wrapped into a weak reference and the weak reference is added to the callback list.
+///   If a KeyboardKeyMessage/MouseButtonMessage/MousePointerMessage is dispatched, then the the Shizu_Object value in the weak reference is retrieved.
+///   If it expired, then the weak reference is removed from the callback list.  Otherwise the Shizu_Object's "call" metamethod is invoked with the object as the first argument and the message object as the second argument.
+/// - If the value stores a Shizu_Void value, then nothing is added to the callback list.
+/// - If value stores any other value than the above, an error is raised.
+void
+Visuals_Service_addMousePointerCallback
+  (
+    Shizu_State* state,
+    Shizu_Value* value
+  );
+
+Shizu_String*
+Visuals_Service_getBackendVendorName
+  (
+    Shizu_State* state
+  );
+
+Shizu_String*
+Visuals_Service_getBackendRendererName
+  (
+    Shizu_State* state
+  );
+
+Shizu_Integer32
+Visuals_Service_getBackendMajorVersion
+  (
+    Shizu_State* state
+  );
+
+Shizu_Integer32
+Visuals_Service_getBackendMinorVersion
+  (
+    Shizu_State* state
   );
 
 #endif // VISUALS_SERVICE_H_INCLUDED

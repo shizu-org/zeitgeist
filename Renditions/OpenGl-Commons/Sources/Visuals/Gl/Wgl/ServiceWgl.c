@@ -8,8 +8,8 @@
 // malloc, free
 #include <malloc.h>
 
-// ServiceGl_emitKeyboardKeyMessage
-#include "Visuals/Gl/ServiceGl.h"
+// Visuals_Service_emitKeyboardKeyMessage
+#include "Visuals/Service.h"
 #include "KeyboardKeyMessage.h"
 
 #if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
@@ -455,7 +455,7 @@ windowCallback
 					Shizu_Value mappedKey = mapKeyboardKey(wParam);
 					if (Shizu_Value_isInteger32(&mappedKey)) {
 						KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Pressed, Shizu_Value_getInteger32(&mappedKey));
-						Visuals_ServiceGl_emitKeyboardKeyMessage(state, message);
+						Visuals_Service_emitKeyboardKeyMessage(state, message);
 					}
 					Shizu_State_popJumpTarget(state);
 				} else {
@@ -474,7 +474,7 @@ windowCallback
 					Shizu_Value mappedKey = mapKeyboardKey(wParam);
 					if (Shizu_Value_isInteger32(&mappedKey)) {
 						KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Released, Shizu_Value_getInteger32(&mappedKey));
-						Visuals_ServiceGl_emitKeyboardKeyMessage(state, message);
+						Visuals_Service_emitKeyboardKeyMessage(state, message);
 					}
 					Shizu_State_popJumpTarget(state);
 				} else {
