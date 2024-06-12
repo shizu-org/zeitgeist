@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 #include "KeyboardKeyMessage.h"
-#include "Visuals/Gl/ServiceGl.h"
+#include "Visuals/Service.h"
 #include "World.h"
 
 #include "Visuals/DefaultPrograms.h"
@@ -23,36 +23,6 @@
 #include "Visuals/PhongMaterial.h"
 #include "Visuals/BlinnPhongMaterial.h"
 #include "Visuals/Gl/Context.h"
-
-#if 0
-/*
-Effectively, this is
-@code
-{
-  type : "Material",
-  name : "material1",
-  techniques : [
-      {
-        // https://en.wikipedia.org/wiki/Phong_reflection_model
-        Technique: "Phong",
-        specular: 85,
-        diffuse: 85,
-        ambient: 85,
-        shininess: 85,
-      },
-      {
-        // https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model
-        Technique : "Blinn-Phong",
-        specular: 85,
-        diffuse: 85,
-        ambient: 85,
-        shininess: 230,
-      },
-    ],
-}
-@endcode
-*/
-#endif
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   #define Shizu_Rendition_Export _declspec(dllexport)
@@ -88,16 +58,51 @@ static World* g_world = NULL;
 #define LightModel_BlinnPhong (2)
 static Shizu_Integer32 g_lightModel = LightModel_Phong;
 
+static void bindPhongMaterial(Shizu_State* state, Visuals_Context* context, Visuals_Program* program, Visuals_PhongMaterial* material) {
+  Visuals_Program_bindVector3F32(state, g_program, "phongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)material->ambientR) / 255.f,
+                                                                                                     ((Shizu_Float32)material->ambientG) / 255.f,
+                                                                                                     ((Shizu_Float32)material->ambientB) / 255.f));
+  Visuals_Program_bindVector3F32(state, g_program, "phongMaterial.diffuse", Vector3F32_create(state, ((Shizu_Float32)material->diffuseR) / 255.f,
+                                                                                                     ((Shizu_Float32)material->diffuseG) / 255.f,
+                                                                                                     ((Shizu_Float32)material->diffuseB) / 255.f));
+  Visuals_Program_bindVector3F32(state, g_program, "phongMaterial.specular", Vector3F32_create(state, ((Shizu_Float32)material->specularR) / 255.f,
+                                                                                                      ((Shizu_Float32)material->specularG) / 255.f,
+                                                                                                      ((Shizu_Float32)material->specularB) / 255.f));
+  Visuals_Program_bindFloat32(state, g_program, "phongMaterial.shininess", ((Shizu_Float32)material->shininess) / 255.f);
+}
+
+static void bindBlinnPhongMaterial(Shizu_State* state, Visuals_Context* context, Visuals_Program* program, Visuals_BlinnPhongMaterial* material) {
+  Visuals_Program_bindVector3F32(state, g_program, "blinnPhongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)material->ambientR) / 255.f,
+                                                                                                          ((Shizu_Float32)material->ambientG) / 255.f,
+                                                                                                          ((Shizu_Float32)material->ambientB) / 255.f));
+  Visuals_Program_bindVector3F32(state, g_program, "blinnPhongMaterial.diffuse", Vector3F32_create(state, ((Shizu_Float32)material->diffuseR) / 255.f,
+                                                                                                          ((Shizu_Float32)material->diffuseG) / 255.f,
+                                                                                                          ((Shizu_Float32)material->diffuseB) / 255.f));
+  Visuals_Program_bindVector3F32(state, g_program, "blinnPhongMaterial.specular", Vector3F32_create(state, ((Shizu_Float32)material->specularR) / 255.f,
+                                                                                                           ((Shizu_Float32)material->specularG) / 255.f,
+                                                                                                           ((Shizu_Float32)material->specularB) / 255.f));
+  Visuals_Program_bindFloat32(state, g_program, "blinnPhongMaterial.shininess", ((Shizu_Float32)material->shininess) / 255.f);
+}
+
+static void bindMaterial(Shizu_State* state, Visuals_Context* context, Visuals_Program* program, Visuals_Material* material) {
+  if (Shizu_Types_isSubTypeOf(Shizu_State_getState1(state), Shizu_State_getTypes(state), ((Shizu_Object*)material)->type, Visuals_PhongMaterial_getType(state))) {
+    bindPhongMaterial(state, context, program, (Visuals_PhongMaterial*)material);
+  }
+  if (Shizu_Types_isSubTypeOf(Shizu_State_getState1(state), Shizu_State_getTypes(state), ((Shizu_Object*)material)->type, Visuals_BlinnPhongMaterial_getType(state))) {
+    bindBlinnPhongMaterial(state, context, program, (Visuals_BlinnPhongMaterial*)material);
+  }
+}
+
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
   (
     Shizu_State* state
   )
 {
-  Visuals_ServiceGl_update(state);
+  Visuals_Service_update(state);
   World_update(state, g_world, 200); /* TODO: Pass delta time. */
 
-  if (Visuals_ServiceGl_quitRequested(state)) {
+  if (Visuals_Service_quitRequested(state)) {
     Zeitgeist_UpstreamRequest* request = Zeitgeist_UpstreamRequest_createExitProcessRequest(state);
     Zeitgeist_sendUpstreamRequest(state, request);
   }
@@ -105,8 +110,8 @@ Zeitgeist_Rendition_update
   Visuals_Context* visualsContext = (Visuals_Context*)Visuals_Gl_Context_create(state);
 
   Shizu_Integer32 canvasWidth, canvasHeight;
-  Visuals_ServiceGl_getClientSize(state, &canvasWidth, &canvasHeight);
-  Visuals_ServiceGl_beginFrame(state);
+  Visuals_Service_getClientSize(state, &canvasWidth, &canvasHeight);
+  Visuals_Service_beginFrame(state);
 
   Visuals_Context_clear(state, visualsContext, true, true);
 
@@ -135,32 +140,6 @@ Zeitgeist_Rendition_update
   projection = Matrix4F32_createPerspective(state, 90.f, canvasHeight > 0.f ? canvasWidth / canvasHeight : 16.f/9.f, 0.1f, 100.f);
   Visuals_Program_bindMatrix4F32(state, g_program, "matrices.projection", projection);
  
-  // "Phong" material.
-  Visuals_PhongMaterial* phongMaterial = Visuals_PhongMaterial_create(state);
-  Visuals_Program_bindVector3F32(state, g_program, "phongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)phongMaterial->ambientR) / 255.f, 
-                                                                                                     ((Shizu_Float32)phongMaterial->ambientG) / 255.f, 
-                                                                                                     ((Shizu_Float32)phongMaterial->ambientB) / 255.f));
-  Visuals_Program_bindVector3F32(state, g_program, "phongMaterial.diffuse", Vector3F32_create(state, ((Shizu_Float32)phongMaterial->diffuseR) / 255.f,
-                                                                                                     ((Shizu_Float32)phongMaterial->diffuseG) / 255.f,
-                                                                                                     ((Shizu_Float32)phongMaterial->diffuseB) / 255.f));
-  Visuals_Program_bindVector3F32(state, g_program, "phongMaterial.specular", Vector3F32_create(state, ((Shizu_Float32)phongMaterial->specularR) / 255.f,
-                                                                                                      ((Shizu_Float32)phongMaterial->specularG) / 255.f,
-                                                                                                      ((Shizu_Float32)phongMaterial->specularB) / 255.f));
-  Visuals_Program_bindFloat32(state, g_program, "phongMaterial.shininess", ((Shizu_Float32)phongMaterial->shininess) / 255.f);
-
-  // "Blinn-Phong" material.
-  Visuals_BlinnPhongMaterial* blinnPhongMaterial = Visuals_BlinnPhongMaterial_create(state);
-  Visuals_Program_bindVector3F32(state, g_program, "blinnPhongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)blinnPhongMaterial->ambientR) / 255.f,
-                                                                                                          ((Shizu_Float32)blinnPhongMaterial->ambientG) / 255.f,
-                                                                                                          ((Shizu_Float32)blinnPhongMaterial->ambientB) / 255.f));
-  Visuals_Program_bindVector3F32(state, g_program, "blinnPhongMaterial.diffuse", Vector3F32_create(state, ((Shizu_Float32)blinnPhongMaterial->diffuseR) / 255.f,
-                                                                                                          ((Shizu_Float32)blinnPhongMaterial->diffuseG) / 255.f,
-                                                                                                          ((Shizu_Float32)blinnPhongMaterial->diffuseB) / 255.f));
-  Visuals_Program_bindVector3F32(state, g_program, "blinnPhongMaterial.specular", Vector3F32_create(state, ((Shizu_Float32)blinnPhongMaterial->specularR) / 255.f,
-                                                                                                           ((Shizu_Float32)blinnPhongMaterial->specularG) / 255.f,
-                                                                                                           ((Shizu_Float32)blinnPhongMaterial->specularB) / 255.f));
-  Visuals_Program_bindFloat32(state, g_program, "blinnPhongMaterial.shininess", ((Shizu_Float32)blinnPhongMaterial->shininess) / 255.f);
-
   Visuals_Program_bindInteger32(state, g_program, "currentNumberOfLights", 3);
   // Define an ambient light source.
   Visuals_Program_bindInteger32(state, g_program, "g_lights[0].type", 4);
@@ -175,10 +154,16 @@ Zeitgeist_Rendition_update
   Visuals_Program_bindVector3F32(state, g_program, "g_lights[2].color", Vector3F32_create(state, 0.8f, 0.8f, 0.8f));
   Visuals_Program_bindVector3F32(state, g_program, "g_lights[2].position", Vector3F32_create(state, 0.f, 0.f, 0.f));
 
-  Shizu_Value sizeValue = Shizu_List_getSize(state, g_world->geometries);
-  for (Shizu_Integer32 i = 0, n = Shizu_Value_getInteger32(&sizeValue); i < n; ++i) {
+  for (size_t i = 0, n = Shizu_List_getSize(state, g_world->geometries); i < n; ++i) {
     Shizu_Value elementValue = Shizu_List_getValue(state, g_world->geometries, i);
-    StaticGeometryGl *element = (StaticGeometryGl*)Shizu_Value_getObject(&elementValue);
+    StaticGeometry *element = (StaticGeometry*)Shizu_Value_getObject(&elementValue);
+    // Bind materials.
+    for (size_t i = 0, n = Shizu_List_getSize(state, element->materials); i < n; ++i) {
+      Shizu_Value elementValue = Shizu_List_getValue(state, element->materials, i);
+      Visuals_Material* element = (Visuals_Material*)Shizu_Value_getObject(&elementValue);
+      bindMaterial(state, visualsContext, g_program, element);
+    }
+    // Bind vertices.
     switch (element->vertexBuffer->flags) {
       case (Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3): {
         Visuals_Program_bindInteger32(state, g_program, "vertexDescriptor", Visuals_VertexSemantics_PositionXyz);
@@ -198,7 +183,7 @@ Zeitgeist_Rendition_update
     Visuals_Context_render(state, visualsContext, element->vertexBuffer, g_program);
   }
 
-  Visuals_ServiceGl_endFrame(state);
+  Visuals_Service_endFrame(state);
 }
 
 static void
@@ -258,12 +243,12 @@ Zeitgeist_Rendition_load
     Shizu_State* state
   )
 {
-  Visuals_ServiceGl_startup(state);
-  Visuals_ServiceGl_setTitle(state, Shizu_String_create(state, "Room (OpenGL)", strlen("Room (OpenGL)")));
+  Visuals_Service_startup(state);
+  Visuals_Service_setTitle(state, Shizu_String_create(state, "Room (OpenGL)", strlen("Room (OpenGL)")));
 
   Shizu_Value temporary;
   Shizu_Value_setCxxFunction(&temporary, &onKeyboardKeyMessage);
-  Visuals_ServiceGl_addKeyboardKeyCallback(state, &temporary);
+  Visuals_Service_addKeyboardKeyCallback(state, &temporary);
 
   Shizu_JumpTarget jumpTarget;
   Shizu_State_pushJumpTarget(state, &jumpTarget);
@@ -279,6 +264,20 @@ Zeitgeist_Rendition_load
     Visuals_RenderBuffer* renderBuffer = Visuals_Context_createRenderBuffer(state, visualsContext);
     Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)renderBuffer);
     g_renderBuffer = renderBuffer;
+
+    Shizu_String* p;
+
+    p = Visuals_Service_getBackendVendorName(state);
+    fprintf(stdout, "backend vendor: ");
+    fwrite(Shizu_String_getBytes(state, p), 1, Shizu_String_getNumberOfBytes(state, p), stdout);
+    fprintf(stdout, "\n");
+
+    p = Visuals_Service_getBackendRendererName(state);
+    fprintf(stdout, "backend renderer: ");
+    fwrite(Shizu_String_getBytes(state, p), 1, Shizu_String_getNumberOfBytes(state, p), stdout);
+    fprintf(stdout, "\n");
+
+    fprintf(stdout, "backend version: %d.%d\n", Visuals_Service_getBackendMajorVersion(state), Visuals_Service_getBackendMinorVersion(state));
 
     Visuals_Context_setCullMode(state, visualsContext, Visuals_CullMode_Back);
     Visuals_Context_setDepthFunction(state, visualsContext, Visuals_DepthFunction_LessThanOrEqualTo);
@@ -302,9 +301,6 @@ Zeitgeist_Rendition_load
     }
     Shizu_State_jump(state);
   }
-  fprintf(stdout, "OpenGL renderer: %s\n", glGetString(GL_RENDERER));
-  fprintf(stdout, "OpenGL vendor:   %s\n", glGetString(GL_VENDOR));
-  fprintf(stdout, "OpenGL version:  %s\n", glGetString(GL_VERSION));
 }
 
 Shizu_Rendition_Export void
@@ -313,11 +309,17 @@ Zeitgeist_Rendition_unload
     Shizu_State* state
   )
 {
-  Shizu_Value sizeValue = Shizu_List_getSize(state, g_world->geometries);
-  for (Shizu_Integer32 i = 0, n = Shizu_Value_getInteger32(&sizeValue); i < n; ++i) {
+  for (size_t i = 0, n = Shizu_List_getSize(state, g_world->geometries); i < n; ++i) {
     Shizu_Value elementValue = Shizu_List_getValue(state, g_world->geometries, i);
-    StaticGeometryGl* element = (StaticGeometryGl*)Shizu_Value_getObject(&elementValue);
-    StaticGeometryGl_unmaterialize(state, element);
+    StaticGeometry* element = (StaticGeometry*)Shizu_Value_getObject(&elementValue);
+    Shizu_JumpTarget jumpTarget;
+    Shizu_State_pushJumpTarget(state, &jumpTarget);
+    if (!setjmp(jumpTarget.environment)) {
+      StaticGeometry_unmaterialize(state, element);
+      Shizu_State_popJumpTarget(state);
+    } else {
+      Shizu_State_popJumpTarget(state);
+    }
   }
   if (g_renderBuffer) {
     Visuals_Object_unmaterialize(state, (Visuals_Object*)g_renderBuffer);
@@ -333,5 +335,5 @@ Zeitgeist_Rendition_unload
     Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_program);
     g_program = NULL;
   }
-  Visuals_ServiceGl_shutdown(state);
+  Visuals_Service_shutdown(state);
 }

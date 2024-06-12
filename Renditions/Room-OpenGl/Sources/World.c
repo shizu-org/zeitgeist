@@ -1,32 +1,35 @@
 #include "World.h"
 
-#include "Visuals/VertexBuffer.h"
+#include "Visuals/BlinnPhongMaterial.h"
 #include "Visuals/Context.h"
+#include "Visuals/PhongMaterial.h"
+#include "Visuals/VertexBuffer.h"
+
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 static void
-StaticGeometryGl_finalize
+StaticGeometry_finalize
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self
+		StaticGeometry* self
 	);
 
 static void
-StaticGeometryGl_visit
+StaticGeometry_visit
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self
+		StaticGeometry* self
 	);
 
 static Shizu_TypeDescriptor const StaticGeometryGl_Type = {
 	.postCreateType = NULL,
 	.preDestroyType = NULL,
 	.visitType = NULL,
-	.size = sizeof(StaticGeometryGl),
-	.finalize = (Shizu_OnFinalizeCallback*)&StaticGeometryGl_finalize,
-	.visit = (Shizu_OnVisitCallback*)&StaticGeometryGl_visit,
-	.dispatchSize = sizeof(StaticGeometryGl_Dispatch),
+	.size = sizeof(StaticGeometry),
+	.finalize = (Shizu_OnFinalizeCallback*)&StaticGeometry_finalize,
+	.visit = (Shizu_OnVisitCallback*)&StaticGeometry_visit,
+	.dispatchSize = sizeof(StaticGeometry_Dispatch),
 	.dispatchInitialize = NULL,
 	.dispatchUninitialize = NULL,
 };
@@ -34,68 +37,73 @@ static Shizu_TypeDescriptor const StaticGeometryGl_Type = {
 Shizu_defineType(StaticGeometryGl, Shizu_Object);
 
 static void
-StaticGeometryGl_finalize
+StaticGeometry_finalize
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self
+		StaticGeometry* self
 	)
 {
-	self->colorTexture = NULL;
+	self->materials = NULL;
 	self->vertexBuffer = NULL;
 }
 
 static void
-StaticGeometryGl_visit
+StaticGeometry_visit
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self
+		StaticGeometry* self
 	)
 {
+	if (self->materials) {
+		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->materials);
+	}
 	if (self->vertexBuffer) {
 		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->vertexBuffer);
-	}
-	if (self->colorTexture) {
-		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->colorTexture);
 	}
 }
 
 void
-StaticGeometryGl_unmaterialize
+StaticGeometry_unmaterialize
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self
+		StaticGeometry* self
 	)
 {
+	for (size_t i = 0, n = Shizu_List_getSize(state, self->materials); i < n; ++i) {
+		Shizu_Value element = Shizu_List_getValue(state, self->materials, i);
+		Visuals_Object_unmaterialize(state, (Visuals_Object*)Shizu_Value_getObject(&element));
+	}
 	if (self->vertexBuffer) {
 		Visuals_Object_unmaterialize(state, (Visuals_Object*)self->vertexBuffer);
 	}
-	if (self->colorTexture) {
-		Visuals_Object_unmaterialize(state, (Visuals_Object*)self->colorTexture);
-	}
 }
 
-StaticGeometryGl*
-StaticGeometryGl_create
+StaticGeometry*
+StaticGeometry_create
 	(
 		Shizu_State* state,
 		Visuals_Context* visualsContext
 	)
 {
 	Shizu_Type* type = StaticGeometryGl_getType(state);
-	StaticGeometryGl* self = (StaticGeometryGl*)Shizu_Gc_allocateObject(state, sizeof(StaticGeometryGl));
+	StaticGeometry* self = (StaticGeometry*)Shizu_Gc_allocateObject(state, sizeof(StaticGeometry));
 	self->vertexBuffer = (Visuals_VertexBuffer*)Visuals_Context_createVertexBuffer(state, visualsContext);
+	self->materials = Shizu_List_create(state);
+	{
+		Shizu_List_appendObject(state, self->materials, (Shizu_Object*)Visuals_PhongMaterial_create(state));
+		Shizu_List_appendObject(state, self->materials, (Shizu_Object*)Visuals_BlinnPhongMaterial_create(state));
+	}
 	self->numberOfVertices = 0;
-	self->colorTexture = NULL;
 	Visuals_Object_materialize(state, (Visuals_Object*)self->vertexBuffer);
 	((Shizu_Object*)self)->type = type;
 	return self;
 }
 
 void
-StaticGeometryGl_setData
+StaticGeometry_setData
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self,
+		StaticGeometry* self,
 		uint8_t flags,
 		size_t numberOfVertices,
 		size_t numberOfBytes,
@@ -165,10 +173,10 @@ struct VERTEX {
 #endif
 
 void
-StaticGeometryGl_setDataNorthWall
+StaticGeometry_setDataNorthWall
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self,
+		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
 		Shizu_Float32 height
@@ -198,15 +206,15 @@ StaticGeometryGl_setDataNorthWall
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometry_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = NORTH_WALL;
 }
 
 void
-StaticGeometryGl_setDataSouthWall
+StaticGeometry_setDataSouthWall
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self,
+		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
 		Shizu_Float32 height
@@ -236,15 +244,15 @@ StaticGeometryGl_setDataSouthWall
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometry_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = SOUTH_WALL;
 }
 
 void
-StaticGeometryGl_setDataEastWall
+StaticGeometry_setDataEastWall
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self,
+		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
 		Shizu_Float32 height
@@ -274,15 +282,15 @@ StaticGeometryGl_setDataEastWall
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometry_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = EAST_WALL;
 }
 
 void
-StaticGeometryGl_setDataWestWall
+StaticGeometry_setDataWestWall
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self,
+		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
 		Shizu_Float32 height
@@ -312,15 +320,15 @@ StaticGeometryGl_setDataWestWall
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometry_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = WEST_WALL;
 }
 
 void
-StaticGeometryGl_setDataFloor
+StaticGeometry_setDataFloor
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self,
+		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
 		Shizu_Float32 length
@@ -350,15 +358,15 @@ StaticGeometryGl_setDataFloor
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometry_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = FLOOR;
 }
 
 void
-StaticGeometryGl_setDataCeiling
+StaticGeometry_setDataCeiling
 	(
 		Shizu_State* state,
-		StaticGeometryGl* self,
+		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
 		Shizu_Float32 length
@@ -388,7 +396,7 @@ StaticGeometryGl_setDataCeiling
 	debugCheckNormal(state, &vertices[0], &n);
 
 	size_t numberOfVertices = sizeof(vertices) / sizeof(struct VERTEX);
-	StaticGeometryGl_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
+	StaticGeometry_setData(state, self, Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess | Visuals_VertexSyntactics_Float3_Float3_Float3_Float3_Float3_Float, numberOfVertices, sizeof(vertices), vertices);
 	self->flags = CEILING;
 }
 
@@ -442,7 +450,7 @@ World_create
 
 	self->geometries = Shizu_List_create(state);
 	
-	StaticGeometryGl* geometry = NULL;
+	StaticGeometry* geometry = NULL;
 
 	// Extend along the x-axis in metres.
 	static const Shizu_Float32 breadth = 5.f;
@@ -451,28 +459,28 @@ World_create
 	// Extend along the y-axis in metres.
 	static const Shizu_Float32 height = 4.f;
 
-	geometry = StaticGeometryGl_create(state, visualsContext);
-	StaticGeometryGl_setDataFloor(state, geometry, Vector3F32_create(state, 0.f, -height / 2.f, 0.f), breadth, length);
+	geometry = StaticGeometry_create(state, visualsContext);
+	StaticGeometry_setDataFloor(state, geometry, Vector3F32_create(state, 0.f, -height / 2.f, 0.f), breadth, length);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state, visualsContext);
-	StaticGeometryGl_setDataCeiling(state, geometry, Vector3F32_create(state, 0.f, +height / 2.f, 0.f), breadth, length);
+	geometry = StaticGeometry_create(state, visualsContext);
+	StaticGeometry_setDataCeiling(state, geometry, Vector3F32_create(state, 0.f, +height / 2.f, 0.f), breadth, length);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state, visualsContext);
-	StaticGeometryGl_setDataWestWall(state, geometry, Vector3F32_create(state, -breadth / 2.f, 0.f, 0.f), length, height);
+	geometry = StaticGeometry_create(state, visualsContext);
+	StaticGeometry_setDataWestWall(state, geometry, Vector3F32_create(state, -breadth / 2.f, 0.f, 0.f), length, height);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state, visualsContext);
-	StaticGeometryGl_setDataNorthWall(state, geometry, Vector3F32_create(state, 0.f, 0.f, -length / 2.f), breadth, height);
+	geometry = StaticGeometry_create(state, visualsContext);
+	StaticGeometry_setDataNorthWall(state, geometry, Vector3F32_create(state, 0.f, 0.f, -length / 2.f), breadth, height);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state, visualsContext);
-	StaticGeometryGl_setDataEastWall(state, geometry, Vector3F32_create(state, +breadth / 2.f, 0.f, 0.f), length, height);
+	geometry = StaticGeometry_create(state, visualsContext);
+	StaticGeometry_setDataEastWall(state, geometry, Vector3F32_create(state, +breadth / 2.f, 0.f, 0.f), length, height);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
-	geometry = StaticGeometryGl_create(state, visualsContext);
-	StaticGeometryGl_setDataSouthWall(state, geometry, Vector3F32_create(state, 0.f, 0.f, +length / 2.f), breadth, height);
+	geometry = StaticGeometry_create(state, visualsContext);
+	StaticGeometry_setDataSouthWall(state, geometry, Vector3F32_create(state, 0.f, 0.f, +length / 2.f), breadth, height);
 	Shizu_List_appendObject(state, self->geometries, (Shizu_Object*)geometry);
 
 	self->player = Player_create(state);

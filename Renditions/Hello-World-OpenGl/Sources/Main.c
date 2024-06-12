@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include "Zeitgeist/UpstreamRequests.h"
-#include "Visuals/Gl/ServiceGl.h"
+#include "Visuals/Service.h"
 
 #include "Visuals/DefaultPrograms.h"
 #include "Visuals/Program.h"
@@ -58,9 +58,9 @@ Zeitgeist_Rendition_update
     Shizu_State* state
   )
 {
-  Visuals_ServiceGl_update(state);
+  Visuals_Service_update(state);
 
-  if (Visuals_ServiceGl_quitRequested(state)) {
+  if (Visuals_Service_quitRequested(state)) {
     Zeitgeist_UpstreamRequest* request = Zeitgeist_UpstreamRequest_createExitProcessRequest(state);
     Zeitgeist_sendUpstreamRequest(state, request);
   }
@@ -68,8 +68,8 @@ Zeitgeist_Rendition_update
   Visuals_Context* visualsContext = (Visuals_Context*)Visuals_Gl_Context_create(state);
 
   Shizu_Integer32 canvasWidth, canvasHeight;
-  Visuals_ServiceGl_getClientSize(state, &canvasWidth, &canvasHeight);
-  Visuals_ServiceGl_beginFrame(state);
+  Visuals_Service_getClientSize(state, &canvasWidth, &canvasHeight);
+  Visuals_Service_beginFrame(state);
 
   Visuals_Context_clear(state, visualsContext, true, true);
     
@@ -82,7 +82,7 @@ Zeitgeist_Rendition_update
 
   Visuals_Context_render(state, visualsContext, g_vertexBuffer, g_program);
 
-  Visuals_ServiceGl_endFrame(state);
+  Visuals_Service_endFrame(state);
 }
 
 Shizu_Rendition_Export void
@@ -93,12 +93,12 @@ Zeitgeist_Rendition_load
 {
   Shizu_JumpTarget jumpTarget;
 
-  Visuals_ServiceGl_startup(state);
+  Visuals_Service_startup(state);
 
   Shizu_State_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
     Visuals_Context* visualsContext = (Visuals_Context*)Visuals_Gl_Context_create(state);
-    Visuals_ServiceGl_setTitle(state, Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)")));
+    Visuals_Service_setTitle(state, Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)")));
     Visuals_Program* program = Visuals_getProgram(state, "simple");
     Visuals_Object_materialize(state, (Visuals_Object*)program);
     Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)program);
@@ -110,6 +110,21 @@ Zeitgeist_Rendition_load
     Visuals_RenderBuffer* renderBuffer = Visuals_Context_createRenderBuffer(state, visualsContext);
     Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)renderBuffer);
     g_renderBuffer = renderBuffer;
+
+    Shizu_String* p;
+
+    p = Visuals_Service_getBackendVendorName(state);
+    fprintf(stdout, "backend vendor: ");
+    fwrite(Shizu_String_getBytes(state, p), 1, Shizu_String_getNumberOfBytes(state, p), stdout);
+    fprintf(stdout, "\n");
+
+    p = Visuals_Service_getBackendRendererName(state);
+    fprintf(stdout, "backend renderer: ");
+    fwrite(Shizu_String_getBytes(state, p), 1, Shizu_String_getNumberOfBytes(state, p), stdout);
+    fprintf(stdout, "\n");
+
+    fprintf(stdout, "backend version: %d.%d\n", Visuals_Service_getBackendMajorVersion(state), Visuals_Service_getBackendMinorVersion(state));
+
     Shizu_State_popJumpTarget(state);
   } else {
     Shizu_State_popJumpTarget(state);
@@ -128,7 +143,7 @@ Zeitgeist_Rendition_load
       Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_program);
       g_program = NULL;
     }
-    Visuals_ServiceGl_shutdown(state);
+    Visuals_Service_shutdown(state);
     Shizu_State_jump(state);
   }
 }
@@ -154,5 +169,5 @@ Zeitgeist_Rendition_unload
     Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_program);
     g_program = NULL;
   }
-  Visuals_ServiceGl_shutdown(state);
+  Visuals_Service_shutdown(state);
 }
