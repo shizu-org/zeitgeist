@@ -101,8 +101,7 @@ onListRenditions
   )
 {
   Shizu_List* renditions = loadRenditions(state);
-  Shizu_Value size = Shizu_List_getSize(state, renditions);
-  for (size_t i = 0, n = Shizu_Value_getInteger32(&size); i < n; ++i) {
+  for (size_t i = 0, n = Shizu_List_getSize(state, renditions); i < n; ++i) {
     Shizu_Value value = Shizu_List_getValue(state, renditions, i);
     if (!Shizu_Value_isObject(&value)) {
       Shizu_State_setStatus(state, 1);
@@ -174,8 +173,7 @@ onRendition
   )
 { 
   Shizu_List* loadedRenditions = loadRenditions(state);
-  Shizu_Value size = Shizu_List_getSize(state, loadedRenditions);
-  for (size_t i = 0, n = Shizu_Value_getInteger32(&size); i < n; ++i) {
+  for (size_t i = 0, n = Shizu_List_getSize(state, loadedRenditions); i < n; ++i) {
     Shizu_Value value = Shizu_List_getValue(state, loadedRenditions, i);
     if (!Shizu_Value_isObject(&value)) {
       Shizu_State_setStatus(state, 1);
