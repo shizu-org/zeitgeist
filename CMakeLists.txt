@@ -67,17 +67,17 @@ endif()
 
 set(idlib-bit-scan.tag CACHE STRING "IdLib Bit Scan: The Git tag to check out")
 if (NOT idlib-bit-scan.tag)
-  set(idlib-bit-scan.tag 1.4)
+  set(idlib-bit-scan.tag 1.5)
 endif()
 
 set(idlib-bit-scan.source-dir CACHE STRING "IdLib Bit Scan: Path to the source directory")
 if (NOT idlib-bit-scan.source-dir)
-  set(idlib-bit-scan.source-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-bit-scan-1.4-src")
+  set(idlib-bit-scan.source-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-bit-scan-1.5-src")
 endif()
 
 set(idlib-bit-scan.binary-dir CACHE STRING "IdLib Bit Scan: Path to the build directory")
 if (NOT idlib-bit-scan.binary-dir)
-  set(idlib-bit-scan.binary-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-bit-scan-1.4-bld")
+  set(idlib-bit-scan.binary-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-bit-scan-1.5-bld")
 endif()
 
 #######################################################################################################################
