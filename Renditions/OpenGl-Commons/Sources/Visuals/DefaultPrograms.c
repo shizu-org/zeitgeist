@@ -22,6 +22,8 @@
 #include "Visuals/DefaultPrograms.h"
 
 #include "Visuals/Gl/Program.h"
+// strlen
+#include <string.h>
 
 #define VertexPositionName "vertexPosition"
 #define VertexNormalName "vertexNormal"

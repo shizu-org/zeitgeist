@@ -21,7 +21,7 @@
 
 #include "KeyboardKeyMessage.h"
 
-#include "Shizu/Runtime/debugAssert.h"
+#include "Shizu/Runtime/DebugAssert.h"
 
 Shizu_TypeDescriptor const KeyboardKeyMessage_Type = {
 	.postCreateType = NULL,

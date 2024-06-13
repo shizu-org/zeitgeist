@@ -6,6 +6,48 @@
 #include "idlib/file_system.h"
 #include "Zeitgeist/Rendition.h"
 
+static Shizu_Object* Shizu_Environment_getObject(Shizu_State* state, Shizu_Environment* self, Shizu_String* name, Shizu_Type* type) {
+  Shizu_Value v = Shizu_Environment_get(state, self, name);
+  if (!Shizu_Value_isObject(&v)) {
+    Shizu_State_setStatus(state, Shizu_Status_ArgumentInvalid);
+    Shizu_State_jump(state);
+  }
+  if (!Shizu_Types_isSubTypeOf(Shizu_State_getState1(state), Shizu_State_getTypes(state), Shizu_Value_getObject(&v)->type, type)) {
+    Shizu_State_setStatus(state, Shizu_Status_ArgumentInvalid);
+    Shizu_State_jump(state);
+  }
+  return Shizu_Value_getObject(&v);
+}
+
+static Shizu_CxxProcedure* Shizu_Environment_getCxxProcedure(Shizu_State* state, Shizu_Environment* self, Shizu_String* name) {
+  Shizu_Type* type = Shizu_CxxProcedure_getType(state);
+  return (Shizu_CxxProcedure*)Shizu_Environment_getObject(state, self, name, type);
+}
+
+static Shizu_String* Shizu_Environment_getString(Shizu_State* state, Shizu_Environment* self, Shizu_String* name) {
+  return (Shizu_String*)Shizu_Environment_getObject(state, self, name, Shizu_String_getType(state));
+}
+
+static Shizu_String* getWorkingDirectory(Shizu_State* state) {
+  Shizu_Value returnValue;
+  Shizu_Value argumentValues[2];
+  Shizu_CxxProcedure* p;
+  Shizu_Environment* environment = Shizu_State_getGlobals(state);
+  // Compute the path.
+  p = Shizu_Environment_getCxxProcedure(state, environment, Shizu_String_create(state, "getWorkingDirectory", strlen("getWorkingDirectory")));
+  p->f(state, &returnValue, 0, argumentValues);
+  if (!Shizu_Value_isObject(&returnValue)) {
+    Shizu_State_setStatus(state, Shizu_Status_ArgumentInvalid);
+    Shizu_State_jump(state);
+  }
+  if (!Shizu_Types_isSubTypeOf(Shizu_State_getState1(state), Shizu_State_getTypes(state), Shizu_Value_getObject(&returnValue)->type, Shizu_String_getType(state))) {
+    Shizu_State_setStatus(state, Shizu_Status_ArgumentInvalid);
+    Shizu_State_jump(state);
+  }
+  Shizu_String* path = (Shizu_String*)Shizu_Value_getObject(&returnValue);
+  return path;
+}
+
 typedef struct LoadRenditionsContext {
   Shizu_State* state;
   Shizu_List* list;
@@ -35,13 +77,17 @@ loadRenditions
     Shizu_State* state
   )
 {
+  Shizu_String *path = getWorkingDirectory(state);
+  path = Shizu_String_concatenate(state, path, Shizu_String_create(state, Shizu_OperatingSystem_DirectorySeparator "Renditions", strlen(Shizu_OperatingSystem_DirectorySeparator "Renditions")));
+
+
   Shizu_List* renditions = Shizu_List_create(state);
   LoadRenditionsContext context;
   context.state = state;
   context.list = renditions;
-  context.prefix = Shizu_String_create(state, "." Shizu_OperatingSystem_DirectorySeparator "Renditions" Shizu_OperatingSystem_DirectorySeparator,
-                                       strlen("." Shizu_OperatingSystem_DirectorySeparator "Renditions" Shizu_OperatingSystem_DirectorySeparator));
-  if (idlib_enumerate_files("." Shizu_OperatingSystem_DirectorySeparator "Renditions", &context, &loadRenditionsCallback, true, true)) {
+  context.prefix = Shizu_String_concatenate(state, path, Shizu_String_create(state, Shizu_OperatingSystem_DirectorySeparator, strlen(Shizu_OperatingSystem_DirectorySeparator)));
+  if (idlib_enumerate_files(Shizu_String_getBytes(state, Shizu_String_concatenate(state, path, Shizu_String_create(state, "", 1))), &context, &loadRenditionsCallback, true, true)) {
+    Shizu_State_setStatus(state, Shizu_Status_EnvironmentFailed);
     Shizu_State_jump(state);
   }
   return renditions;
@@ -218,6 +264,7 @@ main
   Shizu_JumpTarget jumpTarget;
   Shizu_State_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
+    Shizu_State_ensureModulesLoaded(state);
     main1(state, argc, argv);
     exitCode = EXIT_SUCCESS;
     Shizu_State_popJumpTarget(state);

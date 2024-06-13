@@ -269,9 +269,9 @@ Visuals_Gl_Program_dispatchInitialize
   ((Visuals_Program_Dispatch*)self)->bindBoolean = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Boolean)) &Visuals_Gl_Program_bindBooleanImpl;
   ((Visuals_Program_Dispatch*)self)->bindFloat32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Float32)) & Visuals_Gl_Program_bindFloat32Impl;
   ((Visuals_Program_Dispatch*)self)->bindInteger32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Shizu_Integer32)) & Visuals_Gl_Program_bindInteger32Impl;
-  ((Visuals_Program_Dispatch*)self)->bindMatrix4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Matrix4F32 const*)) & Visuals_Gl_Program_bindMatrix4R32Impl;
-  ((Visuals_Program_Dispatch*)self)->bindVector3F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector3F32 const*)) & Visuals_Gl_Program_bindVector3R32Impl;
-  ((Visuals_Program_Dispatch*)self)->bindVector4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector4F32 const*)) & Visuals_Gl_Program_bindVector4R32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindMatrix4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Matrix4F32*)) & Visuals_Gl_Program_bindMatrix4R32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindVector3F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector3F32*)) & Visuals_Gl_Program_bindVector3R32Impl;
+  ((Visuals_Program_Dispatch*)self)->bindVector4F32 = (void(*)(Shizu_State*, Visuals_Program*, char const*, Vector4F32*)) & Visuals_Gl_Program_bindVector4R32Impl;
 }
 
 void
