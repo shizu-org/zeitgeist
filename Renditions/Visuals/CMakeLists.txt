@@ -16,6 +16,10 @@ list(APPEND ${name}.header_files Sources/Vector4F32.h)
 
 list(APPEND ${name}.source_files Sources/KeyboardKeyMessage.c)
 list(APPEND ${name}.header_files Sources/KeyboardKeyMessage.h)
+list(APPEND ${name}.source_files Sources/MouseButtonMessage.c)
+list(APPEND ${name}.header_files Sources/MouseButtonMessage.h)
+list(APPEND ${name}.source_files Sources/MousePointerMessage.c)
+list(APPEND ${name}.header_files Sources/MousePointerMessage.h)
 
 list(APPEND ${name}.source_files Sources/Visuals/Object.c)
 list(APPEND ${name}.header_files Sources/Visuals/Object.h)
@@ -24,6 +28,13 @@ list(APPEND ${name}.source_files Sources/Visuals/Texture.c)
 list(APPEND ${name}.header_files Sources/Visuals/Texture.h)
 list(APPEND ${name}.source_files Sources/Visuals/VertexBuffer.c)
 list(APPEND ${name}.header_files Sources/Visuals/VertexBuffer.h)
+
+list(APPEND ${name}.source_files Sources/Visuals/Material.c)
+list(APPEND ${name}.header_files Sources/Visuals/Material.h)
+list(APPEND ${name}.source_files Sources/Visuals/PhongMaterial.c)
+list(APPEND ${name}.header_files Sources/Visuals/PhongMaterial.h)
+list(APPEND ${name}.source_files Sources/Visuals/BlinnPhongMaterial.c)
+list(APPEND ${name}.header_files Sources/Visuals/BlinnPhongMaterial.h)
 
 end_library()
 
