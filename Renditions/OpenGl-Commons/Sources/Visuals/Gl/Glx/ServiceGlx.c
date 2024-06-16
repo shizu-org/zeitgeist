@@ -371,6 +371,15 @@ startupWindow
   XMapWindow( g_display, g_window );
   
   XSync(g_display, False);
+  
+  // We are only interested in keyboard events
+  long eventMask = 0;
+  eventMask |= KeyPressMask | KeyReleaseMask;
+  eventMask |= ButtonPressMask | ButtonReleaseMask;
+  eventMask |= PointerMotionMask;
+  // Set the input mask for our window on the current display
+  XSelectInput(g_display, g_window, eventMask);
+
 
   XSetErrorHandler(g_oldErrorHandler);
   
@@ -465,6 +474,42 @@ mapKeyboardKey
     case XK_Right: {
       Shizu_Value value;
       Shizu_Value_setInteger32(&value, KeyboardKey_Right);
+      return value;
+    } break;
+    case XK_a:
+    case XK_A: {
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_A);
+      return value;
+    } break;
+    case XK_d:
+    case XK_D: {
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_D);
+      return value;
+    } break;
+    case XK_e:
+    case XK_E: {
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_Q);
+      return value;
+    } break;
+    case XK_q:
+    case XK_Q: {
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_Q);
+      return value;
+    } break;
+    case XK_s:
+    case XK_S: {
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_S);
+      return value;
+    } break;
+    case XK_w:
+    case XK_W: {
+      Shizu_Value value;
+      Shizu_Value_setInteger32(&value, KeyboardKey_W);
       return value;
     } break;
     default: {
