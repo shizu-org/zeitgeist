@@ -10,7 +10,7 @@ It protects the actual software from environment idiosyncrasies like compilers a
 
 ## Contribute
 If you have questions on using *Zeitgeist* or you want to contribute,
-contact me under [contact@primordialmachine.com](contact@priordialmachine.com).
+contact me under [contact@shizu.org](contact@shizu.org).
 
 # How Zeitgeist Works (2024)
 The *Zeitgeist* interpreter is invoked via command line and expects the name of a *rendition* as its single parameter.
