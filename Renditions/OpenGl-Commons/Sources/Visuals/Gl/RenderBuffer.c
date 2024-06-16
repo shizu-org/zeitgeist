@@ -29,6 +29,13 @@ Visuals_Gl_RenderBuffer_dispatchInitialize
   );
 
 static void
+Visuals_Gl_RenderBuffer_finalize
+  (
+    Shizu_State* state,
+    Visuals_Gl_RenderBuffer* self
+  );
+
+static void
 Visuals_Gl_RenderBuffer_materializeImpl
   (
     Shizu_State* state,
@@ -56,7 +63,7 @@ static Shizu_TypeDescriptor const Visuals_Gl_RenderBuffer_Type = {
   .preDestroyType = NULL,
   .visitType = NULL,
   .size = sizeof(Visuals_Gl_RenderBuffer),
-  .finalize = NULL,
+  .finalize = (Shizu_OnFinalizeCallback*)&Visuals_Gl_RenderBuffer_finalize,
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_Gl_RenderBuffer_Dispatch),
   .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&Visuals_Gl_RenderBuffer_dispatchInitialize,
@@ -75,6 +82,31 @@ Visuals_Gl_RenderBuffer_dispatchInitialize
   ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_materializeImpl;
   ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_unmaterializeImpl;
   ((Visuals_RenderBuffer_Dispatch*)self)->resize = (void(*)(Shizu_State*,Visuals_RenderBuffer*,Shizu_Integer32,Shizu_Integer32)) & Visuals_Gl_RenderBuffer_resizeImpl;
+}
+
+static void
+Visuals_Gl_RenderBuffer_finalize
+  (
+    Shizu_State* state,
+    Visuals_Gl_RenderBuffer* self
+  )
+{
+  // Destroy the framebuffer.
+  if (self->frameBufferId) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &self->frameBufferId);
+    self->frameBufferId = 0;
+  }
+  // Destroy the depth and stencil attachment texture.
+  if (self->depthStencilTextureId) {
+    glDeleteTextures(1, &self->depthStencilTextureId);
+    self->depthStencilTextureId = 0;
+  }
+  // Destroy the color attachment texture.
+  if (self->colorTextureId) {
+    glDeleteTextures(1, &self->colorTextureId);
+    self->colorTextureId = 0;
+  }
 }
 
 static void
@@ -195,13 +227,14 @@ Visuals_Gl_RenderBuffer_construct
     Visuals_Gl_RenderBuffer* self
   )
 {
-  Shizu_Type* type = Visuals_Gl_RenderBuffer_getType(state);
+  Shizu_Type *TYPE = Visuals_Gl_RenderBuffer_getType(state);
+  Visuals_RenderBuffer_construct(state, (Visuals_RenderBuffer*)self);
   self->width = 640;
   self->height = 480;
   self->frameBufferId = 0; 
   self->colorTextureId = 0;
   self->depthStencilTextureId = 0;
-  ((Shizu_Object*)self)->type = type;
+  ((Shizu_Object*)self)->type = TYPE;
 }
 
 Visuals_Gl_RenderBuffer*
