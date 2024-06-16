@@ -12,7 +12,7 @@ include(FetchContent)
 
 set(idlib-math.repository CACHE STRING "IdLib Math: The Git repository to check out")
 if (NOT idlib-math.repository)
-  set(idlib-math.repository https://github.com/michaelheilmann/idlib-math.git)
+  set(idlib-math.repository https://github.com/shizu-org/idlib-math.git)
 endif()
 
 set(idlib-math.tag CACHE STRING "IdLib Math: The Git tag to check out")
@@ -40,7 +40,7 @@ FetchContent_Declare(idlib-math
 
 set(idlib-process.repository CACHE STRING "IdLib Process: The Git repository to check out")
 if (NOT idlib-process.repository)
-  set(idlib-process.repository https://github.com/michaelheilmann/idlib-process.git)
+  set(idlib-process.repository https://github.com/shizu-org/idlib-process.git)
 endif()
 
 set(idlib-process.tag CACHE STRING "IdLib Process: The Git tag to check out")
@@ -62,7 +62,7 @@ endif()
 
 set(idlib-bit-scan.repository CACHE STRING "IdLib Bit Scan: The Git repository to check out")
 if (NOT idlib-bit-scan.repository)
-  set(idlib-bit-scan.repository https://github.com/michaelheilmann/idlib-bit-scan.git)
+  set(idlib-bit-scan.repository https://github.com/shizu-org/idlib-bit-scan.git)
 endif()
 
 set(idlib-bit-scan.tag CACHE STRING "IdLib Bit Scan: The Git tag to check out")
@@ -84,7 +84,7 @@ endif()
 
 set(idlib-file-system.repository CACHE STRING "IdLib File System: The Git repository to check out")
 if (NOT idlib-file-systme.repository)
-  set(idlib-file-system.repository https://github.com/michaelheilmann/idlib-file-system.git)
+  set(idlib-file-system.repository https://github.com/shizu-org/idlib-file-system.git)
 endif()
 
 set(idlib-file-system.tag CACHE STRING "IdLib File System: The Git tag to check out")
@@ -106,7 +106,7 @@ endif()
 
 set(Shizu.Runtime.repository CACHE STRING "Shizu Runtime: The Git repository to check out")
 if (NOT Shizu.Runtime.repository)
-  set(Shizu.Runtime.repository https://github.com/michaelheilmann/shizu-runtime.git)
+  set(Shizu.Runtime.repository https://github.com/shizu-org/shizu-runtime.git)
 endif()
 
 set(Shizu.Runtime.tag CACHE STRING "Shizu Runtime: The Git tag to check out")
