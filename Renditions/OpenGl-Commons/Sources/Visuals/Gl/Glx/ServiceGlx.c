@@ -491,7 +491,7 @@ mapKeyboardKey
     case XK_e:
     case XK_E: {
       Shizu_Value value;
-      Shizu_Value_setInteger32(&value, KeyboardKey_Q);
+      Shizu_Value_setInteger32(&value, KeyboardKey_E);
       return value;
     } break;
     case XK_q:
