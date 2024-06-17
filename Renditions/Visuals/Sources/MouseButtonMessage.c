@@ -21,7 +21,7 @@
 
 #include "MouseButtonMessage.h"
 
-#include "Shizu/Runtime/debugAssert.h"
+#include "Shizu/Runtime/DebugAssert.h"
 
 Shizu_TypeDescriptor const MouseButtonMessage_Type = {
 	.postCreateType = NULL,

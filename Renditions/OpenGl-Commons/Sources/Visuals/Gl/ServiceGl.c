@@ -2,7 +2,7 @@
 
 #include "ServiceGl.h"
 
-// malloc
+// malloc, free
 #include <malloc.h>
 
 // fprintf, stdio
@@ -10,6 +10,9 @@
 
 // exit, EXIT_FAILURE
 #include <stdlib.h>
+
+// strlen
+#include <string.h>
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   #include "Visuals/Gl/Wgl/ServiceWgl.h"
