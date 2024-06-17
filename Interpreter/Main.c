@@ -6,28 +6,6 @@
 #include "idlib/file_system.h"
 #include "Zeitgeist/Rendition.h"
 
-static Shizu_Object* Shizu_Environment_getObject(Shizu_State* state, Shizu_Environment* self, Shizu_String* name, Shizu_Type* type) {
-  Shizu_Value v = Shizu_Environment_get(state, self, name);
-  if (!Shizu_Value_isObject(&v)) {
-    Shizu_State_setStatus(state, Shizu_Status_ArgumentInvalid);
-    Shizu_State_jump(state);
-  }
-  if (!Shizu_Types_isSubTypeOf(Shizu_State_getState1(state), Shizu_State_getTypes(state), Shizu_Value_getObject(&v)->type, type)) {
-    Shizu_State_setStatus(state, Shizu_Status_ArgumentInvalid);
-    Shizu_State_jump(state);
-  }
-  return Shizu_Value_getObject(&v);
-}
-
-static Shizu_CxxProcedure* Shizu_Environment_getCxxProcedure(Shizu_State* state, Shizu_Environment* self, Shizu_String* name) {
-  Shizu_Type* type = Shizu_CxxProcedure_getType(state);
-  return (Shizu_CxxProcedure*)Shizu_Environment_getObject(state, self, name, type);
-}
-
-static Shizu_String* Shizu_Environment_getString(Shizu_State* state, Shizu_Environment* self, Shizu_String* name) {
-  return (Shizu_String*)Shizu_Environment_getObject(state, self, name, Shizu_String_getType(state));
-}
-
 static Shizu_String* getWorkingDirectory(Shizu_State* state) {
   Shizu_Value returnValue;
   Shizu_Value argumentValues[2];
