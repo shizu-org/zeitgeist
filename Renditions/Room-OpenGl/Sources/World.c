@@ -11,14 +11,14 @@
 static void
 StaticGeometry_finalize
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self
 	);
 
 static void
 StaticGeometry_visit
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self
 	);
 
@@ -39,7 +39,7 @@ Shizu_defineType(StaticGeometryGl, Shizu_Object);
 static void
 StaticGeometry_finalize
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self
 	)
 {
@@ -50,22 +50,22 @@ StaticGeometry_finalize
 static void
 StaticGeometry_visit
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self
 	)
 {
 	if (self->materials) {
-		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->materials);
+		Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->materials);
 	}
 	if (self->vertexBuffer) {
-		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->vertexBuffer);
+		Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->vertexBuffer);
 	}
 }
 
 void
 StaticGeometry_unmaterialize
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self
 	)
 {
@@ -81,7 +81,7 @@ StaticGeometry_unmaterialize
 StaticGeometry*
 StaticGeometry_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Visuals_Context* visualsContext
 	)
 {
@@ -102,7 +102,7 @@ StaticGeometry_create
 void
 StaticGeometry_setData
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		uint8_t flags,
 		size_t numberOfVertices,
@@ -128,7 +128,7 @@ struct VERTEX {
 	static void
 	debugCheckNormal
 		(
-			Shizu_State* state,
+			Shizu_State2* state,
 			struct VERTEX const* vertices,
 			idlib_vector_3_f32 const* n
 		)
@@ -140,8 +140,8 @@ struct VERTEX {
 		idlib_vector_3_f32_cross(&z, &x, &y);
 		idlib_vector_3_f32_normalize(&z, &z);
 		if (!idlib_vector_3_f32_are_equal(n, &z)) {
-			Shizu_State_setStatus(state, 1);
-			Shizu_State_jump(state);
+			Shizu_State2_setStatus(state, 1);
+			Shizu_State2_jump(state);
 		}
 
 		idlib_vector_3_f32 nn;
@@ -154,8 +154,8 @@ struct VERTEX {
 		idlib_vector_3_f32_cross(&z, &x, &y);
 		idlib_vector_3_f32_normalize(&z, &z);
 		if (!idlib_vector_3_f32_are_equal(&nn, &z)) {
-			Shizu_State_setStatus(state, 1);
-			Shizu_State_jump(state);
+			Shizu_State2_setStatus(state, 1);
+			Shizu_State2_jump(state);
 		}
 	}
 
@@ -164,7 +164,7 @@ struct VERTEX {
 	static void
 	debugCheckNormal
 		(
-			Shizu_State* state,
+			Shizu_State2* state,
 			struct VERTEX const* vertices,
 			idlib_vector_3_f32 const* n
 		)
@@ -175,7 +175,7 @@ struct VERTEX {
 void
 StaticGeometry_setDataNorthWall
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -213,7 +213,7 @@ StaticGeometry_setDataNorthWall
 void
 StaticGeometry_setDataSouthWall
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -251,7 +251,7 @@ StaticGeometry_setDataSouthWall
 void
 StaticGeometry_setDataEastWall
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -289,7 +289,7 @@ StaticGeometry_setDataEastWall
 void
 StaticGeometry_setDataWestWall
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -327,7 +327,7 @@ StaticGeometry_setDataWestWall
 void
 StaticGeometry_setDataFloor
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -365,7 +365,7 @@ StaticGeometry_setDataFloor
 void
 StaticGeometry_setDataCeiling
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -403,7 +403,7 @@ StaticGeometry_setDataCeiling
 static void
 World_visit
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		World* self
 	);
 
@@ -424,22 +424,22 @@ Shizu_defineType(World, Shizu_Object);
 static void
 World_visit
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		World* self
 	)
 {
 	if (self->geometries) {
-		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->geometries);
+		Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->geometries);
 	}
 	if (self->player) {
-		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->player);
+		Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->player);
 	}
 }
 
 World*
 World_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Visuals_Context* visualsContext
 	)
 {
@@ -492,7 +492,7 @@ World_create
 void
 World_update
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		World* self,
 		Shizu_Float32 tick
 	)

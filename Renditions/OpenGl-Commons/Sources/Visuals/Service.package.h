@@ -25,7 +25,7 @@
 #include "Visuals/Service.h"
 typedef struct Visuals_Object Visuals_Object;
 
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 void
 Visuals_Service_registerVisualsObject
   (

@@ -44,7 +44,7 @@ Shizu_ModuleLibrary_getName
 Shizu_Rendition_Export Shizu_String*
 Zeitgeist_Rendition_getName
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   return Shizu_String_create(state, "Room (OpenGL)", strlen("Room (OpenGL)"));
@@ -58,7 +58,7 @@ static World* g_world = NULL;
 #define LightModel_BlinnPhong (2)
 static Shizu_Integer32 g_lightModel = LightModel_Phong;
 
-static void bindPhongMaterial(Shizu_State* state, Visuals_Context* context, Visuals_Program* program, Visuals_PhongMaterial* material) {
+static void bindPhongMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_PhongMaterial* material) {
   Visuals_Program_bindVector3F32(state, g_program, "phongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)material->ambientR) / 255.f,
                                                                                                      ((Shizu_Float32)material->ambientG) / 255.f,
                                                                                                      ((Shizu_Float32)material->ambientB) / 255.f));
@@ -71,7 +71,7 @@ static void bindPhongMaterial(Shizu_State* state, Visuals_Context* context, Visu
   Visuals_Program_bindFloat32(state, g_program, "phongMaterial.shininess", ((Shizu_Float32)material->shininess) / 255.f);
 }
 
-static void bindBlinnPhongMaterial(Shizu_State* state, Visuals_Context* context, Visuals_Program* program, Visuals_BlinnPhongMaterial* material) {
+static void bindBlinnPhongMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_BlinnPhongMaterial* material) {
   Visuals_Program_bindVector3F32(state, g_program, "blinnPhongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)material->ambientR) / 255.f,
                                                                                                           ((Shizu_Float32)material->ambientG) / 255.f,
                                                                                                           ((Shizu_Float32)material->ambientB) / 255.f));
@@ -84,11 +84,11 @@ static void bindBlinnPhongMaterial(Shizu_State* state, Visuals_Context* context,
   Visuals_Program_bindFloat32(state, g_program, "blinnPhongMaterial.shininess", ((Shizu_Float32)material->shininess) / 255.f);
 }
 
-static void bindMaterial(Shizu_State* state, Visuals_Context* context, Visuals_Program* program, Visuals_Material* material) {
-  if (Shizu_Types_isSubTypeOf(Shizu_State_getState1(state), Shizu_State_getTypes(state), ((Shizu_Object*)material)->type, Visuals_PhongMaterial_getType(state))) {
+static void bindMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_Material* material) {
+  if (Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), ((Shizu_Object*)material)->type, Visuals_PhongMaterial_getType(state))) {
     bindPhongMaterial(state, context, program, (Visuals_PhongMaterial*)material);
   }
-  if (Shizu_Types_isSubTypeOf(Shizu_State_getState1(state), Shizu_State_getTypes(state), ((Shizu_Object*)material)->type, Visuals_BlinnPhongMaterial_getType(state))) {
+  if (Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), ((Shizu_Object*)material)->type, Visuals_BlinnPhongMaterial_getType(state))) {
     bindBlinnPhongMaterial(state, context, program, (Visuals_BlinnPhongMaterial*)material);
   }
 }
@@ -96,7 +96,7 @@ static void bindMaterial(Shizu_State* state, Visuals_Context* context, Visuals_P
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Visuals_Service_update(state);
@@ -176,8 +176,8 @@ Zeitgeist_Rendition_update
       } break;
       default: {
         fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
-        Shizu_State_setStatus(state, Shizu_Status_ArgumentInvalid);
-        Shizu_State_jump(state);
+        Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+        Shizu_State2_jump(state);
       } break;
     };
     Visuals_Context_render(state, visualsContext, element->vertexBuffer, g_program);
@@ -189,31 +189,31 @@ Zeitgeist_Rendition_update
 static void
 onKeyboardKeyMessage
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
-  if (Shizu_Stack_getSize(state) < 2) {
+  if (Shizu_Stack_getSize(Shizu_State2_getState1(state), Shizu_State2_getStack(state)) < 2) {
     fprintf(stderr, "%s:%d: too few arguments\n", __FILE__, __LINE__);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
-  if (!Shizu_Stack_isInteger32(state, 0)) {
+  if (!Shizu_Stack_isInteger32(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 0)) {
     fprintf(stderr, "%s:%d: invalid argument type\n", __FILE__, __LINE__);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
-  if (1 != Shizu_Stack_getInteger32(state, 0)) {
+  if (1 != Shizu_Stack_getInteger32(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 0)) {
     fprintf(stderr, "%s:%d: invalid number of arguments\n", __FILE__, __LINE__);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
-  if (!Shizu_Stack_isObject(state, 1)) {
+  if (!Shizu_Stack_isObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 1)) {
     fprintf(stderr, "%s:%d: invalid argument type\n", __FILE__, __LINE__);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   fprintf(stdout, "%s:%d: keyboard key message received\n", __FILE__, __LINE__);
-  KeyboardKeyMessage* message = (KeyboardKeyMessage*)Shizu_Stack_getObject(state, 1);
+  KeyboardKeyMessage* message = (KeyboardKeyMessage*)Shizu_Stack_getObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 1);
   if (KeyboardKey_Escape == KeyboardKeyMessage_getKey(state, message)) {
     if (KeyboardKey_Action_Released == KeyboardKeyMessage_getAction(state, message)) {
       Zeitgeist_UpstreamRequest* request = Zeitgeist_UpstreamRequest_createExitProcessRequest(state);
@@ -233,14 +233,14 @@ onKeyboardKeyMessage
   } else {
     Player_onKeyboardKeyMessage(state, g_world->player, message);
   }
-  Shizu_Stack_pop(state);
-  Shizu_Stack_pop(state);
+  Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
+  Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
 }
 
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_load
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Visuals_Service_startup(state);
@@ -251,18 +251,18 @@ Zeitgeist_Rendition_load
   Visuals_Service_addKeyboardKeyCallback(state, &temporary);
 
   Shizu_JumpTarget jumpTarget;
-  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
     Visuals_Context* visualsContext = (Visuals_Context*)Visuals_Gl_Context_create(state);
     Visuals_Program* program = Visuals_getProgram(state, "pbr1");
     Visuals_Object_materialize(state, (Visuals_Object*)program);
-    Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)program);
+    Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)program);
     g_program = program;
     World* world = World_create(state, visualsContext);
-    Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)world);
+    Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)world);
     g_world = world;
     Visuals_RenderBuffer* renderBuffer = Visuals_Context_createRenderBuffer(state, visualsContext);
-    Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)renderBuffer);
+    Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)renderBuffer);
     g_renderBuffer = renderBuffer;
 
     Shizu_String* p;
@@ -282,57 +282,57 @@ Zeitgeist_Rendition_load
     Visuals_Context_setCullMode(state, visualsContext, Visuals_CullMode_Back);
     Visuals_Context_setDepthFunction(state, visualsContext, Visuals_DepthFunction_LessThanOrEqualTo);
 
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
   } else {
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
     if (g_renderBuffer) {
       Visuals_Object_unmaterialize(state, (Visuals_Object*)g_renderBuffer);
-      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_renderBuffer);
+      Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_renderBuffer);
       g_renderBuffer = NULL;
     }
     if (g_world) {
-      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_world);
+      Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_world);
       g_world = NULL;
     }
     if (g_program) {
       Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
-      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_program);
+      Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_program);
       g_program = NULL;
     }
-    Shizu_State_jump(state);
+    Shizu_State2_jump(state);
   }
 }
 
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_unload
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   for (size_t i = 0, n = Shizu_List_getSize(state, g_world->geometries); i < n; ++i) {
     Shizu_Value elementValue = Shizu_List_getValue(state, g_world->geometries, i);
     StaticGeometry* element = (StaticGeometry*)Shizu_Value_getObject(&elementValue);
     Shizu_JumpTarget jumpTarget;
-    Shizu_State_pushJumpTarget(state, &jumpTarget);
+    Shizu_State2_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
       StaticGeometry_unmaterialize(state, element);
-      Shizu_State_popJumpTarget(state);
+      Shizu_State2_popJumpTarget(state);
     } else {
-      Shizu_State_popJumpTarget(state);
+      Shizu_State2_popJumpTarget(state);
     }
   }
   if (g_renderBuffer) {
     Visuals_Object_unmaterialize(state, (Visuals_Object*)g_renderBuffer);
-    Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_renderBuffer);
+    Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_renderBuffer);
     g_renderBuffer = NULL;
   }
   if (g_world) {
-    Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_world);
+    Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_world);
     g_world = NULL;
   }
   if (g_program) {
     Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
-    Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_program);
+    Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_program);
     g_program = NULL;
   }
   Visuals_Service_shutdown(state);

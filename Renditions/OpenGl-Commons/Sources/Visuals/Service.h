@@ -32,7 +32,7 @@ typedef struct MousePointerMessage MousePointerMessage;
 
 /// @since 0.1
 /// @brief Initialize the "Visuals" service.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to the Shizu_State2 value.
 /// @remarks The "Visuals" service is shared between renditions.
 /// The service is reference counted.
 /// Each time a rendition calls Visuals_Service_startup successfully, the reference count of the service is incremented by @a 1.
@@ -47,7 +47,7 @@ Visuals_Service_startup
 
 /// @since 1.0
 /// @brief Uninitialize the "Visuals" service.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 /// @see Visuals_Service_startup for more information.
 void
 Visuals_Service_shutdown
@@ -57,7 +57,7 @@ Visuals_Service_shutdown
   
 /// @since 1.0
 /// @brief Set the title of the window.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 /// @param title A pointer to a Shizu_String object, the title to be set.
 void
 Visuals_Service_setTitle
@@ -68,7 +68,7 @@ Visuals_Service_setTitle
 
 /// @since 1.0
 /// @brief Get the client size.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 /// @param [out] width A pointer to a <code>Shizu_Integer32</code> variable.
 /// @param [out] height A pointer to a <code>Shizu_Integer32</code> variable.
 /// @success <code>*width</code> was assigned the client width. <code>*height</code> was assigned the client height.
@@ -81,7 +81,7 @@ Visuals_Service_getClientSize
   );
 
 /// @brief Must be invoked to begin rendering a frame.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 void
 Visuals_Service_beginFrame
   (
@@ -89,7 +89,7 @@ Visuals_Service_beginFrame
   );
 
 /// @brief Must be invoked to end rendering a frame.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 void
 Visuals_Service_endFrame
   (
@@ -97,14 +97,14 @@ Visuals_Service_endFrame
   );
 
 /// @brief Must be invoked in intervals.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 void
 Visuals_Service_update
   (
     Shizu_State2* state
   );
 
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 Shizu_Boolean
 Visuals_Service_quitRequested
   (
@@ -113,7 +113,7 @@ Visuals_Service_quitRequested
 
 /// @since 0.1
 /// @brief Emit a keyboard key message.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 /// @param message A pointer to the KeyboardKeyMessage object.
 void
 Visuals_Service_emitKeyboardKeyMessage
@@ -124,7 +124,7 @@ Visuals_Service_emitKeyboardKeyMessage
 
 /// @since 0.1
 /// @brief Add a keyboard key callback.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 /// @param value The value to be used as a callback.
 /// @remarks
 /// - If the value stores a Shizu_CxxFunction* value, then this Shizu_CxxFunction* is added to the callback list.
@@ -143,7 +143,7 @@ Visuals_Service_addKeyboardKeyCallback
 
 /// @since 0.1
 /// @brief Add a mouse button callback.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 object.
 /// @param value The value to be used as a callback.
 /// @remarks
 /// - If the value stores a Shizu_CxxFunction* value, then this Shizu_CxxFunction* is added to the callback list.
@@ -162,7 +162,7 @@ Visuals_Service_addMouseButtonCallback
 
 /// @since 0.1
 /// @brief Add a mouse pointer callback.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 object.
 /// @param value The value to be used as a callback.
 /// @remarks
 /// - If the value stores a Shizu_CxxFunction* value, then this Shizu_CxxFunction* is added to the callback list.

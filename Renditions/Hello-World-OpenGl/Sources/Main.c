@@ -35,7 +35,7 @@ Shizu_ModuleLibrary_getName
 Shizu_Rendition_Export Shizu_String*
 Zeitgeist_Rendition_getName
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   return Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)"));
@@ -55,7 +55,7 @@ static Visuals_RenderBuffer* g_renderBuffer = NULL;
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Visuals_Service_update(state);
@@ -88,27 +88,27 @@ Zeitgeist_Rendition_update
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_load
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Shizu_JumpTarget jumpTarget;
 
   Visuals_Service_startup(state);
 
-  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
     Visuals_Context* visualsContext = (Visuals_Context*)Visuals_Gl_Context_create(state);
     Visuals_Service_setTitle(state, Shizu_String_create(state, "Hello World (OpenGL)", strlen("Hello World (OpenGL)")));
     Visuals_Program* program = Visuals_getProgram(state, "simple");
     Visuals_Object_materialize(state, (Visuals_Object*)program);
-    Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)program);
+    Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)program);
     g_program = program;
     Visuals_VertexBuffer* vertexBuffer = Visuals_Context_createVertexBuffer(state, visualsContext);
     Visuals_VertexBuffer_setData(state, vertexBuffer, Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3, SQUARE, sizeof(SQUARE));
-    Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)vertexBuffer);
+    Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)vertexBuffer);
     g_vertexBuffer = vertexBuffer;
     Visuals_RenderBuffer* renderBuffer = Visuals_Context_createRenderBuffer(state, visualsContext);
-    Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)renderBuffer);
+    Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)renderBuffer);
     g_renderBuffer = renderBuffer;
 
     Shizu_String* p;
@@ -125,48 +125,48 @@ Zeitgeist_Rendition_load
 
     fprintf(stdout, "backend version: %d.%d\n", Visuals_Service_getBackendMajorVersion(state), Visuals_Service_getBackendMinorVersion(state));
 
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
   } else {
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
     if (g_renderBuffer) {
       Visuals_Object_unmaterialize(state, (Visuals_Object*)g_renderBuffer);
-      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_renderBuffer);
+      Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_renderBuffer);
       g_renderBuffer = NULL;
     }
     if (g_vertexBuffer) {
       Visuals_Object_unmaterialize(state, (Visuals_Object*)g_vertexBuffer);
-      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_vertexBuffer);
+      Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_vertexBuffer);
       g_vertexBuffer = NULL;
     }
     if (g_program) {
       Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
-      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_program);
+      Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_program);
       g_program = NULL;
     }
     Visuals_Service_shutdown(state);
-    Shizu_State_jump(state);
+    Shizu_State2_jump(state);
   }
 }
 
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_unload
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   if (g_renderBuffer) {
     Visuals_Object_unmaterialize(state, (Visuals_Object*)g_renderBuffer);
-    Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_renderBuffer);
+    Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_renderBuffer);
     g_renderBuffer = NULL;
   }
   if (g_vertexBuffer) {
     Visuals_Object_unmaterialize(state, (Visuals_Object*)g_vertexBuffer);
-    Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_vertexBuffer);
+    Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_vertexBuffer);
     g_vertexBuffer = NULL;
   }
   if (g_program) {
     Visuals_Object_unmaterialize(state, (Visuals_Object*)g_program);
-    Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_program);
+    Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_program);
     g_program = NULL;
   }
   Visuals_Service_shutdown(state);

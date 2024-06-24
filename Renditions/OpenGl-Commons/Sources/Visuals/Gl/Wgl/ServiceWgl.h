@@ -7,7 +7,7 @@
 
 /// @since 0.1
 /// @brief Startup the WGL service.
-/// @param state A pointer to the Shizu_State object.
+/// @param state A pointer to the Shizu_State2 value.
 void
 ServiceWgl_startup
 	(
@@ -16,7 +16,7 @@ ServiceWgl_startup
 
 /// @since 0.1
 /// @brief Shutdown the WGL service.
-///@param state A pointer to the Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 void
 ServiceWgl_shutdown
 	(
@@ -25,7 +25,7 @@ ServiceWgl_shutdown
 
 /// @since 0.1
 /// @brief Set the window title.
-/// @param state A pointer to the Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 /// @param title A pointer to the title.
 void
 ServiceWgl_setTitle
@@ -36,7 +36,7 @@ ServiceWgl_setTitle
 
 /// @since 0.1
 /// @brief Must be called in intervals to update.
-/// @params tate A pointer to the Shizu_State object.
+/// @params state A pointer to a Shizu_State2 value.
 void
 ServiceWgl_update
 	(
@@ -45,7 +45,7 @@ ServiceWgl_update
 
 /// @since 1.0
 /// @brief Get if "quit" was requested.
-/// @param state A pointer to the Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 /// @return @a true if "quit" was requested. @a false otherwise.
 Shizu_Boolean
 ServiceWgl_quitRequested
@@ -55,7 +55,7 @@ ServiceWgl_quitRequested
 
 /// @since 0.1
 /// @brief Get the size, in pixels, of the client rectangle.
-/// @param state A pointer to the Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 /// @param width A pointer to a Shizu_Integer32 variable.
 /// If this function succeeds, this variable is assigned the client width.
 /// @param height A pointer to a Shizu_Integer32 variable.
@@ -71,7 +71,7 @@ ServiceWgl_getClientSize
 /**
  * @since 0.1
  * @brief Try to link the an OpenGL function.
- * @param state A pointer to the Shizu_State object.
+ * @param state A pointer to a Shizu_State2 value.
  * @param functionName A pointer to the function name.
  * @param extensionName A pointer to the extension name or the null pointer.
  * @return A poiner to the function on success.

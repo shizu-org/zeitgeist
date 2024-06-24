@@ -42,13 +42,13 @@ struct Player {
 Player*
 Player_create
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 void
 Player_onKeyboardKeyMessage
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Player* self,
 		KeyboardKeyMessage* message
 	);
@@ -56,7 +56,7 @@ Player_onKeyboardKeyMessage
 void
 Player_update
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Player* self,
 		Shizu_Float32 tick
 	);

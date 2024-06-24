@@ -70,7 +70,7 @@ struct Visuals_PhongMaterial_Dispatch {
 };
 
 /// @brief Construct this Phong material with default values.
-/// @param state A pointer to a Shizu_State object.
+/// @param state A pointer to a Shizu_State2 value.
 /// @param self A pointer to this Phong material.
 /// @remarks
 /// The default values are

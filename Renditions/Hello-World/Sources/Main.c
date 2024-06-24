@@ -27,14 +27,14 @@ Shizu_ModuleLibrary_getName
 Shizu_Rendition_Export Shizu_String*
 Zeitgeist_Rendition_getName
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { return Shizu_String_create(state, "Hello World", strlen("Hello World")); }
 
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   fprintf(stdout, "Hello, World!\n");
@@ -45,13 +45,13 @@ Zeitgeist_Rendition_update
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_load
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {/*Intentionally empty.*/}
 
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_unload
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {/*Intentionally empty.*/}

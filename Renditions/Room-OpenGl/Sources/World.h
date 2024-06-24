@@ -100,7 +100,7 @@ struct StaticGeometry {
 void
 StaticGeometry_unmaterialize
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self
 	);
 
@@ -113,7 +113,7 @@ StaticGeometry_unmaterialize
 void
 StaticGeometry_setData
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		uint8_t flags,
 		size_t numberOfVertices,
@@ -130,7 +130,7 @@ StaticGeometry_setData
 void
 StaticGeometry_setDataNorthWall
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -146,7 +146,7 @@ StaticGeometry_setDataNorthWall
 void
 StaticGeometry_setDataSouthWall
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -162,7 +162,7 @@ StaticGeometry_setDataSouthWall
 void
 StaticGeometry_setDataEastWall
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -178,7 +178,7 @@ StaticGeometry_setDataEastWall
 void
 StaticGeometry_setDataWestWall
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -194,7 +194,7 @@ StaticGeometry_setDataWestWall
 void
 StaticGeometry_setDataFloor
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -210,7 +210,7 @@ StaticGeometry_setDataFloor
 void
 StaticGeometry_setDataCeiling
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		StaticGeometry* self,
 		Vector3F32* translation,
 		Shizu_Float32 breadth,
@@ -220,7 +220,7 @@ StaticGeometry_setDataCeiling
 StaticGeometry*
 StaticGeometry_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Visuals_Context* visualsContext
 	);
 
@@ -243,14 +243,14 @@ struct World {
 World*
 World_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Visuals_Context* visualsContext
 	);
 
 void
 World_update
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		World* self,
 		Shizu_Float32 tick
 	);

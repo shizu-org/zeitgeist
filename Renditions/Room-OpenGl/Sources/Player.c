@@ -5,7 +5,7 @@
 static void
 Player_visit
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Player* self
 	);
 
@@ -26,22 +26,22 @@ Shizu_defineType(Player, Shizu_Object);
 static void
 Player_visit
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Player* self
 	)
 {
 	if (self->position) {
-		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->position);
+		Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->position);
 	}
 	if (self->positionSpeed) {
-		Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->positionSpeed);
+		Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->positionSpeed);
 	}
 }
 
 Player*
 Player_create
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {
 	Shizu_Type* type = Player_getType(state);
@@ -65,7 +65,7 @@ Player_create
 void
 Player_onKeyboardKeyMessage
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Player* self,
 		KeyboardKeyMessage* message
 	)
@@ -99,7 +99,7 @@ Player_onKeyboardKeyMessage
 void
 Player_update
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Player* self,
 		Shizu_Float32 tick
 	)
