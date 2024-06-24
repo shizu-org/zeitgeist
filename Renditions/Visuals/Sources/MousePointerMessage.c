@@ -21,9 +21,9 @@
 
 #include "MousePointerMessage.h"
 
-#include "Shizu/Runtime/DebugAssert.h"
+#include "Shizu/Runtime/CxxUtilities.h"
 
-Shizu_TypeDescriptor const MousePointerMessage_Type = {
+static Shizu_TypeDescriptor const MousePointerMessage_Type = {
 	.postCreateType = NULL,
 	.preDestroyType = NULL,
 	.visitType = NULL,
@@ -37,29 +37,43 @@ Shizu_TypeDescriptor const MousePointerMessage_Type = {
 
 Shizu_defineType(MousePointerMessage, Shizu_Object);
 
+void
+MousePointerMessage_construct
+	(
+		Shizu_State2* state,
+		MousePointerMessage* self,
+		Shizu_Integer32 action,
+		Shizu_Integer32 x,
+		Shizu_Integer32 y
+	)
+{
+	Shizu_Type* TYPE = MousePointerMessage_getType(state);
+	Shizu_Object_construct(state, (Shizu_Object*)self);
+	self->action = action;
+	self->x = x;
+	self->y = y;
+	((Shizu_Object*)self)->type = TYPE;
+}
+
 MousePointerMessage*
 MousePointerMessage_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_Integer32 action,
 		Shizu_Integer32 x,
     Shizu_Integer32 y
 	)
 {
-	Shizu_Type* type = MousePointerMessage_getType(state);
+	Shizu_Type* TYPE = MousePointerMessage_getType(state);
 	MousePointerMessage* self = (MousePointerMessage*)Shizu_Gc_allocateObject(state, sizeof(MousePointerMessage));
- 	Shizu_Object_construct(state, (Shizu_Object*)self);
-	self->action = action;
-	self->x = x;
-  self->y = y;
-	((Shizu_Object*)self)->type = type;
+	MousePointerMessage_construct(state, self, action, x, y);
 	return self;
 }
 
 Shizu_Integer32
 MousePointerMessage_getAction
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		MousePointerMessage* self
 	)
 {
@@ -71,7 +85,7 @@ MousePointerMessage_getAction
 Shizu_Integer32
 MousePointerMessage_getX
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		MousePointerMessage* self
 	)
 {
@@ -83,7 +97,7 @@ MousePointerMessage_getX
 Shizu_Integer32
 MousePointerMessage_getY
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		MousePointerMessage* self
 	)
 {

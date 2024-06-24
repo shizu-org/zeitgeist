@@ -39,10 +39,20 @@ struct MousePointerMessage {
   Shizu_Integer32 y;
 };
 
+void
+MousePointerMessage_construct
+	(
+		Shizu_State2* state,
+		MousePointerMessage* self,
+		Shizu_Integer32 action,
+		Shizu_Integer32 x,
+		Shizu_Integer32 y
+	);
+
 MousePointerMessage*
 MousePointerMessage_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_Integer32 action,
 		Shizu_Integer32 x,
     Shizu_Integer32 y
@@ -51,21 +61,21 @@ MousePointerMessage_create
 Shizu_Integer32
 MousePointerMessage_getAction
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		MousePointerMessage* self
 	);
 
 Shizu_Integer32
 MousePointerMessage_getX
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		MousePointerMessage* self
 	);
 
 Shizu_Integer32
 MousePointerMessage_getY
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		MousePointerMessage* self
 	);
 

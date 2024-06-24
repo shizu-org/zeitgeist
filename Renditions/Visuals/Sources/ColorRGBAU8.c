@@ -19,74 +19,54 @@
 	3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "MouseButtonMessage.h"
+#include "ColorRGBAU8.h"
 
-#include "Shizu/Runtime/CxxUtilities.h"
-
-static Shizu_TypeDescriptor const MouseButtonMessage_Type = {
+static Shizu_TypeDescriptor const ColorRGBAU8_Type = {
 	.postCreateType = NULL,
 	.preDestroyType = NULL,
 	.visitType = NULL,
-	.size = sizeof(MouseButtonMessage),
+	.size = sizeof(ColorRGBAU8),
 	.finalize = NULL,
 	.visit = NULL,
-	.dispatchSize = sizeof(MouseButtonMessage_Dispatch),
+	.dispatchSize = sizeof(ColorRGBAU8_Dispatch),
 	.dispatchInitialize = NULL,
 	.dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(MouseButtonMessage, Shizu_Object);
+Shizu_defineType(ColorRGBAU8, Shizu_Object);
 
 void
-MouseButtonMessage_construct
+ColorRGBAU8_construct
 	(
 		Shizu_State2* state,
-		MouseButtonMessage* self,
-		Shizu_Integer32 action,
-		Shizu_Integer32 button
+		ColorRGBAU8* self,
+		Shizu_Integer32 r,
+		Shizu_Integer32 g,
+		Shizu_Integer32 b,
+		Shizu_Integer32 a
 	)
 {
-	Shizu_Type* TYPE = MouseButtonMessage_getType(state);
+	Shizu_Type* TYPE = ColorRGBAU8_getType(state);
 	Shizu_Object_construct(state, (Shizu_Object*)self);
-	self->action = action;
-	self->button = button;
+	self->r = r;
+	self->g = g;
+	self->b = b;
+	self->a = a;
 	((Shizu_Object*)self)->type = TYPE;
 }
 
-MouseButtonMessage*
-MouseButtonMessage_create
+ColorRGBAU8*
+ColorRGBAU8_create
 	(
 		Shizu_State2* state,
-		Shizu_Integer32 action,
-		Shizu_Integer32 button
+		Shizu_Integer32 r,
+		Shizu_Integer32 g,
+		Shizu_Integer32 b,
+		Shizu_Integer32 a
 	)
 {
-	Shizu_Type* type = MouseButtonMessage_getType(state);
-	MouseButtonMessage* self = (MouseButtonMessage*)Shizu_Gc_allocateObject(state, sizeof(MouseButtonMessage));
- 	MouseButtonMessage_construct(state, self, action, button);
+	Shizu_Type* TYPE = ColorRGBAU8_getType(state);
+	ColorRGBAU8* self = (ColorRGBAU8*)Shizu_Gc_allocateObject(state, sizeof(ColorRGBAU8));
+	ColorRGBAU8_construct(state, self, r, g, b, a);
 	return self;
-}
-
-Shizu_Integer32
-MouseButtonMessage_getAction
-	(
-		Shizu_State2* state,
-		MouseButtonMessage* self
-	)
-{
-	Shizu_debugAssert(NULL != state);
-	Shizu_debugAssert(NULL != self);
-	return self->action;
-}
-
-Shizu_Integer32
-MouseButtonMessage_getButton
-	(
-		Shizu_State2* state,
-		MouseButtonMessage* self
-	)
-{
-	Shizu_debugAssert(NULL != state);
-	Shizu_debugAssert(NULL != self);
-	return self->button;
 }

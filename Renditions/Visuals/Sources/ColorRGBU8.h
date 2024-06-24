@@ -19,47 +19,41 @@
 	3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VECTOR4F32_H_INCLUDED)
-#define VECTOR4F32_H_INCLUDED
+#if !defined(COLORGBU8_H_INCLUDED)
+#define COLORGBU8_H_INCLUDED
 
-#include "Zeitgeist.h"
-#include "idlib/math.h"
+#include "Shizu/Runtime/Include.h"
 
-Shizu_declareType(Vector4F32)
+Shizu_declareType(ColorRGBU8);
 
-struct Vector4F32_Dispatch {
+struct ColorRGBU8_Dispatch {
 	Shizu_Object_Dispatch _parent;
 };
 
-struct Vector4F32 {
-	Shizu_Object _parent;
-	idlib_vector_4_f32 v;
+struct ColorRGBU8 {
+	Shizu_Object parent;
+	Shizu_Integer32 r;
+	Shizu_Integer32 g;
+	Shizu_Integer32 b;
 };
 
-Vector4F32*
-Vector4F32_create
+void
+ColorRGBU8_construct
 	(
 		Shizu_State2* state,
-		Shizu_Float32 x,
-		Shizu_Float32 y,
-		Shizu_Float32 z,
-		Shizu_Float32 w
+		ColorRGBU8* self,
+		Shizu_Integer32 r,
+		Shizu_Integer32 g,
+		Shizu_Integer32 b
 	);
 
-Vector4F32*
-Vector4F32_add
+ColorRGBU8*
+ColorRGBU8_create
 	(
 		Shizu_State2* state,
-		Vector4F32* left,
-		Vector4F32* right
+		Shizu_Integer32 r,
+		Shizu_Integer32 g,
+		Shizu_Integer32 b
 	);
 
-Vector4F32*
-Vector4F32_subtract
-	(
-		Shizu_State2* state,
-		Vector4F32* left,
-		Vector4F32* right
-	);
-
-#endif // VECTOR3R32_H_INCLUDED
+#endif // COLORGBU8_H_INCLUDED

@@ -50,7 +50,7 @@ Shizu_declareType(Visuals_VertexBuffer);
 
 struct Visuals_VertexBuffer_Dispatch {
   Visuals_Object_Dispatch _parent;
-  void (*setData)(Shizu_State* state, Visuals_VertexBuffer* self, uint8_t flags, void const* bytes, size_t numberOfBytes);
+  void (*setData)(Shizu_State2* state, Visuals_VertexBuffer* self, uint8_t flags, void const* bytes, size_t numberOfBytes);
 };
 
 struct Visuals_VertexBuffer {
@@ -74,14 +74,14 @@ struct Visuals_VertexBuffer {
 void
 Visuals_VertexBuffer_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_VertexBuffer* self
   );
 
 static inline void
 Visuals_VertexBuffer_setData
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_VertexBuffer* self,
     uint8_t flags,
     void const* bytes,

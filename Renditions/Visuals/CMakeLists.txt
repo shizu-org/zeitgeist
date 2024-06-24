@@ -36,6 +36,11 @@ list(APPEND ${name}.header_files Sources/Visuals/PhongMaterial.h)
 list(APPEND ${name}.source_files Sources/Visuals/BlinnPhongMaterial.c)
 list(APPEND ${name}.header_files Sources/Visuals/BlinnPhongMaterial.h)
 
+list(APPEND ${name}.source_files Sources/ColorRGBU8.c)
+list(APPEND ${name}.header_files Sources/ColorRGBU8.h)
+list(APPEND ${name}.source_files Sources/ColorRGBAU8.c)
+list(APPEND ${name}.header_files Sources/ColorRGBAU8.h)
+
 end_library()
 
 source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${${name}.configuration_files})

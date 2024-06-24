@@ -21,10 +21,12 @@
 
 #include "Visuals/Texture.h"
 
+Shizu_defineEnumerationType(Visuals_PixelFormat);
+
 static void
 Visuals_Texture_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Texture* self
   );
 
@@ -52,7 +54,7 @@ Shizu_defineType(Visuals_Texture, Visuals_Object);
 static void
 Visuals_Texture_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Texture* self
   )
 {/*Intentionally empty.*/}
@@ -68,7 +70,7 @@ Visuals_Texture_dispatchInitialize
 void
 Visuals_Texture_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Texture* self
   )
 {

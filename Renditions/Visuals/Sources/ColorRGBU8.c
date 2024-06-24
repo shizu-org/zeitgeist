@@ -19,47 +19,51 @@
 	3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VECTOR4F32_H_INCLUDED)
-#define VECTOR4F32_H_INCLUDED
+#include "ColorRGBU8.h"
 
-#include "Zeitgeist.h"
-#include "idlib/math.h"
-
-Shizu_declareType(Vector4F32)
-
-struct Vector4F32_Dispatch {
-	Shizu_Object_Dispatch _parent;
+static Shizu_TypeDescriptor const ColorRGBU8_Type = {
+	.postCreateType = NULL,
+	.preDestroyType = NULL,
+	.visitType = NULL,
+	.size = sizeof(ColorRGBU8),
+	.finalize = NULL,
+	.visit = NULL,
+	.dispatchSize = sizeof(ColorRGBU8_Dispatch),
+	.dispatchInitialize = NULL,
+	.dispatchUninitialize = NULL,
 };
 
-struct Vector4F32 {
-	Shizu_Object _parent;
-	idlib_vector_4_f32 v;
-};
+Shizu_defineType(ColorRGBU8, Shizu_Object);
 
-Vector4F32*
-Vector4F32_create
+void
+ColorRGBU8_construct
 	(
 		Shizu_State2* state,
-		Shizu_Float32 x,
-		Shizu_Float32 y,
-		Shizu_Float32 z,
-		Shizu_Float32 w
-	);
+		ColorRGBU8* self,
+		Shizu_Integer32 r,
+		Shizu_Integer32 g,
+		Shizu_Integer32 b
+	)
+{
+	Shizu_Type* TYPE = ColorRGBU8_getType(state);
+	Shizu_Object_construct(state, (Shizu_Object*)self);
+	self->r = r;
+	self->g = g;
+	self->b = b;
+	((Shizu_Object*)self)->type = TYPE;
+}
 
-Vector4F32*
-Vector4F32_add
+ColorRGBU8*
+ColorRGBU8_create
 	(
 		Shizu_State2* state,
-		Vector4F32* left,
-		Vector4F32* right
-	);
-
-Vector4F32*
-Vector4F32_subtract
-	(
-		Shizu_State2* state,
-		Vector4F32* left,
-		Vector4F32* right
-	);
-
-#endif // VECTOR3R32_H_INCLUDED
+		Shizu_Integer32 r,
+		Shizu_Integer32 g,
+		Shizu_Integer32 b
+	)
+{
+	Shizu_Type* TYPE = ColorRGBU8_getType(state);
+	ColorRGBU8* self = (ColorRGBU8*)Shizu_Gc_allocateObject(state, sizeof(ColorRGBU8));
+	ColorRGBU8_construct(state, self, r, g, b);
+	return self;
+}

@@ -79,14 +79,14 @@ struct Visuals_PhongMaterial_Dispatch {
 void
 Visuals_PhongMaterial_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_PhongMaterial* self
   );
 
 Visuals_PhongMaterial*
 Visuals_PhongMaterial_create
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 #endif // VISUALS_PHONGMATERIAL_H_INCLUDED

@@ -33,7 +33,7 @@
 
 #endif
 
-Shizu_TypeDescriptor const Matrix4F32_Type = {
+static Shizu_TypeDescriptor const Matrix4F32_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -50,7 +50,7 @@ Shizu_defineType(Matrix4F32, Shizu_Object);
 Matrix4F32*
 Matrix4F32_createIdentity
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Shizu_Type* type = Matrix4F32_getType(state);
@@ -64,7 +64,7 @@ Matrix4F32_createIdentity
 Matrix4F32*
 Matrix4F32_createTranslate
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Vector3F32* translate
   )
 {
@@ -79,7 +79,7 @@ Matrix4F32_createTranslate
 Matrix4F32*
 Matrix4F32_createRotateY
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Float32 degrees
   )
 {
@@ -94,7 +94,7 @@ Matrix4F32_createRotateY
 Matrix4F32*
 Matrix4F32_createPerspective
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Float32 fieldOfViewY,
     Shizu_Float32 aspectRatio,
     Shizu_Float32 near,
@@ -112,7 +112,7 @@ Matrix4F32_createPerspective
 Matrix4F32*
 Matrix4F32_createOrthographic
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Float32 left,
     Shizu_Float32 right,
     Shizu_Float32 bottom,
@@ -132,7 +132,7 @@ Matrix4F32_createOrthographic
 Matrix4F32*
 Matrix4F32_createLookAt
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Vector3F32* source,
     Vector3F32* target,
     Vector3F32* up
@@ -149,7 +149,7 @@ Matrix4F32_createLookAt
 Matrix4F32*
 Matrix4F32_createScale
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Vector3F32* scale
   )
 {
@@ -164,7 +164,7 @@ Matrix4F32_createScale
 Matrix4F32*
 Matrix4F32_negate
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Matrix4F32* matrix
   )
 {
@@ -179,7 +179,7 @@ Matrix4F32_negate
 Matrix4F32*
 Matrix4F32_multiply
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Matrix4F32* operand1,
     Matrix4F32* operand2
   )

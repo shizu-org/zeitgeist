@@ -24,14 +24,14 @@
 static void
 Visuals_BlinnPhongMaterial_materializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_BlinnPhongMaterial* self
   );
 
 static void
 Visuals_BlinnPhongMaterial_unmaterializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_BlinnPhongMaterial* self
   );
 static void
@@ -58,7 +58,7 @@ Shizu_defineType(Visuals_BlinnPhongMaterial, Visuals_Material);
 static void
 Visuals_BlinnPhongMaterial_materializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_BlinnPhongMaterial* self
   )
 { }
@@ -66,7 +66,7 @@ Visuals_BlinnPhongMaterial_materializeImpl
 static void
 Visuals_BlinnPhongMaterial_unmaterializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_BlinnPhongMaterial* self
   )
 { }
@@ -78,14 +78,14 @@ Visuals_BlinnPhongMaterial_dispatchInitialize
     Visuals_BlinnPhongMaterial_Dispatch* self
   )
 {
-  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*, Visuals_Object*)) & Visuals_BlinnPhongMaterial_materializeImpl;
-  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*, Visuals_Object*)) & Visuals_BlinnPhongMaterial_unmaterializeImpl;
+  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State2*, Visuals_Object*)) & Visuals_BlinnPhongMaterial_materializeImpl;
+  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State2*, Visuals_Object*)) & Visuals_BlinnPhongMaterial_unmaterializeImpl;
 }
 
 void
 Visuals_BlinnPhongMaterial_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_BlinnPhongMaterial* self
   )
 {
@@ -112,7 +112,7 @@ Visuals_BlinnPhongMaterial_construct
 Visuals_BlinnPhongMaterial*
 Visuals_BlinnPhongMaterial_create
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Visuals_BlinnPhongMaterial* self = (Visuals_BlinnPhongMaterial*)Shizu_Gc_allocateObject(state, sizeof(Visuals_BlinnPhongMaterial));

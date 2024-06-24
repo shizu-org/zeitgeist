@@ -79,14 +79,14 @@ struct Visuals_BlinnPhongMaterial_Dispatch {
 void
 Visuals_BlinnPhongMaterial_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_BlinnPhongMaterial* self
   );
 
 Visuals_BlinnPhongMaterial*
 Visuals_BlinnPhongMaterial_create
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 #endif // VISUALS_BLINNPHONGMATERIAL_H_INCLUDED

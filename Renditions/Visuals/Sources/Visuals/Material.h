@@ -38,7 +38,7 @@ struct Visuals_Material_Dispatch {
 void
 Visuals_Material_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Material* self
   );
 

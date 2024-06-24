@@ -52,10 +52,19 @@ struct MouseButtonMessage {
 	Shizu_Integer32 button;
 };
 
+void
+MouseButtonMessage_construct
+	(
+		Shizu_State2* state,
+		MouseButtonMessage* self,
+		Shizu_Integer32 action,
+		Shizu_Integer32 button
+	);
+
 MouseButtonMessage*
 MouseButtonMessage_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_Integer32 action,
 		Shizu_Integer32 button
 	);
@@ -63,14 +72,14 @@ MouseButtonMessage_create
 Shizu_Integer32
 MouseButtonMessage_getAction
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		MouseButtonMessage* self
 	);
 
 Shizu_Integer32
 MouseButtonMessage_getButton
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		MouseButtonMessage* self
 	);
 

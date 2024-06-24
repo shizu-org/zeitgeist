@@ -53,10 +53,22 @@ struct KeyboardKeyMessage {
 	Shizu_Integer32 key;
 };
 
+/// @code
+/// construct(Shizu.Integer32 action, Shizu.Integer32 key)
+/// @endcode
+void
+KeyboardKeyMessage_construct
+	(
+		Shizu_State2* state,
+		KeyboardKeyMessage* self,
+		Shizu_Integer32 action,
+		Shizu_Integer32 key
+	);
+
 KeyboardKeyMessage*
 KeyboardKeyMessage_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_Integer32 action,
 		Shizu_Integer32 key
 	);
@@ -64,14 +76,14 @@ KeyboardKeyMessage_create
 Shizu_Integer32
 KeyboardKeyMessage_getAction
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		KeyboardKeyMessage* self
 	);
 
 Shizu_Integer32
 KeyboardKeyMessage_getKey
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		KeyboardKeyMessage* self
 	);
 

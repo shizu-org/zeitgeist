@@ -31,7 +31,7 @@ dispatchInitialize
 static void
 notifyVisualsShutdownImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* self
   );
 
@@ -62,7 +62,7 @@ dispatchInitialize
 static void
 notifyVisualsShutdownImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* self
   )
 { Visuals_Object_unmaterialize(state, self); }
@@ -70,7 +70,7 @@ notifyVisualsShutdownImpl
 void
 Visuals_Object_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* self
   )
 {

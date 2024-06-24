@@ -38,7 +38,7 @@ Shizu_defineType(Visuals_Material, Visuals_Object);
 void
 Visuals_Material_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Material* self
   )
 {

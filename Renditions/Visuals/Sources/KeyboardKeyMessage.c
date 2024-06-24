@@ -21,9 +21,9 @@
 
 #include "KeyboardKeyMessage.h"
 
-#include "Shizu/Runtime/DebugAssert.h"
+#include "Shizu/Runtime/CxxUtilities.h"
 
-Shizu_TypeDescriptor const KeyboardKeyMessage_Type = {
+static Shizu_TypeDescriptor const KeyboardKeyMessage_Type = {
 	.postCreateType = NULL,
 	.preDestroyType = NULL,
 	.visitType = NULL,
@@ -37,27 +37,40 @@ Shizu_TypeDescriptor const KeyboardKeyMessage_Type = {
 
 Shizu_defineType(KeyboardKeyMessage, Shizu_Object);
 
+void
+KeyboardKeyMessage_construct
+	(
+		Shizu_State2* state,
+		KeyboardKeyMessage* self,
+		Shizu_Integer32 action,
+		Shizu_Integer32 key
+	)
+{
+	Shizu_Type* TYPE = KeyboardKeyMessage_getType(state);
+	Shizu_Object_construct(state, (Shizu_Object*)self);
+	self->action = action;
+	self->key = key;
+	((Shizu_Object*)self)->type = TYPE;
+}
+
 KeyboardKeyMessage*
 KeyboardKeyMessage_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_Integer32 action,
 		Shizu_Integer32 key
 	)
 {
 	Shizu_Type* type = KeyboardKeyMessage_getType(state);
 	KeyboardKeyMessage* self = (KeyboardKeyMessage*)Shizu_Gc_allocateObject(state, sizeof(KeyboardKeyMessage));
- 	Shizu_Object_construct(state, (Shizu_Object*)self);
-	self->action = action;
-	self->key = key;
-	((Shizu_Object*)self)->type = type;
+	KeyboardKeyMessage_construct(state, self, action, key);
 	return self;
 }
 
 Shizu_Integer32
 KeyboardKeyMessage_getAction
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		KeyboardKeyMessage* self
 	)
 {
@@ -69,7 +82,7 @@ KeyboardKeyMessage_getAction
 Shizu_Integer32
 KeyboardKeyMessage_getKey
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		KeyboardKeyMessage* self
 	)
 {

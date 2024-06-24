@@ -28,9 +28,9 @@ Shizu_declareType(Visuals_Object);
 
 struct Visuals_Object_Dispatch {
   Shizu_Object_Dispatch _parent;
-  void (*materialize)(Shizu_State* state, Visuals_Object*);
-  void (*unmaterialize)(Shizu_State* state, Visuals_Object*);
-  void (*notifyVisualsShutdown)(Shizu_State*, Visuals_Object*);
+  void (*materialize)(Shizu_State2* state, Visuals_Object*);
+  void (*unmaterialize)(Shizu_State2* state, Visuals_Object*);
+  void (*notifyVisualsShutdown)(Shizu_State2*, Visuals_Object*);
 };
 
 struct Visuals_Object {
@@ -40,7 +40,7 @@ struct Visuals_Object {
 void
 Visuals_Object_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* self
   );
 
@@ -51,7 +51,7 @@ Visuals_Object_construct
 static inline void
 Visuals_Object_notifyVisualsShutdown
   (
-    Shizu_State *state,
+    Shizu_State2 *state,
     Visuals_Object* self
   )
 { Shizu_VirtualCall(Visuals_Object, materialize, self); }
@@ -59,7 +59,7 @@ Visuals_Object_notifyVisualsShutdown
 static inline void
 Visuals_Object_materialize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* self
   )
 { Shizu_VirtualCall(Visuals_Object, materialize, self); }
@@ -67,7 +67,7 @@ Visuals_Object_materialize
 static inline void
 Visuals_Object_unmaterialize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* self
   )
 { Shizu_VirtualCall(Visuals_Object, unmaterialize, self); }

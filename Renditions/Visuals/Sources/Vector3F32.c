@@ -38,7 +38,7 @@ Shizu_defineType(Vector3F32, Shizu_Object);
 Vector3F32*
 Vector3F32_create
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_Float32 x,
 		Shizu_Float32 y,
 		Shizu_Float32 z
@@ -55,7 +55,7 @@ Vector3F32_create
 Vector3F32*
 Vector3F32_add
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Vector3F32* left,
 		Vector3F32* right
 	)
@@ -71,7 +71,7 @@ Vector3F32_add
 Vector3F32*
 Vector3F32_subtract
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Vector3F32* left,
 		Vector3F32* right
 	)
