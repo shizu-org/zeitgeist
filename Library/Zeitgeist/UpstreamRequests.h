@@ -30,25 +30,25 @@ struct Zeitgeist_UpstreamRequest {
 /**
  * @since 0.1
  * @brief Create a "exit process request" upstream request.
- * @param state A pointer to the Shizu_State object.
+ * @param state A pointer to a Shizu_State2 value.
  * @return A pointer to the Zeitgeist_UpstreamRequest object.
  */
 Zeitgeist_UpstreamRequest*
 Zeitgeist_UpstreamRequest_createExitProcessRequest
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 /**
  * @since 0.1
  * @brief Send an upstream request.
- * @param state A pointer to the Shizu_State object.
- * @param state A pointer to the Zeitgeist_UpstreamRequest object.
+ * @param state A pointer to a Shizu_State2 value.
+ * @param state A pointer to the Zeitgeist_UpstreamRequest value.
  */
 void
 Zeitgeist_sendUpstreamRequest
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_UpstreamRequest* request
   );
 

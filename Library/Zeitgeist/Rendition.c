@@ -16,14 +16,14 @@
 static void
 Zeitgeist_Rendition_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* rendition
   );
 
 static void
 Zeitgeist_Rendition_visit
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* rendition
   );
 
@@ -44,12 +44,12 @@ Shizu_defineType(Zeitgeist_Rendition, Shizu_Object);
 static void
 Zeitgeist_Rendition_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* self
   )
 { 
   if (self->dl) {
-    Shizu_Dl_unref(state, self->dl);
+    Shizu_State1_unrefDl(Shizu_State2_getState1(state), self->dl);
     self->dl = NULL;
   }
 }
@@ -57,19 +57,19 @@ Zeitgeist_Rendition_finalize
 static void
 Zeitgeist_Rendition_visit
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* self
   )
 {
   if (self->folderPath) {
-    Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->folderPath);
+    Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->folderPath);
   }
 }
 
 static void
 Zeitgeist_Rendition_ensureLibraryLoaded
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* self
   )
 {
@@ -79,10 +79,10 @@ Zeitgeist_Rendition_ensureLibraryLoaded
                                                     strlen(Shizu_OperatingSystem_DirectorySeparator "library" Shizu_OperatingSystem_DlExtension));
     libraryPath = Shizu_String_concatenate(state, self->folderPath, libraryPath);
     libraryPath = Shizu_String_concatenate(state, libraryPath, zeroTerminator);
-    self->dl = Shizu_State_getOrLoadDl(state, Shizu_String_getBytes(state, libraryPath), true);
+    self->dl = Shizu_State1_getOrLoadDl(Shizu_State2_getState1(state), Shizu_String_getBytes(state, libraryPath), true);
     if (!self->dl) {
       fprintf(stderr, "unable to link `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, libraryPath), Shizu_String_getBytes(state, libraryPath));
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
   }
 }
@@ -90,7 +90,7 @@ Zeitgeist_Rendition_ensureLibraryLoaded
 Zeitgeist_Rendition*
 Zeitgeist_createRendition
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_String* folderPath
   )
 {
@@ -104,96 +104,96 @@ Zeitgeist_createRendition
 Shizu_String*
 Zeitgeist_Rendition_getName
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* rendition
   )
 {
   Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
   Shizu_JumpTarget jumpTarget;
-  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
-    Shizu_String* (*getName)(Shizu_State*) = (Shizu_String * (*)(Shizu_State*))Shizu_Dl_getSymbol(state, rendition->dl, "Zeitgeist_Rendition_getName");
+    Shizu_String* (*getName)(Shizu_State2*) = (Shizu_String * (*)(Shizu_State2*))Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_getName");
     if (!getName) {
       fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_getName", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
     Shizu_String* name = getName(state);
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
     return name;
   } else {
-    Shizu_State_popJumpTarget(state);
-    Shizu_State_jump(state);
+    Shizu_State2_popJumpTarget(state);
+    Shizu_State2_jump(state);
   }
 }
 
 Shizu_CxxFunction*
 Zeitgeist_Rendition_getUpdate
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* rendition
   )
 {
   Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
   Shizu_JumpTarget jumpTarget;
-  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
-    Shizu_CxxFunction* f = (void (*)(Shizu_State*))Shizu_Dl_getSymbol(state, rendition->dl, "Zeitgeist_Rendition_update");
+    Shizu_CxxFunction* f = (void (*)(Shizu_State2*))Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_update");
     if (!f) {
       fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_update", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
     return f;
   } else {
-    Shizu_State_popJumpTarget(state);
-    Shizu_State_jump(state);
+    Shizu_State2_popJumpTarget(state);
+    Shizu_State2_jump(state);
   }
 }
 
 Shizu_CxxFunction*
 Zeitgeist_Rendition_getLoad
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* rendition
   )
 {
   Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
   Shizu_JumpTarget jumpTarget;
-  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
-    Shizu_CxxFunction* f = (void (*)(Shizu_State*))Shizu_Dl_getSymbol(state, rendition->dl, "Zeitgeist_Rendition_load");
+    Shizu_CxxFunction* f = (void (*)(Shizu_State2*))Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_load");
     if (!f) {
       fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_load", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
     return f;
   } else {
-    Shizu_State_popJumpTarget(state);
-    Shizu_State_jump(state);
+    Shizu_State2_popJumpTarget(state);
+    Shizu_State2_jump(state);
   }
 }
 
 Shizu_CxxFunction*
 Zeitgeist_Rendition_getUnload
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* rendition
   )
 {
   Zeitgeist_Rendition_ensureLibraryLoaded(state, rendition);
   Shizu_JumpTarget jumpTarget;
-  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
-    Shizu_CxxFunction* f = (void (*)(Shizu_State*))Shizu_Dl_getSymbol(state, rendition->dl, "Zeitgeist_Rendition_unload");
+    Shizu_CxxFunction* f = (void (*)(Shizu_State2*))Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_unload");
     if (!f) {
       fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_unload", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
     return f;
   } else {
-    Shizu_State_popJumpTarget(state);
-    Shizu_State_jump(state);
+    Shizu_State2_popJumpTarget(state);
+    Shizu_State2_jump(state);
   }
 }

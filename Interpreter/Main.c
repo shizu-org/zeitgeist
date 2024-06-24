@@ -6,44 +6,45 @@
 #include "idlib/file_system.h"
 #include "Zeitgeist/Rendition.h"
 
-static Shizu_String* getWorkingDirectory(Shizu_State* state) {
+// Must be FileSystem.getWorkingDirectory instead of just "getWorkingDirectory".
+static Shizu_String* getWorkingDirectory(Shizu_State2* state) {
   Shizu_Value returnValue;
   Shizu_Value argumentValues[2];
   Shizu_CxxProcedure* p;
-  Shizu_Environment* environment = Shizu_State_getGlobals(state);
+  Shizu_Environment* environment = Shizu_Environment_getEnvironment(state, Shizu_State2_getGlobalEnvironment(state), Shizu_String_create(state, "FileSystem", strlen("Filesystem")));
   // Compute the path.
   p = Shizu_Environment_getCxxProcedure(state, environment, Shizu_String_create(state, "getWorkingDirectory", strlen("getWorkingDirectory")));
   p->f(state, &returnValue, 0, argumentValues);
   if (!Shizu_Value_isObject(&returnValue)) {
-    Shizu_State_setStatus(state, Shizu_Status_ArgumentInvalid);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+    Shizu_State2_jump(state);
   }
-  if (!Shizu_Types_isSubTypeOf(Shizu_State_getState1(state), Shizu_State_getTypes(state), Shizu_Value_getObject(&returnValue)->type, Shizu_String_getType(state))) {
-    Shizu_State_setStatus(state, Shizu_Status_ArgumentInvalid);
-    Shizu_State_jump(state);
+  if (!Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), Shizu_Value_getObject(&returnValue)->type, Shizu_String_getType(state))) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+    Shizu_State2_jump(state);
   }
   Shizu_String* path = (Shizu_String*)Shizu_Value_getObject(&returnValue);
   return path;
 }
 
 typedef struct LoadRenditionsContext {
-  Shizu_State* state;
+  Shizu_State2* state;
   Shizu_List* list;
   Shizu_String* prefix;
 } LoadRenditionsContext;
 
 static bool loadRenditionsCallback(LoadRenditionsContext* context, char const* bytes, size_t numberOfBytes) {
   Shizu_JumpTarget jumpTarget;
-  Shizu_State_pushJumpTarget(context->state, &jumpTarget);
+  Shizu_State2_pushJumpTarget(context->state, &jumpTarget);
   bool result = true;
   if (!setjmp(jumpTarget.environment)) {
     Shizu_String* string = Shizu_String_create(context->state, bytes, numberOfBytes);
     string = Shizu_String_concatenate(context->state, context->prefix, string);
     Zeitgeist_Rendition* rendition = Zeitgeist_createRendition(context->state, string);
     Shizu_List_appendObject(context->state, context->list, (Shizu_Object*)rendition);
-    Shizu_State_popJumpTarget(context->state);
+    Shizu_State2_popJumpTarget(context->state);
   } else {
-    Shizu_State_popJumpTarget(context->state);
+    Shizu_State2_popJumpTarget(context->state);
     return false;
   }
   return true;
@@ -52,7 +53,7 @@ static bool loadRenditionsCallback(LoadRenditionsContext* context, char const* b
 static Shizu_List*
 loadRenditions
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Shizu_String *path = getWorkingDirectory(state);
@@ -65,8 +66,8 @@ loadRenditions
   context.list = renditions;
   context.prefix = Shizu_String_concatenate(state, path, Shizu_String_create(state, Shizu_OperatingSystem_DirectorySeparator, strlen(Shizu_OperatingSystem_DirectorySeparator)));
   if (idlib_enumerate_files(Shizu_String_getBytes(state, Shizu_String_concatenate(state, path, Shizu_String_create(state, "", 1))), &context, &loadRenditionsCallback, true, true)) {
-    Shizu_State_setStatus(state, Shizu_Status_EnvironmentFailed);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+    Shizu_State2_jump(state);
   }
   return renditions;
 }
@@ -75,15 +76,15 @@ loadRenditions
 static void
 onListRenditions
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Shizu_List* renditions = loadRenditions(state);
   for (size_t i = 0, n = Shizu_List_getSize(state, renditions); i < n; ++i) {
     Shizu_Value value = Shizu_List_getValue(state, renditions, i);
     if (!Shizu_Value_isObject(&value)) {
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
     Zeitgeist_Rendition* rendition = (Zeitgeist_Rendition*)Shizu_Value_getObject(&value);
     Shizu_String* name = Zeitgeist_Rendition_getName(state, rendition);
@@ -94,7 +95,7 @@ onListRenditions
 static void
 onRendition1
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_Rendition* rendition
   )
 { 
@@ -102,43 +103,43 @@ onRendition1
   Shizu_CxxFunction* loadFunction = Zeitgeist_Rendition_getLoad(state, rendition);
   if (!loadFunction) {
     fprintf(stderr, "unable to acquire unload function of rendition `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, renditionName), Shizu_String_getBytes(state, renditionName));
-    Shizu_State_jump(state);
+    Shizu_State2_jump(state);
   }
   Shizu_CxxFunction* unloadFunction = Zeitgeist_Rendition_getUnload(state, rendition);
   if (!unloadFunction) {
     fprintf(stderr, "unable to acquire unload function of rendition `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, renditionName), Shizu_String_getBytes(state, renditionName));
-    Shizu_State_jump(state);
+    Shizu_State2_jump(state);
   }
   Shizu_CxxFunction* updateFunction = Zeitgeist_Rendition_getUpdate(state, rendition);
   if (!updateFunction) {
     fprintf(stderr, "unable to acquire update function of rendition `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, renditionName), Shizu_String_getBytes(state, renditionName));
-    Shizu_State_jump(state);
+    Shizu_State2_jump(state);
   }
   (*loadFunction)(state);
   Shizu_JumpTarget jumpTarget1;
-  Shizu_State_pushJumpTarget(state, &jumpTarget1);
+  Shizu_State2_pushJumpTarget(state, &jumpTarget1);
   if (!setjmp(jumpTarget1.environment)) {
-    Shizu_Stack_pushObject(state, (Shizu_Object*)rendition);
+    Shizu_Stack_pushObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), (Shizu_Object*)rendition);
     Shizu_JumpTarget jumpTarget2;
-    Shizu_State_pushJumpTarget(state, &jumpTarget2);
+    Shizu_State2_pushJumpTarget(state, &jumpTarget2);
     if (!setjmp(jumpTarget1.environment)) {
-      while (!Shizu_State_getProcessExitRequested(state)) {
+      while (!Shizu_State2_getProcessExitRequested(state)) {
         (*updateFunction)(state);
-        Shizu_Gc_run(state);
+        Shizu_Gc_run(state, Shizu_State2_getGc(state), NULL);
       }
-      Shizu_State_popJumpTarget(state);
+      Shizu_State2_popJumpTarget(state);
       (*unloadFunction)(state);
     } else {
-      Shizu_State_popJumpTarget(state);
+      Shizu_State2_popJumpTarget(state);
       (*unloadFunction)(state);
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
-    Shizu_State_popJumpTarget(state);
-    Shizu_Stack_pop(state);
+    Shizu_State2_popJumpTarget(state);
+    Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
   } else {
-    Shizu_State_popJumpTarget(state);
-    Shizu_Stack_pop(state);
-    Shizu_State_jump(state);
+    Shizu_State2_popJumpTarget(state);
+    Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
+    Shizu_State2_jump(state);
   }
 }
 
@@ -146,7 +147,7 @@ onRendition1
 static void
 onRendition
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_String* renditionName
   )
 { 
@@ -154,8 +155,8 @@ onRendition
   for (size_t i = 0, n = Shizu_List_getSize(state, loadedRenditions); i < n; ++i) {
     Shizu_Value value = Shizu_List_getValue(state, loadedRenditions, i);
     if (!Shizu_Value_isObject(&value)) {
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
     Zeitgeist_Rendition* loadedRendition = (Zeitgeist_Rendition*)Shizu_Value_getObject(&value);
     Shizu_String* loadedRenditionName = Zeitgeist_Rendition_getName(state, loadedRendition);
@@ -169,7 +170,7 @@ onRendition
 static void
 onHelp
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   fprintf(stdout, "usage: zeitgeist-interpreter [--rendition <name> ] [--list-renditions] [--help]\n");
@@ -181,7 +182,7 @@ onHelp
 static void
 main1
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     int argc,
     char** argv
   )
@@ -191,18 +192,18 @@ main1
   Shizu_String* help = Shizu_String_create(state, "--help", strlen("--help"));
   if (argc < 2) {
     fprintf(stderr, "error: no command specified\n");
-    Shizu_State_jump(state);
+    Shizu_State2_jump(state);
   }
   for (int argi = 1; argi < argc; ++argi) {
     Shizu_String* arg = Shizu_String_create(state, argv[argi], strlen(argv[argi]));
     if (Shizu_String_getNumberOfBytes(state, arg) > 128) {
       fprintf(stderr, "error: command `%.*s` too long\n", (int)64, Shizu_String_getBytes(state, arg));
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
     if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, (Shizu_Object*)listRenditions)) {
       if (argc != 2) {
         fprintf(stderr, "error: unknown arguments to command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
-        Shizu_State_jump(state);
+        Shizu_State2_jump(state);
       }
       fprintf(stdout, "listing renditions\n");
       onListRenditions(state);
@@ -210,17 +211,17 @@ main1
     } else if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, (Shizu_Object*)rendition)) {
       if (argc != 3) {
         fprintf(stderr, "error: missing argument for command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
-        Shizu_State_jump(state);
+        Shizu_State2_jump(state);
       }
       fprintf(stdout, "executing rendition\n");
       onRendition(state, Shizu_String_create(state, argv[argi + 1], strlen(argv[argi + 1])));
       break;
     } else if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, (Shizu_Object*)help)) {
       onHelp(state);
-      Shizu_State_setProcessExitRequested(state, Shizu_Boolean_True);
+      Shizu_State2_setProcessExitRequested(state, Shizu_Boolean_True);
     } else {
       fprintf(stderr, "error: unknown command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
   }
 }
@@ -232,23 +233,23 @@ main
     char** argv
   )
 {
-  Shizu_State* state = NULL;
-  if (Shizu_State_create(&state)) {
+  Shizu_State2* state = NULL;
+  if (Shizu_State2_acquire(&state)) {
     return EXIT_FAILURE;
   }
   int exitCode = EXIT_SUCCESS;
   Shizu_JumpTarget jumpTarget;
-  Shizu_State_pushJumpTarget(state, &jumpTarget);
+  Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
-    Shizu_State_ensureModulesLoaded(state);
+    Shizu_State2_ensureModulesLoaded(state);
     main1(state, argc, argv);
     exitCode = EXIT_SUCCESS;
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
   } else {
     exitCode = EXIT_FAILURE;
-    Shizu_State_popJumpTarget(state);
+    Shizu_State2_popJumpTarget(state);
   }
-  Shizu_State_destroy(state);
+  Shizu_State2_relinquish(state);
   state = NULL;
   return exitCode;
 }

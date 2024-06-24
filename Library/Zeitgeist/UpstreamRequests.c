@@ -24,7 +24,7 @@ Shizu_defineType(Zeitgeist_UpstreamRequest, Shizu_Object);
 Zeitgeist_UpstreamRequest*
 Zeitgeist_UpstreamRequest_createExitProcessRequest
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Zeitgeist_UpstreamRequest* self = (Zeitgeist_UpstreamRequest*)Shizu_Gc_allocateObject(state, sizeof(Zeitgeist_UpstreamRequest));
@@ -36,11 +36,11 @@ Zeitgeist_UpstreamRequest_createExitProcessRequest
 void
 Zeitgeist_sendUpstreamRequest
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Zeitgeist_UpstreamRequest* request
   )
 { 
   if (Zeitgeist_UpstreamRequestType_ExitProcessRequest == request->type) {
-    Shizu_State_setProcessExitRequested(state, Shizu_Boolean_True);
+    Shizu_State2_setProcessExitRequested(state, Shizu_Boolean_True);
   }
 }
