@@ -11,7 +11,7 @@
 void
 ServiceWgl_startup
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 /// @since 0.1
@@ -20,7 +20,7 @@ ServiceWgl_startup
 void
 ServiceWgl_shutdown
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 /// @since 0.1
@@ -30,7 +30,7 @@ ServiceWgl_shutdown
 void
 ServiceWgl_setTitle
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_String* title
 	);
 
@@ -40,7 +40,7 @@ ServiceWgl_setTitle
 void
 ServiceWgl_update
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 /// @since 1.0
@@ -50,7 +50,7 @@ ServiceWgl_update
 Shizu_Boolean
 ServiceWgl_quitRequested
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 /// @since 0.1
@@ -63,7 +63,7 @@ ServiceWgl_quitRequested
 void
 ServiceWgl_getClientSize
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_Integer32 *width,
 		Shizu_Integer32 *height
 	);
@@ -79,7 +79,7 @@ ServiceWgl_getClientSize
 void*
 ServiceWgl_link
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		char const* functionName,
 		char const* extensionName
 	);
@@ -87,13 +87,13 @@ ServiceWgl_link
 void
 ServiceWgl_beginFrame
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 void
 ServiceWgl_endFrame
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 #endif // SERVICEWGL_H_INCLUDED

@@ -36,18 +36,18 @@ Shizu_declareType(Visuals_Context);
 
 struct Visuals_Context_Dispatch {
   Shizu_Object_Dispatch _parent;
-  Visuals_Program* (*createProgram)(Shizu_State*, Visuals_Context*, Shizu_String* vertexSource, Shizu_String* fragmentSource);
-  Visuals_RenderBuffer* (*createRenderBuffer)(Shizu_State*, Visuals_Context*);
-  Visuals_Texture* (*createTexture)(Shizu_State*, Visuals_Context*);
-  Visuals_VertexBuffer* (*createVertexBuffer)(Shizu_State*, Visuals_Context*);
-  void (*setClearColor)(Shizu_State*, Visuals_Context*, Shizu_Float32 r, Shizu_Float32 g, Shizu_Float32 b, Shizu_Float32 a);
-  void (*setClearDepth)(Shizu_State*, Visuals_Context*, Shizu_Float32 z);
-  void (*setBlendFactors)(Shizu_State*, Visuals_Context*, Visuals_BlendFactor, Visuals_BlendFactor);
-  void (*setCullMode)(Shizu_State*, Visuals_Context*, Visuals_CullMode);
-  void (*setDepthFunction)(Shizu_State*, Visuals_Context*, Visuals_DepthFunction);
-  void (*setViewport)(Shizu_State*, Visuals_Context*, Shizu_Float32 left, Shizu_Float32 bottom, Shizu_Float32 width, Shizu_Float32 height);
-  void (*clear)(Shizu_State*, Visuals_Context*, bool colorBuffer, bool depthBuffer);
-  void (*render)(Shizu_State*, Visuals_Context*, Visuals_VertexBuffer* vertexBuffer, Visuals_Program* program);
+  Visuals_Program* (*createProgram)(Shizu_State2*, Visuals_Context*, Shizu_String* vertexSource, Shizu_String* fragmentSource);
+  Visuals_RenderBuffer* (*createRenderBuffer)(Shizu_State2*, Visuals_Context*);
+  Visuals_Texture* (*createTexture)(Shizu_State2*, Visuals_Context*);
+  Visuals_VertexBuffer* (*createVertexBuffer)(Shizu_State2*, Visuals_Context*);
+  void (*setClearColor)(Shizu_State2*, Visuals_Context*, Shizu_Float32 r, Shizu_Float32 g, Shizu_Float32 b, Shizu_Float32 a);
+  void (*setClearDepth)(Shizu_State2*, Visuals_Context*, Shizu_Float32 z);
+  void (*setBlendFactors)(Shizu_State2*, Visuals_Context*, Visuals_BlendFactor, Visuals_BlendFactor);
+  void (*setCullMode)(Shizu_State2*, Visuals_Context*, Visuals_CullMode);
+  void (*setDepthFunction)(Shizu_State2*, Visuals_Context*, Visuals_DepthFunction);
+  void (*setViewport)(Shizu_State2*, Visuals_Context*, Shizu_Float32 left, Shizu_Float32 bottom, Shizu_Float32 width, Shizu_Float32 height);
+  void (*clear)(Shizu_State2*, Visuals_Context*, bool colorBuffer, bool depthBuffer);
+  void (*render)(Shizu_State2*, Visuals_Context*, Visuals_VertexBuffer* vertexBuffer, Visuals_Program* program);
 };
 
 struct Visuals_Context {
@@ -57,14 +57,14 @@ struct Visuals_Context {
 void
 Visuals_Context_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self
   );
 
 static inline Visuals_Program*
 Visuals_Context_createProgram
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self,
     Shizu_String* vertexSource,
     Shizu_String* fragmentSource
@@ -74,7 +74,7 @@ Visuals_Context_createProgram
 static inline Visuals_RenderBuffer*
 Visuals_Context_createRenderBuffer
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self
   )
 { Shizu_VirtualCallWithReturn(Visuals_Context, createRenderBuffer, self); }
@@ -82,7 +82,7 @@ Visuals_Context_createRenderBuffer
 static inline Visuals_Texture*
 Visuals_Context_createTexture
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self
   )
 { Shizu_VirtualCallWithReturn(Visuals_Context, createTexture, self); }
@@ -90,7 +90,7 @@ Visuals_Context_createTexture
 static inline Visuals_VertexBuffer*
 Visuals_Context_createVertexBuffer
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self
   )
 { Shizu_VirtualCallWithReturn(Visuals_Context, createVertexBuffer, self); }
@@ -99,7 +99,7 @@ Visuals_Context_createVertexBuffer
 static inline void
 Visuals_Context_setClearColor
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self,
     Shizu_Float32 r,
     Shizu_Float32 g,
@@ -112,7 +112,7 @@ Visuals_Context_setClearColor
 static inline void
 Visuals_Context_setClearDepth
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self,
     Shizu_Float32 z
   )
@@ -122,7 +122,7 @@ Visuals_Context_setClearDepth
 static inline void
 Visuals_Context_setBlendFactors
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self,
     Visuals_BlendFactor source,
     Visuals_BlendFactor target
@@ -133,7 +133,7 @@ Visuals_Context_setBlendFactors
 static inline void
 Visuals_Context_setCullMode
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self,
     Visuals_CullMode cullMode
   )
@@ -143,7 +143,7 @@ Visuals_Context_setCullMode
 static inline void
 Visuals_Context_setDepthFunction
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self,
     Visuals_DepthFunction depthFunction
   )
@@ -153,7 +153,7 @@ Visuals_Context_setDepthFunction
 static inline void
 Visuals_Context_setViewport
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self,
     Shizu_Float32 left,
     Shizu_Float32 bottom,
@@ -165,7 +165,7 @@ Visuals_Context_setViewport
 static inline void
 Visuals_Context_clear
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self,
     bool colorBuffer,
     bool depthBuffer
@@ -175,7 +175,7 @@ Visuals_Context_clear
 static inline void
 Visuals_Context_render
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self,
     Visuals_VertexBuffer* vertexBuffer,
     Visuals_Program* program

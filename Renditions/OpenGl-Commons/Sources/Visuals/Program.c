@@ -24,7 +24,7 @@
 static void
 Visuals_Program_visit
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self
   );
 
@@ -45,30 +45,30 @@ Shizu_defineType(Visuals_Program, Visuals_Object);
 static void
 Visuals_Program_visit
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self
   )
 {
   if (self->vertexProgramSource) {
-    Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->vertexProgramSource);
+    Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->vertexProgramSource);
   }
   if (self->fragmentProgramSource) {
-    Shizu_Gc_visitObject(Shizu_State_getState1(state), Shizu_State_getGc(state), (Shizu_Object*)self->fragmentProgramSource);
+    Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->fragmentProgramSource);
   }
 }
 
 void
 Visuals_Program_construct
   ( 
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self,
     Shizu_String* vertexProgramSource,
     Shizu_String* fragmentProgramSource
   )
 {
-  Shizu_Type* type = Visuals_Program_getType(state);
+  Shizu_Type* TYPE = Visuals_Program_getType(state);
   Visuals_Object_construct(state, (Visuals_Object*)self);
   self->vertexProgramSource = vertexProgramSource;
   self->fragmentProgramSource = fragmentProgramSource;
-  ((Shizu_Object*)self)->type = type;
+  ((Shizu_Object*)self)->type = TYPE;
 }

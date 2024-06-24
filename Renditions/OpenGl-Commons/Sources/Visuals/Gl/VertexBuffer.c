@@ -24,28 +24,28 @@
 static void
 Visuals_Gl_VertexBuffer_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self
   );
   
 static void
 Visuals_Gl_VertexBuffer_materializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self
   );
 
 static void
 Visuals_Gl_VertexBuffer_unmaterializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self
   );
 
 static void
 Visuals_Gl_VertexBuffer_setDataImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self,
     uint8_t flags,
     void const* bytes,
@@ -76,7 +76,7 @@ Shizu_defineType(Visuals_Gl_VertexBuffer, Visuals_VertexBuffer);
 static void
 Visuals_Gl_VertexBuffer_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self
   )
 {
@@ -93,7 +93,7 @@ Visuals_Gl_VertexBuffer_finalize
 static void
 Visuals_Gl_VertexBuffer_materializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self
   )
 {
@@ -102,16 +102,16 @@ Visuals_Gl_VertexBuffer_materializeImpl
     glGenBuffers(1, &self->bufferId);
     if (glGetError()) {
       fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenBuffers");
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
     glGenVertexArrays(1, &self->vertexArrayId);
     if (glGetError()) {
       glDeleteBuffers(1, &self->bufferId);
       self->bufferId = 0;
       fprintf(stderr, "%s:%d: %s failed\n", __FILE__, __LINE__, "glGenVertexArrays");
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
   }
 }
@@ -119,7 +119,7 @@ Visuals_Gl_VertexBuffer_materializeImpl
 static void
 Visuals_Gl_VertexBuffer_unmaterializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self
   )
 {
@@ -145,15 +145,15 @@ Visuals_Gl_VertexBuffer_unmaterializeImpl
 static void
 Visuals_Gl_VertexBuffer_setDataImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self,
     uint8_t flags,
     void const* bytes,
     size_t numberOfBytes
   )
 {
-  Shizu_Type* parentType = Shizu_Types_getParentType(Shizu_State_getState1(state), Shizu_State_getTypes(state), ((Shizu_Object*)self)->type);
-  Visuals_VertexBuffer_Dispatch* parentDispatch = (Visuals_VertexBuffer_Dispatch*)Shizu_Types_getDispatch(Shizu_State_getState1(state), Shizu_State_getTypes(state), parentType);
+  Shizu_Type* parentType = Shizu_Types_getParentType(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), ((Shizu_Object*)self)->type);
+  Visuals_VertexBuffer_Dispatch* parentDispatch = (Visuals_VertexBuffer_Dispatch*)Shizu_Types_getDispatch(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), parentType);
   parentDispatch->setData(state, (Visuals_VertexBuffer*)self, flags, bytes, numberOfBytes);
 
   static const GLint POSITION_INDEX = 0;
@@ -176,8 +176,8 @@ Visuals_Gl_VertexBuffer_setDataImpl
     } break;
     default: {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     } break;
   };
 
@@ -364,8 +364,8 @@ Visuals_Gl_VertexBuffer_setDataImpl
     } break;
     default: {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     } break;
   };
 
@@ -380,15 +380,15 @@ Visuals_Gl_VertexBuffer_dispatchInitialize
     Visuals_Gl_VertexBuffer_Dispatch* self
   )
 {
-  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_VertexBuffer_materializeImpl;
-  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_VertexBuffer_unmaterializeImpl;
-  ((Visuals_VertexBuffer_Dispatch*)self)->setData = (void(*)(Shizu_State*, Visuals_VertexBuffer*, uint8_t,void const*,size_t)) & Visuals_Gl_VertexBuffer_setDataImpl;
+  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State2*,Visuals_Object*)) & Visuals_Gl_VertexBuffer_materializeImpl;
+  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State2*,Visuals_Object*)) & Visuals_Gl_VertexBuffer_unmaterializeImpl;
+  ((Visuals_VertexBuffer_Dispatch*)self)->setData = (void(*)(Shizu_State2*, Visuals_VertexBuffer*, uint8_t,void const*,size_t)) & Visuals_Gl_VertexBuffer_setDataImpl;
 }
 
 void
 Visuals_Gl_VertexBuffer_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self
   )
 {
@@ -402,7 +402,7 @@ Visuals_Gl_VertexBuffer_construct
 Visuals_Gl_VertexBuffer*
 Visuals_Gl_VertexBuffer_create
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Visuals_Gl_VertexBuffer* self = (Visuals_Gl_VertexBuffer*)Shizu_Gc_allocateObject(state, sizeof(Visuals_Gl_VertexBuffer));

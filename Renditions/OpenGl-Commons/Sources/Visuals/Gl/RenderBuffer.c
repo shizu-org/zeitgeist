@@ -24,35 +24,35 @@
 static void
 Visuals_Gl_RenderBuffer_dispatchInitialize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer_Dispatch* self
   );
 
 static void
 Visuals_Gl_RenderBuffer_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self
   );
 
 static void
 Visuals_Gl_RenderBuffer_materializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self
   );
 
 static void
 Visuals_Gl_RenderBuffer_unmaterializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self
   );
 
 static void
 Visuals_Gl_RenderBuffer_resizeImpl
   (   
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self,
     Shizu_Integer32 width,
     Shizu_Integer32 height
@@ -75,19 +75,19 @@ Shizu_defineType(Visuals_Gl_RenderBuffer, Visuals_RenderBuffer);
 static void
 Visuals_Gl_RenderBuffer_dispatchInitialize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer_Dispatch* self
   )
 { 
-  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_materializeImpl;
-  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_unmaterializeImpl;
-  ((Visuals_RenderBuffer_Dispatch*)self)->resize = (void(*)(Shizu_State*,Visuals_RenderBuffer*,Shizu_Integer32,Shizu_Integer32)) & Visuals_Gl_RenderBuffer_resizeImpl;
+  ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State2*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_materializeImpl;
+  ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State2*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_unmaterializeImpl;
+  ((Visuals_RenderBuffer_Dispatch*)self)->resize = (void(*)(Shizu_State2*,Visuals_RenderBuffer*,Shizu_Integer32,Shizu_Integer32)) & Visuals_Gl_RenderBuffer_resizeImpl;
 }
 
 static void
 Visuals_Gl_RenderBuffer_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self
   )
 {
@@ -112,7 +112,7 @@ Visuals_Gl_RenderBuffer_finalize
 static void
 Visuals_Gl_RenderBuffer_materializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self
   )
 {
@@ -120,8 +120,8 @@ Visuals_Gl_RenderBuffer_materializeImpl
   if (!self->colorTextureId) {
     glGenTextures(1, &self->colorTextureId);
     if (glGetError()) {
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
     glBindTexture(GL_TEXTURE_2D, self->colorTextureId);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, self->width, self->height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -131,8 +131,8 @@ Visuals_Gl_RenderBuffer_materializeImpl
     if (glGetError()) {
       glDeleteTextures(1, &self->colorTextureId);
       self->colorTextureId = 0;
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
   }
 
@@ -142,8 +142,8 @@ Visuals_Gl_RenderBuffer_materializeImpl
     if (glGetError()) {
       glDeleteTextures(1, &self->colorTextureId);
       self->colorTextureId = 0;
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
     glBindTexture(GL_TEXTURE_2D, self->depthStencilTextureId);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, self->width, self->height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
@@ -153,8 +153,8 @@ Visuals_Gl_RenderBuffer_materializeImpl
     if (glGetError()) {
       glDeleteTextures(1, &self->depthStencilTextureId);
       self->depthStencilTextureId = 0;
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
   }
 
@@ -162,8 +162,8 @@ Visuals_Gl_RenderBuffer_materializeImpl
   if (!self->frameBufferId) {
     glGenFramebuffers(1, &self->frameBufferId);
     if (glGetError()) {
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, self->frameBufferId);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self->colorTextureId, 0);
@@ -172,8 +172,8 @@ Visuals_Gl_RenderBuffer_materializeImpl
     if (glGetError()) {
       glDeleteFramebuffers(1, &self->frameBufferId);
       self->frameBufferId = 0;
-      Shizu_State_setStatus(state, 1);
-      Shizu_State_jump(state);
+      Shizu_State2_setStatus(state, 1);
+      Shizu_State2_jump(state);
     }
   }
 }
@@ -181,7 +181,7 @@ Visuals_Gl_RenderBuffer_materializeImpl
 static void
 Visuals_Gl_RenderBuffer_unmaterializeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self
   )
 {
@@ -206,7 +206,7 @@ Visuals_Gl_RenderBuffer_unmaterializeImpl
 static void
 Visuals_Gl_RenderBuffer_resizeImpl
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self,
     Shizu_Integer32 width,
     Shizu_Integer32 height
@@ -223,7 +223,7 @@ Visuals_Gl_RenderBuffer_resizeImpl
 void
 Visuals_Gl_RenderBuffer_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self
   )
 {
@@ -240,7 +240,7 @@ Visuals_Gl_RenderBuffer_construct
 Visuals_Gl_RenderBuffer*
 Visuals_Gl_RenderBuffer_create
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Visuals_Gl_RenderBuffer* self = (Visuals_Gl_RenderBuffer*)Shizu_Gc_allocateObject(state, sizeof(Visuals_Gl_RenderBuffer));

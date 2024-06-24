@@ -43,14 +43,14 @@ struct Visuals_Gl_RenderBuffer {
 void
 Visuals_Gl_RenderBuffer_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self
   );
 
 Visuals_Gl_RenderBuffer*
 Visuals_Gl_RenderBuffer_create
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 #endif // VISUALS_GL_RENDERBUFFER_H_INCLUDED

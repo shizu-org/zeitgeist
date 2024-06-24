@@ -45,14 +45,14 @@ struct Visuals_Gl_VertexBuffer {
 void
 Visuals_Gl_VertexBuffer_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self
   );
 
 Visuals_Gl_VertexBuffer*
 Visuals_Gl_VertexBuffer_create
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 #endif // VISUALS_GL_VERTEXBUFFER_H_INCLUDED

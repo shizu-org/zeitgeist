@@ -35,12 +35,12 @@ Shizu_declareType(Visuals_Program);
 
 struct Visuals_Program_Dispatch {
   Visuals_Object_Dispatch _parent;
-  void (*bindMatrix4F32)(Shizu_State* state, Visuals_Program* self, char const* name, Matrix4F32* value);
-  void (*bindVector3F32)(Shizu_State* state, Visuals_Program* self, char const* name, Vector3F32* value);
-  void (*bindVector4F32)(Shizu_State* state, Visuals_Program* self, char const* name, Vector4F32* value);
-  void (*bindInteger32)(Shizu_State* state, Visuals_Program* self, char const* name, Shizu_Integer32 value);
-  void (*bindFloat32)(Shizu_State* state, Visuals_Program* self, char const* name, Shizu_Float32 value);
-  void (*bindBoolean)(Shizu_State* state, Visuals_Program* self, char const* name, Shizu_Boolean value);
+  void (*bindMatrix4F32)(Shizu_State2* state, Visuals_Program* self, char const* name, Matrix4F32* value);
+  void (*bindVector3F32)(Shizu_State2* state, Visuals_Program* self, char const* name, Vector3F32* value);
+  void (*bindVector4F32)(Shizu_State2* state, Visuals_Program* self, char const* name, Vector4F32* value);
+  void (*bindInteger32)(Shizu_State2* state, Visuals_Program* self, char const* name, Shizu_Integer32 value);
+  void (*bindFloat32)(Shizu_State2* state, Visuals_Program* self, char const* name, Shizu_Float32 value);
+  void (*bindBoolean)(Shizu_State2* state, Visuals_Program* self, char const* name, Shizu_Boolean value);
 };
 
 struct Visuals_Program {
@@ -52,7 +52,7 @@ struct Visuals_Program {
 void
 Visuals_Program_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self,
     Shizu_String* vertexSource,
     Shizu_String* fragmentSource
@@ -61,7 +61,7 @@ Visuals_Program_construct
 static inline void
 Visuals_Program_bindMatrix4F32
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self,
     char const* name,
     Matrix4F32* value
@@ -71,7 +71,7 @@ Visuals_Program_bindMatrix4F32
 static inline void
 Visuals_Program_bindVector3F32
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self,
     char const* name,
     Vector3F32* value
@@ -81,7 +81,7 @@ Visuals_Program_bindVector3F32
 static inline void
 Visuals_Program_bindVector4F32
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self,
     char const* name,
     Vector4F32* value
@@ -91,7 +91,7 @@ Visuals_Program_bindVector4F32
 static inline void
 Visuals_Program_bindInteger32
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self,
     char const* name,
     Shizu_Integer32 value
@@ -101,7 +101,7 @@ Visuals_Program_bindInteger32
 static inline void
 Visuals_Program_bindFloat32
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self,
     char const* name,
     Shizu_Float32 value
@@ -111,7 +111,7 @@ Visuals_Program_bindFloat32
 static inline void
 Visuals_Program_bindBoolean
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Program* self,
     char const* name,
     Shizu_Boolean value

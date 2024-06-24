@@ -29,7 +29,7 @@ typedef struct Visuals_Object Visuals_Object;
 void
 Visuals_Service_registerVisualsObject
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* object
   );
 

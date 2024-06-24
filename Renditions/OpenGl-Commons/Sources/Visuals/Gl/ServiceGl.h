@@ -39,26 +39,26 @@ typedef struct Visuals_Object Visuals_Object;
 void
 Visuals_Gl_Service_startup
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 void
 Visuals_Gl_Service_shutdown
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 void
 Visuals_Gl_Service_setTitle
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_String* title
   );
 
 void
 Visuals_Gl_Service_getClientSize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Integer32* width,
     Shizu_Integer32* height
   );
@@ -66,31 +66,31 @@ Visuals_Gl_Service_getClientSize
 void
 Visuals_Gl_Service_beginFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 void
 Visuals_Gl_Service_endFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 void
 Visuals_Gl_Service_update
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 Shizu_Boolean
 Visuals_Gl_Service_quitRequested
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 GLuint
 Visuals_Gl_Service_compileShader
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     GLenum type,
     const GLchar *source
   );
@@ -98,7 +98,7 @@ Visuals_Gl_Service_compileShader
 GLuint
 Visuals_Gl_Service_linkProgram
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     GLuint vert,
     GLuint frag
   );
@@ -106,32 +106,32 @@ Visuals_Gl_Service_linkProgram
 void
 Visuals_Gl_Service_registerVisualsObject
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* object
   );
 
 Shizu_String*
 Visuals_Gl_Service_getBackendVendorName
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 Shizu_String*
 Visuals_Gl_Service_getBackendRendererName
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 Shizu_Integer32
 Visuals_Gl_Service_getBackendMajorVersion
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 Shizu_Integer32
 Visuals_Gl_Service_getBackendMinorVersion
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 #endif // SERVICEGL_H_INCLUDED

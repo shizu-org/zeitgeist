@@ -83,7 +83,7 @@ static bool g_quitRequested = false;
 static void
 createIcon
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		HICON* RETURN,
 		COLORREF color,
 		int width,
@@ -93,7 +93,7 @@ createIcon
 static void
 createIcons
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		HWND hWnd,
 		COLORREF color
 	);
@@ -101,7 +101,7 @@ createIcons
 static void
 destroyIcons
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 // Helper to check for extension string presence.	Adapted from:
@@ -140,43 +140,43 @@ windowCallback
 static void
 choosePixelFormatLegacy
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 void
 choosePixelFormat
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 static void
 shutdownLegacy
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 static void
 startupLegacy
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 static void
 shutdown
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 static void
 startup
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	);
 
 static void
 createIcon
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		HICON* RETURN,
 		COLORREF color,
 		int width,
@@ -186,8 +186,8 @@ createIcon
 	// Obtain a handle to the screen device context.
 	HDC hdcScreen = GetDC(NULL);
 	if (!hdcScreen) {
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 
 	// Create a memory device context, which we will draw into.
@@ -195,8 +195,8 @@ createIcon
 	if (!hdcMem) {
 		ReleaseDC(NULL, hdcScreen);
 		hdcScreen = NULL;
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 
 	// Create the bitmap, and select it into the device context for drawing.
@@ -206,8 +206,8 @@ createIcon
 		hdcMem = NULL;
 		ReleaseDC(NULL, hdcScreen);
 		hdcScreen = NULL;
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	HBITMAP hbmpOld = (HBITMAP)SelectObject(hdcMem, hbmp);
 
@@ -249,7 +249,7 @@ createIcon
 static void
 createIcons
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		HWND hWnd,
 		COLORREF color
 	)
@@ -263,23 +263,23 @@ createIcons
 	// Create small icon.
 	size = GetSystemMetrics(SM_CXSMICON);
 	Shizu_JumpTarget jumpTarget;
-	Shizu_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State2_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		createIcon(state, &g_hSmallIcon, color, size, size);
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 	} else {
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 		DestroyIcon(g_hBigIcon);
 		g_hBigIcon = NULL;
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 }
 
 static void
 destroyIcons
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {
 	if (g_hSmallIcon) {
@@ -433,7 +433,7 @@ windowCallback
 			if (!pCreateStruct) {
 				return -1;
 			}
-			Shizu_State* state = (Shizu_State*)pCreateStruct->lpCreateParams;
+			Shizu_State2* state = (Shizu_State2*)pCreateStruct->lpCreateParams;
 			if (!SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)state)) {
 				if (GetLastError()) {
 					return -1;
@@ -447,38 +447,38 @@ windowCallback
 		} break;
 		case WM_KEYDOWN: {
 			//fprintf(stdout, "[service wgl] WM_KEYDOWN\n");
-			Shizu_State* state = (Shizu_State*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			Shizu_State2* state = (Shizu_State2*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (state) {
 				Shizu_JumpTarget jumpTarget;
-				Shizu_State_pushJumpTarget(state, &jumpTarget);
+				Shizu_State2_pushJumpTarget(state, &jumpTarget);
 				if (!setjmp(jumpTarget.environment)) {
 					Shizu_Value mappedKey = mapKeyboardKey(wParam);
 					if (Shizu_Value_isInteger32(&mappedKey)) {
 						KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Pressed, Shizu_Value_getInteger32(&mappedKey));
 						Visuals_Service_emitKeyboardKeyMessage(state, message);
 					}
-					Shizu_State_popJumpTarget(state);
+					Shizu_State2_popJumpTarget(state);
 				} else {
-					Shizu_State_popJumpTarget(state);
+					Shizu_State2_popJumpTarget(state);
 				}
 			}
 			return 0;
 		} break;
 		case WM_KEYUP: {
 			//fprintf(stdout, "[service wgl] WM_KEYUP\n");
-			Shizu_State* state = (Shizu_State*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			Shizu_State2* state = (Shizu_State2*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (state) {
 				Shizu_JumpTarget jumpTarget;
-				Shizu_State_pushJumpTarget(state, &jumpTarget);
+				Shizu_State2_pushJumpTarget(state, &jumpTarget);
 				if (!setjmp(jumpTarget.environment)) {
 					Shizu_Value mappedKey = mapKeyboardKey(wParam);
 					if (Shizu_Value_isInteger32(&mappedKey)) {
 						KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Released, Shizu_Value_getInteger32(&mappedKey));
 						Visuals_Service_emitKeyboardKeyMessage(state, message);
 					}
-					Shizu_State_popJumpTarget(state);
+					Shizu_State2_popJumpTarget(state);
 				} else {
-					Shizu_State_popJumpTarget(state);
+					Shizu_State2_popJumpTarget(state);
 				}
 			}
 			return 0;
@@ -494,7 +494,7 @@ windowCallback
 static void
 choosePixelFormatLegacy
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {
 	PIXELFORMATDESCRIPTOR descriptor;
@@ -507,25 +507,25 @@ choosePixelFormatLegacy
 	int pixelFormat = ChoosePixelFormat(g_hDc, &descriptor);
 	if (!pixelFormat) {
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	if (!DescribePixelFormat(g_hDc, pixelFormat, sizeof(descriptor), &descriptor)) {
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	if (!SetPixelFormat(g_hDc, pixelFormat, &descriptor)) {
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 }
 
 void
 choosePixelFormat
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 { 
 	int samples = 0;
@@ -544,24 +544,24 @@ choosePixelFormat
 	};
 	int i, n;
 	if (!wglChoosePixelFormatARB(g_hDc, pixelFormatAttribs, 0, 1, &i, &n)) {
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	PIXELFORMATDESCRIPTOR desc;
 	if (!DescribePixelFormat(g_hDc, i, sizeof(desc), &desc)) {
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	if (!SetPixelFormat(g_hDc, i, &desc)) {
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 }
 
 static void
 shutdownLegacy
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {
 	wglCreateContextAttribsARB = NULL;
@@ -574,22 +574,22 @@ shutdownLegacy
 static void
 startupLegacy
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {
 	Shizu_JumpTarget jumpTarget;
 
 	g_hInstance = GetModuleHandle(NULL);
 	if (!g_hInstance) {
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	g_className = _strdup("windowClassLegacy");
 	if (!g_className) {
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	WNDCLASSEX wcex;
@@ -613,8 +613,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	g_hWnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE,
 		 										  g_className,
@@ -638,17 +638,17 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	//
 	COLORREF color = RGB(0, 0, 0);
-	Shizu_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State2_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		createIcons(state, g_hWnd, color);
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 	} else {
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 		//
 		DestroyWindow(g_hWnd);
 		g_hWnd = NULL;
@@ -661,8 +661,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	SendMessage(g_hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hBigIcon);
 	SendMessage(g_hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hSmallIcon);
@@ -683,15 +683,15 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
-	Shizu_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State2_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		choosePixelFormatLegacy(state);
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 	} else {
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 		//
 		ReleaseDC(g_hWnd, g_hDc);
 		g_hDc = NULL;
@@ -709,8 +709,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	g_hGlrc = wglCreateContext(g_hDc);
 	if (!g_hGlrc) {
@@ -731,8 +731,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	if (!wglMakeCurrent(g_hDc, g_hGlrc)) {
 		//
@@ -755,8 +755,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	//
 	wglGetPixelFormatAttribivARB = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribivARB");
@@ -781,8 +781,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	wglGetPixelFormatAttribfvARB = (PFNWGLGETPIXELFORMATATTRIBFVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribfvARB");
 	if (!wglGetPixelFormatAttribfvARB) {
@@ -807,8 +807,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
 	if (!wglGetPixelFormatAttribfvARB) {
@@ -834,8 +834,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
 	if (!wglGetPixelFormatAttribfvARB) {
@@ -862,8 +862,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
 	if (!wglCreateContextAttribsARB) {
@@ -890,8 +890,8 @@ startupLegacy
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	//
 	wglDeleteContext(g_hGlrc);
@@ -915,7 +915,7 @@ startupLegacy
 static void
 shutdown
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 { 
 	if (g_hGlrc) {
@@ -953,7 +953,7 @@ shutdown
 static void
 startup
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {
 	Shizu_JumpTarget jumpTarget;
@@ -962,8 +962,8 @@ startup
 	if (!g_hInstance) {
 		shutdownLegacy(state);
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	g_className = _strdup("windowClass");
 	if (!g_className) {
@@ -971,8 +971,8 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	WNDCLASSEX wcex;
@@ -998,8 +998,8 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	g_hWnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE,
 													g_className,
@@ -1025,17 +1025,17 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	//
 	COLORREF color = RGB(0, 0, 0);
-	Shizu_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State2_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		createIcons(state, g_hWnd, color);
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 	} else {
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 		//
 		DestroyWindow(g_hWnd);
 		g_hWnd = NULL;
@@ -1048,8 +1048,8 @@ startup
 		//
 		g_hInstance = NULL;
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	SendMessage(g_hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hBigIcon);
 	SendMessage(g_hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hSmallIcon);
@@ -1072,16 +1072,16 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	//
-	Shizu_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State2_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		choosePixelFormat(state);
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 	} else {
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 		//
 		ReleaseDC(g_hWnd, g_hDc);
 		g_hDc = NULL;
@@ -1101,8 +1101,8 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	//
 	ShowWindow(g_hWnd, SW_SHOW);
@@ -1135,8 +1135,8 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	if (!wglMakeCurrent(g_hDc, g_hGlrc)) {
 		//
@@ -1161,8 +1161,8 @@ startup
 		//
 		shutdownLegacy(state);
 		//
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	// Default value. See Visuals_Context.
 	glEnable(GL_BLEND);
@@ -1181,20 +1181,20 @@ startup
 void
 ServiceWgl_startup
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {
 	fprintf(stdout, "[Hello World (OpenGL)] starting up WGL service\n");
 	startupLegacy(state);
 	Shizu_JumpTarget jumpTarget;
-	Shizu_State_pushJumpTarget(state, &jumpTarget);
+	Shizu_State2_pushJumpTarget(state, &jumpTarget);
 	if (!setjmp(jumpTarget.environment)) {
 		startup(state);
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 	} else {
-		Shizu_State_popJumpTarget(state);
+		Shizu_State2_popJumpTarget(state);
 		shutdownLegacy(state);
-		Shizu_State_jump(state);
+		Shizu_State2_jump(state);
 	}
 	g_quitRequested = false;
 }
@@ -1202,7 +1202,7 @@ ServiceWgl_startup
 void
 ServiceWgl_shutdown
 	(
-		Shizu_State* state
+		Shizu_State2* state
  	)
 {
 	fprintf(stdout, "[Hello World (OpenGL)] shutting down WGL service\n");
@@ -1213,7 +1213,7 @@ ServiceWgl_shutdown
 void
 ServiceWgl_setTitle
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_String* title
 	)
 {
@@ -1225,7 +1225,7 @@ ServiceWgl_setTitle
 void
 ServiceWgl_update
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {
 	MSG message;
@@ -1242,14 +1242,14 @@ ServiceWgl_update
 Shizu_Boolean
 ServiceWgl_quitRequested
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 { return g_quitRequested; }
 
 void
 ServiceWgl_getClientSize
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		Shizu_Integer32 *width,
 		Shizu_Integer32 *height
 	)
@@ -1263,7 +1263,7 @@ ServiceWgl_getClientSize
 void*
 ServiceWgl_link
 	(
-		Shizu_State* state,
+		Shizu_State2* state,
 		char const* functionName,
 		char const* extensionName
 	)
@@ -1271,14 +1271,14 @@ ServiceWgl_link
 	if (extensionName) {
 		char const* extensionNames = wglGetExtensionsStringARB(g_hDc);
 		if (!isExtensionSupported(extensionNames, extensionName)) {
-			Shizu_State_setStatus(state, 1);
-			Shizu_State_jump(state);
+			Shizu_State2_setStatus(state, 1);
+			Shizu_State2_jump(state);
 		}
 	}
 	void* p = wglGetProcAddress(functionName);
 	if (!p) {
-		Shizu_State_setStatus(state, 1);
-		Shizu_State_jump(state);
+		Shizu_State2_setStatus(state, 1);
+		Shizu_State2_jump(state);
 	}
 	return p;
 }
@@ -1286,14 +1286,14 @@ ServiceWgl_link
 void
 ServiceWgl_beginFrame
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {/*Intentionally empty.*/}
 
 void
 ServiceWgl_endFrame
 	(
-		Shizu_State* state
+		Shizu_State2* state
 	)
 {
 	SwapBuffers(g_hDc);

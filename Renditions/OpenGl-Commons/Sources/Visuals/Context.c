@@ -3,7 +3,7 @@
 static void
 Visuals_Context_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self
   );
 
@@ -31,7 +31,7 @@ Shizu_defineType(Visuals_Context, Shizu_Object);
 static void
 Visuals_Context_finalize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self
   )
 {/*Intentionally empty.*/}
@@ -47,11 +47,11 @@ Visuals_Context_dispatchInitialize
 void
 Visuals_Context_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Context* self
   )
 {
-  Shizu_Type* type = Visuals_Context_getType(state);
+  Shizu_Type* TYPE = Visuals_Context_getType(state);
   Shizu_Object_construct(state, (Shizu_Object*)self);
-  ((Shizu_Object*)self)->type = type;
+  ((Shizu_Object*)self)->type = TYPE;
 }

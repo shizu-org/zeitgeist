@@ -38,11 +38,11 @@ Shizu_defineType(Visuals_RenderBuffer, Visuals_Object);
 void
 Visuals_RenderBuffer_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_RenderBuffer* self
   )
 {
-  Shizu_Type* type = Visuals_RenderBuffer_getType(state);
+  Shizu_Type* TYPE = Visuals_RenderBuffer_getType(state);
   Visuals_Object_construct(state, (Visuals_Object*)self);
-  ((Shizu_Object*)self)->type = type;
+  ((Shizu_Object*)self)->type = TYPE;
 }

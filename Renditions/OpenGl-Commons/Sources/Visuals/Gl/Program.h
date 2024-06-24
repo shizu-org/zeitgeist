@@ -41,7 +41,7 @@ struct Visuals_Gl_Program {
 void
 Visuals_Gl_Program_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_Program* self,
     Shizu_String* vertexSource,
     Shizu_String* fragmentSource
@@ -50,7 +50,7 @@ Visuals_Gl_Program_construct
 Visuals_Gl_Program*
 Visuals_Gl_Program_create
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_String* vertexSource,
     Shizu_String* fragmentSource
   );

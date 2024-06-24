@@ -30,7 +30,7 @@ Shizu_declareType(Visuals_RenderBuffer);
 
 struct Visuals_RenderBuffer_Dispatch {
   Visuals_Object_Dispatch _parent;
-  void (*resize)(Shizu_State* state, Visuals_RenderBuffer* self, Shizu_Integer32 width, Shizu_Integer32 height);
+  void (*resize)(Shizu_State2* state, Visuals_RenderBuffer* self, Shizu_Integer32 width, Shizu_Integer32 height);
 };
 
 struct Visuals_RenderBuffer {
@@ -40,14 +40,14 @@ struct Visuals_RenderBuffer {
 void
 Visuals_RenderBuffer_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_RenderBuffer* self
   );
 
 static inline void
 Visuals_RenderBuffer_resize
   (    
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_RenderBuffer* self,
     Shizu_Integer32 width,
     Shizu_Integer32 height

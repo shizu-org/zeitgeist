@@ -49,7 +49,7 @@ static Visuals_Gl_Service g_service = {
 static void*
 link
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     char const* functionName,
     char const* extensionName
   )
@@ -66,7 +66,7 @@ link
 void
 Visuals_Gl_Service_startup
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   if (g_service.referenceCount == 0) {
@@ -88,12 +88,12 @@ Visuals_Gl_Service_startup
 void
 Visuals_Gl_Service_shutdown
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   if (0 == --g_service.referenceCount) {
     if (g_service.objects) {
-      Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_service.objects);
+      Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_service.objects);
       g_service.objects = NULL;
     }
   #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -109,7 +109,7 @@ Visuals_Gl_Service_shutdown
 void
 Visuals_Gl_Service_setTitle
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_String* title
   )
 {
@@ -125,7 +125,7 @@ Visuals_Gl_Service_setTitle
 void
 Visuals_Gl_Service_getClientSize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Integer32* width,
     Shizu_Integer32* height
   )
@@ -142,7 +142,7 @@ Visuals_Gl_Service_getClientSize
 void
 Visuals_Gl_Service_beginFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -157,7 +157,7 @@ Visuals_Gl_Service_beginFrame
 void
 Visuals_Gl_Service_endFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -172,7 +172,7 @@ Visuals_Gl_Service_endFrame
 void
 Visuals_Gl_Service_update
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -187,7 +187,7 @@ Visuals_Gl_Service_update
 Shizu_Boolean
 Visuals_Gl_Service_quitRequested
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -202,7 +202,7 @@ Visuals_Gl_Service_quitRequested
 GLuint
 Visuals_Gl_Service_compileShader
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     GLenum type,
     const GLchar *source
   )
@@ -217,8 +217,8 @@ Visuals_Gl_Service_compileShader
     glGetShaderInfoLog(shader, sizeof(log), NULL, log);
     fprintf(stderr, "error: %s: %s\n",
             type == GL_FRAGMENT_SHADER ? "frag" : "vert", (char *) log);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   return shader;
 }
@@ -226,7 +226,7 @@ Visuals_Gl_Service_compileShader
 GLuint
 Visuals_Gl_Service_linkProgram
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     GLuint vert,
     GLuint frag
   )
@@ -241,8 +241,8 @@ Visuals_Gl_Service_linkProgram
     GLchar log[4096];
     glGetProgramInfoLog(program, sizeof(log), NULL, log);
     fprintf(stderr, "error: link: %s\n", (char *) log);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   return program;
 }
@@ -250,21 +250,21 @@ Visuals_Gl_Service_linkProgram
 void
 Visuals_Gl_Service_registerVisualsObject
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* object
   )
 {
   if (!g_service.objects) {
     g_service.objects = Shizu_List_create(state);
     Shizu_JumpTarget jumpTarget;
-    Shizu_State_pushJumpTarget(state, &jumpTarget);
+    Shizu_State2_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
-      Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_service.objects);
-      Shizu_State_popJumpTarget(state);
+      Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_service.objects);
+      Shizu_State2_popJumpTarget(state);
     } else {
-      Shizu_State_popJumpTarget(state);
+      Shizu_State2_popJumpTarget(state);
       g_service.objects = NULL;
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }   
   }
   Shizu_Value temporary;
@@ -276,7 +276,7 @@ Visuals_Gl_Service_registerVisualsObject
 Shizu_String*
 Visuals_Gl_Service_getBackendVendorName
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   GLubyte const* p = glGetString(GL_VENDOR);
@@ -286,7 +286,7 @@ Visuals_Gl_Service_getBackendVendorName
 Shizu_String*
 Visuals_Gl_Service_getBackendRendererName
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   GLubyte const* p = glGetString(GL_RENDERER);
@@ -296,14 +296,14 @@ Visuals_Gl_Service_getBackendRendererName
 Shizu_Integer32
 Visuals_Gl_Service_getBackendMajorVersion
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   GLint v;
   glGetIntegerv(GL_MAJOR_VERSION, &v);
   if (v < Shizu_Integer32_Minimum || v > Shizu_Integer32_Maximum) {
-    Shizu_State_setStatus(state, Shizu_Status_EnvironmentFailed);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+    Shizu_State2_jump(state);
   }
   return v;
 }
@@ -311,14 +311,14 @@ Visuals_Gl_Service_getBackendMajorVersion
 Shizu_Integer32
 Visuals_Gl_Service_getBackendMinorVersion
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   GLint v;
   glGetIntegerv(GL_MINOR_VERSION, &v);
   if (v < Shizu_Integer32_Minimum || v > Shizu_Integer32_Maximum) {
-    Shizu_State_setStatus(state, Shizu_Status_EnvironmentFailed);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+    Shizu_State2_jump(state);
   }
   return v;
 }

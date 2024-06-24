@@ -36,27 +36,27 @@ static Shizu_List* g_mousePointerListeners = NULL;
 static void
 doStartup
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { Visuals_Gl_Service_startup(state); }
 
 static void
 doShutdown
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   Visuals_Gl_Service_shutdown(state);
   if (g_mousePointerListeners) {
-    Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_mousePointerListeners);
+    Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_mousePointerListeners);
     g_mousePointerListeners = NULL;
   }
   if (g_mouseButtonListeners) {
-    Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_mouseButtonListeners);
+    Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_mouseButtonListeners);
     g_mouseButtonListeners = NULL;
   }
   if (g_keyboardKeyListeners) {
-    Shizu_Object_unlock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_keyboardKeyListeners);
+    Shizu_Object_unlock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_keyboardKeyListeners);
     g_keyboardKeyListeners = NULL;
   }
 }
@@ -64,12 +64,12 @@ doShutdown
 void
 Visuals_Service_startup
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   if (Shizu_Integer32_Maximum == g_referenceCount) {
-    Shizu_State_setStatus(state, Shizu_Status_OperationInvalid);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, Shizu_Status_OperationInvalid);
+    Shizu_State2_jump(state);
   }
   if (g_referenceCount == 0) {
     doStartup(state);
@@ -80,12 +80,12 @@ Visuals_Service_startup
 void
 Visuals_Service_shutdown
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   if (Shizu_Integer32_Minimum == g_referenceCount) {
-    Shizu_State_setStatus(state, Shizu_Status_OperationInvalid);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, Shizu_Status_OperationInvalid);
+    Shizu_State2_jump(state);
   }
   if (g_referenceCount == 1) {
     doShutdown(state);
@@ -96,7 +96,7 @@ Visuals_Service_shutdown
 void
 Visuals_Service_setTitle
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_String* title
   )
 { Visuals_Gl_Service_setTitle(state, title); }
@@ -104,7 +104,7 @@ Visuals_Service_setTitle
 void
 Visuals_Service_getClientSize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Integer32* width,
     Shizu_Integer32* height
   )
@@ -113,35 +113,35 @@ Visuals_Service_getClientSize
 void
 Visuals_Service_beginFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { Visuals_Gl_Service_beginFrame(state); }
 
 void
 Visuals_Service_endFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { Visuals_Gl_Service_endFrame(state); }
 
 void
 Visuals_Service_update
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { Visuals_Gl_Service_update(state); }
 
 Shizu_Boolean
 Visuals_Service_quitRequested
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { return Visuals_Gl_Service_quitRequested(state); }
 
 void
 Visuals_Service_emitKeyboardKeyMessage
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     KeyboardKeyMessage* message
   )
 {
@@ -152,12 +152,11 @@ Visuals_Service_emitKeyboardKeyMessage
     Shizu_Value temporary = Shizu_List_getValue(state, g_keyboardKeyListeners, i);
     if (Shizu_Value_isCxxFunction(&temporary)) {
       Shizu_CxxFunction* cxxFunction = Shizu_Value_getCxxFunction(&temporary);
-      Shizu_Stack_pushObject(state, (Shizu_Object*)message);
-      Shizu_Stack_pushInteger32(state, 1);
+      Shizu_Stack_pushObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), (Shizu_Object*)message);
+      Shizu_Stack_pushInteger32(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 1);
       (*cxxFunction)(state);
     } else {
-      fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
-      exit(EXIT_FAILURE);
+      Shizu_unreachableCodeReached(__FILE__, __LINE__);
     }
   }
 }
@@ -165,7 +164,7 @@ Visuals_Service_emitKeyboardKeyMessage
 void
 Visuals_Service_emitMouseButtonMessage
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     MouseButtonMessage* message
   )
 {
@@ -176,8 +175,8 @@ Visuals_Service_emitMouseButtonMessage
     Shizu_Value temporary = Shizu_List_getValue(state, g_mouseButtonListeners, i);
     if (Shizu_Value_isCxxFunction(&temporary)) {
       Shizu_CxxFunction* cxxFunction = Shizu_Value_getCxxFunction(&temporary);
-      Shizu_Stack_pushObject(state, (Shizu_Object*)message);
-      Shizu_Stack_pushInteger32(state, 1);
+      Shizu_Stack_pushObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), (Shizu_Object*)message);
+      Shizu_Stack_pushInteger32(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 1);
       (*cxxFunction)(state);
     } else {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
@@ -189,7 +188,7 @@ Visuals_Service_emitMouseButtonMessage
 void
 Visuals_Service_emitMousePointerMessage
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     MousePointerMessage* message
   )
 {
@@ -200,8 +199,8 @@ Visuals_Service_emitMousePointerMessage
     Shizu_Value temporary = Shizu_List_getValue(state, g_mousePointerListeners, i);
     if (Shizu_Value_isCxxFunction(&temporary)) {
       Shizu_CxxFunction* cxxFunction = Shizu_Value_getCxxFunction(&temporary);
-      Shizu_Stack_pushObject(state, (Shizu_Object*)message);
-      Shizu_Stack_pushInteger32(state, 1);
+      Shizu_Stack_pushObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), (Shizu_Object*)message);
+      Shizu_Stack_pushInteger32(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 1);
       (*cxxFunction)(state);
     } else {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
@@ -213,21 +212,21 @@ Visuals_Service_emitMousePointerMessage
 void
 Visuals_Service_addKeyboardKeyCallback
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Value* value
   )
 {
   if (!g_keyboardKeyListeners) {
     g_keyboardKeyListeners = Shizu_List_create(state);
     Shizu_JumpTarget jumpTarget;
-    Shizu_State_pushJumpTarget(state, &jumpTarget);
+    Shizu_State2_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
-      Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_keyboardKeyListeners);
-      Shizu_State_popJumpTarget(state);
+      Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_keyboardKeyListeners);
+      Shizu_State2_popJumpTarget(state);
     } else {
-      Shizu_State_popJumpTarget(state);
+      Shizu_State2_popJumpTarget(state);
       g_keyboardKeyListeners = NULL;
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
   }
   if (Shizu_Value_isVoid(value)) {
@@ -239,29 +238,29 @@ Visuals_Service_addKeyboardKeyCallback
     Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)Shizu_Value_getObject(value)));
     Shizu_List_appendValue(state, g_keyboardKeyListeners, &temporary);
   } else {
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
 }
 
 void
 Visuals_Service_addMouseButtonCallback
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Value* value
   )
 {
   if (!g_mouseButtonListeners) {
     g_mouseButtonListeners = Shizu_List_create(state);
     Shizu_JumpTarget jumpTarget;
-    Shizu_State_pushJumpTarget(state, &jumpTarget);
+    Shizu_State2_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
-      Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_mouseButtonListeners);
-      Shizu_State_popJumpTarget(state);
+      Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_mouseButtonListeners);
+      Shizu_State2_popJumpTarget(state);
     } else {
-      Shizu_State_popJumpTarget(state);
+      Shizu_State2_popJumpTarget(state);
       g_mouseButtonListeners = NULL;
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
   }
   if (Shizu_Value_isVoid(value)) {
@@ -273,29 +272,29 @@ Visuals_Service_addMouseButtonCallback
     Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)Shizu_Value_getObject(value)));
     Shizu_List_appendValue(state, g_mouseButtonListeners, &temporary);
   } else {
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
 }
 
 void
 Visuals_Service_addMousePointerCallback
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Value* value
   )
 {
   if (!g_mousePointerListeners) {
     g_mousePointerListeners = Shizu_List_create(state);
     Shizu_JumpTarget jumpTarget;
-    Shizu_State_pushJumpTarget(state, &jumpTarget);
+    Shizu_State2_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
-      Shizu_Object_lock(Shizu_State_getState1(state), Shizu_State_getLocks(state), (Shizu_Object*)g_mousePointerListeners);
-      Shizu_State_popJumpTarget(state);
+      Shizu_Object_lock(Shizu_State2_getState1(state), Shizu_State2_getLocks(state), (Shizu_Object*)g_mousePointerListeners);
+      Shizu_State2_popJumpTarget(state);
     } else {
-      Shizu_State_popJumpTarget(state);
+      Shizu_State2_popJumpTarget(state);
       g_mousePointerListeners = NULL;
-      Shizu_State_jump(state);
+      Shizu_State2_jump(state);
     }
   }
   if (Shizu_Value_isVoid(value)) {
@@ -307,15 +306,15 @@ Visuals_Service_addMousePointerCallback
     Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)Shizu_Value_getObject(value)));
     Shizu_List_appendValue(state, g_mousePointerListeners, &temporary);
   } else {
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
 }
 
 void
 Visuals_Service_registerVisualsObject
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Object* object
   )
 { Visuals_Gl_Service_registerVisualsObject(state, object); }
@@ -324,27 +323,27 @@ Visuals_Service_registerVisualsObject
 Shizu_String*
 Visuals_Service_getBackendVendorName
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { return Visuals_Gl_Service_getBackendVendorName(state); }
 
 Shizu_String*
 Visuals_Service_getBackendRendererName
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { return Visuals_Gl_Service_getBackendRendererName(state); }
 
 Shizu_Integer32
 Visuals_Service_getBackendMajorVersion
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { return Visuals_Gl_Service_getBackendMajorVersion(state); }
 
 Shizu_Integer32
 Visuals_Service_getBackendMinorVersion
 (
-  Shizu_State* state
+  Shizu_State2* state
 )   {
  return Visuals_Gl_Service_getBackendMinorVersion(state); }

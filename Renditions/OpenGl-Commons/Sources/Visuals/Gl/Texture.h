@@ -23,14 +23,14 @@ struct Visuals_Gl_Texture {
 void
 Visuals_Gl_Texture_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_Texture* self
   );
 
 Visuals_Gl_Texture*
 Visuals_Gl_Texture_create
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 #endif // VISUALS_GL_TEXTURE_H_INCLUDED

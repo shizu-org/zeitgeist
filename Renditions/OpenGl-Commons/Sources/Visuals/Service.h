@@ -42,7 +42,7 @@ typedef struct MousePointerMessage MousePointerMessage;
 void
 Visuals_Service_startup
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 /// @since 1.0
@@ -52,7 +52,7 @@ Visuals_Service_startup
 void
 Visuals_Service_shutdown
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
   
 /// @since 1.0
@@ -62,7 +62,7 @@ Visuals_Service_shutdown
 void
 Visuals_Service_setTitle
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_String* title
   );
 
@@ -75,7 +75,7 @@ Visuals_Service_setTitle
 void
 Visuals_Service_getClientSize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Integer32* width,
     Shizu_Integer32* height
   );
@@ -85,7 +85,7 @@ Visuals_Service_getClientSize
 void
 Visuals_Service_beginFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 /// @brief Must be invoked to end rendering a frame.
@@ -93,7 +93,7 @@ Visuals_Service_beginFrame
 void
 Visuals_Service_endFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 /// @brief Must be invoked in intervals.
@@ -101,14 +101,14 @@ Visuals_Service_endFrame
 void
 Visuals_Service_update
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 /// @param state A pointer to a Shizu_State object.
 Shizu_Boolean
 Visuals_Service_quitRequested
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 /// @since 0.1
@@ -118,7 +118,7 @@ Visuals_Service_quitRequested
 void
 Visuals_Service_emitKeyboardKeyMessage
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     KeyboardKeyMessage* message
   );
 
@@ -137,7 +137,7 @@ Visuals_Service_emitKeyboardKeyMessage
 void
 Visuals_Service_addKeyboardKeyCallback
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Value* value
   );
 
@@ -156,7 +156,7 @@ Visuals_Service_addKeyboardKeyCallback
 void
 Visuals_Service_addMouseButtonCallback
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Value* value
   );
 
@@ -175,32 +175,32 @@ Visuals_Service_addMouseButtonCallback
 void
 Visuals_Service_addMousePointerCallback
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Value* value
   );
 
 Shizu_String*
 Visuals_Service_getBackendVendorName
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 Shizu_String*
 Visuals_Service_getBackendRendererName
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 Shizu_Integer32
 Visuals_Service_getBackendMajorVersion
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 Shizu_Integer32
 Visuals_Service_getBackendMinorVersion
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 #endif // VISUALS_SERVICE_H_INCLUDED

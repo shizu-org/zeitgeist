@@ -24,14 +24,14 @@ struct Visuals_Gl_Context {
 void
 Visuals_Gl_Context_construct
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Visuals_Gl_Context* self
   );
   
 Visuals_Gl_Context*
 Visuals_Gl_Context_create
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 #endif // VISUALS_GL_CONTEXT_H_INCLUDED

@@ -329,7 +329,7 @@ static const GLchar* Programs_Simple_fragmentProgram =
  * There are two programs currently:
  * "simple" and "pbr1".
  */
-Visuals_Program* Visuals_getProgram(Shizu_State* state, char const* name) {
+Visuals_Program* Visuals_getProgram(Shizu_State2* state, char const* name) {
   if (!strcmp(name, "simple")) {
     return (Visuals_Program*)
            Visuals_Gl_Program_create(state, Shizu_String_create(state, Programs_Simple_vertexProgram, strlen(Programs_Simple_vertexProgram)),
@@ -339,7 +339,7 @@ Visuals_Program* Visuals_getProgram(Shizu_State* state, char const* name) {
            Visuals_Gl_Program_create(state, Shizu_String_create(state, Programs_Pbr1_vertexProgram, strlen(Programs_Pbr1_vertexProgram)),
                                             Shizu_String_create(state, Programs_Pbr1_fragmentProgram, strlen(Programs_Pbr1_fragmentProgram)));
   } else {
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
 }

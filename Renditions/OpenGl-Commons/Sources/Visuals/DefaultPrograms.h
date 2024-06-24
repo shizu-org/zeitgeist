@@ -30,6 +30,6 @@
  * There are two programs currently:
  * "simple" and "pbr1". 
  */
-Visuals_Program* Visuals_getProgram(Shizu_State* state, char const* name);
+Visuals_Program* Visuals_getProgram(Shizu_State2* state, char const* name);
 
 #endif // VISUALS_DEFAULTPROGRAMS_H_INCLUDED
