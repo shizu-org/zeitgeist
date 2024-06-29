@@ -1,6 +1,25 @@
-// Copyright (c) 2024 Michael Heilmann. All rights reserved.
+/*
+	Shizu Visuals
+	Copyright (C) 2024 Michael Heilmann. All rights reserved.
 
-#include "ServiceWgl.h"
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+		 claim that you wrote the original software. If you use this software
+		 in a product, an acknowledgment in the product documentation would be
+		 appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+		 misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+*/
+
+#include "Visuals/Gl/Wgl/Service.h"
 
 // fprintf, stdout
 #include <stdio.h>
@@ -522,7 +541,7 @@ choosePixelFormatLegacy
 	}
 }
 
-void
+static void
 choosePixelFormat
 	(
 		Shizu_State2* state
@@ -1179,7 +1198,7 @@ startup
 }
 
 void
-ServiceWgl_startup
+Visuals_Gl_Wgl_Service_startup
 	(
 		Shizu_State2* state
 	)
@@ -1200,7 +1219,7 @@ ServiceWgl_startup
 }
 
 void
-ServiceWgl_shutdown
+Visuals_Gl_Wgl_Service_shutdown
 	(
 		Shizu_State2* state
  	)
@@ -1211,7 +1230,7 @@ ServiceWgl_shutdown
 }
 
 void
-ServiceWgl_setTitle
+Visuals_Gl_Wgl_Service_setTitle
 	(
 		Shizu_State2* state,
 		Shizu_String* title
@@ -1223,7 +1242,7 @@ ServiceWgl_setTitle
 }
 
 void
-ServiceWgl_update
+Visuals_Gl_Wgl_Service_update
 	(
 		Shizu_State2* state
 	)
@@ -1240,14 +1259,14 @@ ServiceWgl_update
 }
 
 Shizu_Boolean
-ServiceWgl_quitRequested
+Visuals_Gl_Wgl_Service_quitRequested
 	(
 		Shizu_State2* state
 	)
 { return g_quitRequested; }
 
 void
-ServiceWgl_getClientSize
+Visuals_Gl_Wgl_Service_getClientSize
 	(
 		Shizu_State2* state,
 		Shizu_Integer32 *width,
@@ -1261,7 +1280,7 @@ ServiceWgl_getClientSize
 }
 
 void*
-ServiceWgl_link
+Visuals_Gl_Wgl_Service_link
 	(
 		Shizu_State2* state,
 		char const* functionName,
@@ -1284,14 +1303,14 @@ ServiceWgl_link
 }
 
 void
-ServiceWgl_beginFrame
+Visuals_Gl_Wgl_Service_beginFrame
 	(
 		Shizu_State2* state
 	)
 {/*Intentionally empty.*/}
 
 void
-ServiceWgl_endFrame
+Visuals_Gl_Wgl_Service_endFrame
 	(
 		Shizu_State2* state
 	)

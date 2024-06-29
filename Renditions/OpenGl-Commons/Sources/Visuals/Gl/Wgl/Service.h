@@ -1,7 +1,26 @@
-// Copyright (c) 2024 Michael Heilmann. All rights reserved.
+/*
+	Shizu Visuals
+	Copyright (C) 2024 Michael Heilmann. All rights reserved.
 
-#if !defined(SERVICEWGL_H_INCLUDED)
-#define SERVICEWGL_H_INCLUDED
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+		 claim that you wrote the original software. If you use this software
+		 in a product, an acknowledgment in the product documentation would be
+		 appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+		 misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+*/
+
+#if !defined(VISUALS_GL_WGL_SERVICE_H_INCLUDED)
+#define VISUALS_GL_WGL_SERVICE_H_INCLUDED
 
 #include "Zeitgeist.h"
 
@@ -9,7 +28,7 @@
 /// @brief Startup the WGL service.
 /// @param state A pointer to the Shizu_State2 value.
 void
-ServiceWgl_startup
+Visuals_Gl_Wgl_Service_startup
 	(
 		Shizu_State2* state
 	);
@@ -18,7 +37,7 @@ ServiceWgl_startup
 /// @brief Shutdown the WGL service.
 /// @param state A pointer to a Shizu_State2 value.
 void
-ServiceWgl_shutdown
+Visuals_Gl_Wgl_Service_shutdown
 	(
 		Shizu_State2* state
 	);
@@ -28,7 +47,7 @@ ServiceWgl_shutdown
 /// @param state A pointer to a Shizu_State2 value.
 /// @param title A pointer to the title.
 void
-ServiceWgl_setTitle
+Visuals_Gl_Wgl_Service_setTitle
 	(
 		Shizu_State2* state,
 		Shizu_String* title
@@ -38,7 +57,7 @@ ServiceWgl_setTitle
 /// @brief Must be called in intervals to update.
 /// @params state A pointer to a Shizu_State2 value.
 void
-ServiceWgl_update
+Visuals_Gl_Wgl_Service_update
 	(
 		Shizu_State2* state
 	);
@@ -48,7 +67,7 @@ ServiceWgl_update
 /// @param state A pointer to a Shizu_State2 value.
 /// @return @a true if "quit" was requested. @a false otherwise.
 Shizu_Boolean
-ServiceWgl_quitRequested
+Visuals_Gl_Wgl_Service_quitRequested
 	(
 		Shizu_State2* state
 	);
@@ -61,7 +80,7 @@ ServiceWgl_quitRequested
 /// @param height A pointer to a Shizu_Integer32 variable.
 /// If this function succeeds, this variable is assigned the client height.
 void
-ServiceWgl_getClientSize
+Visuals_Gl_Wgl_Service_getClientSize
 	(
 		Shizu_State2* state,
 		Shizu_Integer32 *width,
@@ -77,7 +96,7 @@ ServiceWgl_getClientSize
  * @return A poiner to the function on success.
  */
 void*
-ServiceWgl_link
+Visuals_Gl_Wgl_Service_link
 	(
 		Shizu_State2* state,
 		char const* functionName,
@@ -85,15 +104,15 @@ ServiceWgl_link
 	);
 	
 void
-ServiceWgl_beginFrame
+Visuals_Gl_Wgl_Service_beginFrame
 	(
 		Shizu_State2* state
 	);
 
 void
-ServiceWgl_endFrame
+Visuals_Gl_Wgl_Service_endFrame
 	(
 		Shizu_State2* state
 	);
 
-#endif // SERVICEWGL_H_INCLUDED
+#endif // VISUALS_GL_WGL_SERVICE_H_INCLUDED

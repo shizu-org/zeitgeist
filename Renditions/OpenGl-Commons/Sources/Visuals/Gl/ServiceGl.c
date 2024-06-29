@@ -15,7 +15,7 @@
 #include <string.h>
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-  #include "Visuals/Gl/Wgl/ServiceWgl.h"
+  #include "Visuals/Gl/Wgl/Service.h"
   #define WIN32_LEAN_AND_MEAN
   #include <Windows.h>
   #include <GL/gl.h>
@@ -55,7 +55,7 @@ link
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-  return ServiceWgl_link(state, functionName, extensionName);
+  return Visuals_Gl_Wgl_Service_link(state, functionName, extensionName);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
   return ServiceGlx_link(state, functionName, extensionName);
 #else
@@ -71,7 +71,7 @@ Visuals_Gl_Service_startup
 {
   if (g_service.referenceCount == 0) {
   #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-    ServiceWgl_startup(state);
+    Visuals_Gl_Wgl_Service_startup(state);
   #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
     ServiceGlx_startup(state);
   #else
@@ -97,7 +97,7 @@ Visuals_Gl_Service_shutdown
       g_service.objects = NULL;
     }
   #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-    ServiceWgl_shutdown(state);
+    Visuals_Gl_Wgl_Service_shutdown(state);
   #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
     ServiceGlx_shutdown(state);
   #else
@@ -114,7 +114,7 @@ Visuals_Gl_Service_setTitle
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-  ServiceWgl_setTitle(state, title);
+  Visuals_Gl_Wgl_Service_setTitle(state, title);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
   ServiceGlx_setTitle(state, title);
 #else
@@ -131,7 +131,7 @@ Visuals_Gl_Service_getClientSize
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-  ServiceWgl_getClientSize(state, width, height);
+  Visuals_Gl_Wgl_Service_getClientSize(state, width, height);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
   ServiceGlx_getClientSize(state, width, height);
 #else
@@ -146,7 +146,7 @@ Visuals_Gl_Service_beginFrame
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-  ServiceWgl_beginFrame(state);
+  Visuals_Gl_Wgl_Service_beginFrame(state);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
   ServiceGlx_beginFrame(state);
 #else
@@ -161,7 +161,7 @@ Visuals_Gl_Service_endFrame
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-  ServiceWgl_endFrame(state);
+  Visuals_Gl_Wgl_Service_endFrame(state);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
   ServiceGlx_endFrame(state);
 #else
@@ -176,7 +176,7 @@ Visuals_Gl_Service_update
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-  ServiceWgl_update(state);
+  Visuals_Gl_Wgl_Service_update(state);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
   ServiceGlx_update(state);
 #else
@@ -191,7 +191,7 @@ Visuals_Gl_Service_quitRequested
   )
 {
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
-  return ServiceWgl_quitRequested(state);
+  return Visuals_Gl_Wgl_Service_quitRequested(state);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
   return ServiceGlx_quitRequested(state);
 #else
