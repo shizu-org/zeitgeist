@@ -1,6 +1,25 @@
-// Copyright (c) 2024 Michael Heilmann. All rights reserved.
+/*
+  Shizu Visuals
+  Copyright (C) 2024 Michael Heilmann. All rights reserved.
 
-#include "Visuals/Gl/Glx/ServiceGlx.h"
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+*/
+
+#include "Visuals/Gl/Glx/Service.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,7 +64,7 @@ isExtensionSupported
 static int
 getBestFbc
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     GLXFBConfig* configs,
     int numberOfConfigs
   );
@@ -60,19 +79,19 @@ errorHandler
 static void
 shutdownContext
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 static void
 startupWindow
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 static void
 shutdownWindow
   (
-    Shizu_State* state
+    Shizu_State2* state
   );
 
 static Shizu_Value
@@ -122,7 +141,7 @@ isExtensionSupported
 static int
 getBestFbc
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     GLXFBConfig* configs,
     int numberOfConfigs
   )
@@ -158,7 +177,7 @@ errorHandler
 static void
 startupContext
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   g_oldErrorHandler = XSetErrorHandler(&errorHandler);
@@ -168,8 +187,8 @@ startupContext
   if (!extensions) {
     fprintf(stderr, "%s:%d: unable to get extension strings\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
 
   // NOTE: It is not necessary to create or make current to a context before calling glXGetProcAddressARB.
@@ -178,8 +197,8 @@ startupContext
   if (!glXCreateContextAttribsARB) {
     fprintf(stderr, "%s:%d: unable to get %s\n", __FILE__, __LINE__, "glXCreateContextAttribsARB");
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   
   // Check for the GLX_ARB_create_context extension string and the function.
@@ -187,8 +206,8 @@ startupContext
   if (!isExtensionSupported(extensions, "GLX_ARB_create_context") || !glXCreateContextAttribsARB) {
     fprintf(stderr, "%s:%d: unable to get %s extension\n", __FILE__, __LINE__, "GLX_ARB_create_context  / glXCreateContextAttribsARB");
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   
   int contextAttribs[] = {
@@ -203,8 +222,8 @@ startupContext
   if (!g_context) {
     fprintf(stderr, "%s:%d: unable to get create context\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   
   if (!glXIsDirect(g_display, g_context)) {
@@ -212,8 +231,8 @@ startupContext
     glXDestroyContext(g_display, g_context);
     g_context = NULL;
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   
   if (!glXMakeCurrent(g_display, g_window, g_context)) {
@@ -221,8 +240,8 @@ startupContext
     glXDestroyContext(g_display, g_context);
     g_context = NULL;
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   
   XSetErrorHandler(g_oldErrorHandler);
@@ -231,7 +250,7 @@ startupContext
 static void
 shutdownContext
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   glXMakeCurrent(g_display, 0, 0);
@@ -242,7 +261,7 @@ shutdownContext
 static void
 startupWindow
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { 
   g_oldErrorHandler = XSetErrorHandler(&errorHandler);
@@ -251,8 +270,8 @@ startupWindow
   if (!g_display) {
     fprintf(stderr, "%s:%d: unable to open display\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   // Get a matching FB config
   static int glx_visualAttributes[] = {
@@ -279,16 +298,16 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to get GLX version\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   if ((glx_major == 1 && glx_minor < 3) || (glx_major < 1)) {
     XCloseDisplay(g_display);
     g_display = NULL;
     fprintf(stderr, "%s:%d: GLX version %d.%d smaller than the minimum required version %d.%d\n", __FILE__, __LINE__, glx_major, glx_minor, 1, 3);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   
   int glx_fbConfigCount;
@@ -298,8 +317,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to get matching frame buffer configuration(s)\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   //
   int glx_bestFbConfigIndex = getBestFbc(state, glx_fbConfigs, glx_fbConfigCount);
@@ -310,8 +329,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to get matching frame buffer configuration(s)\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   g_glx_bestFbConfig = glx_fbConfigs[ glx_bestFbConfigIndex ];
   
@@ -325,8 +344,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to get matching visual\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   
   XSetWindowAttributes swa;
@@ -340,8 +359,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to create a color map\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   swa.background_pixmap = None ;
   swa.border_pixel      = 0;
@@ -358,8 +377,8 @@ startupWindow
     g_display = NULL;
     fprintf(stderr, "%s:%d: unable to create window\n", __FILE__, __LINE__);
     XSetErrorHandler(g_oldErrorHandler);
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   
   XFree(x_visualInfo);
@@ -389,58 +408,13 @@ startupWindow
 static void
 shutdownWindow
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { 
   XDestroyWindow(g_display, g_window);
   XFreeColormap(g_display, g_colorMap);
   XCloseDisplay(g_display);
   g_display = NULL;
-}
-
-void
-ServiceGlx_startup
-  (
-    Shizu_State* state
-  )
-{ 
-  startupWindow(state);
-  startupContext(state);
-}
-
-void
-ServiceGlx_shutdown
-  (
-    Shizu_State* state
-  )
-{
-  shutdownContext(state);
-  shutdownWindow(state);
-}
-
-void
-ServiceGlx_setTitle
-  (
-    Shizu_State* state,
-    Shizu_String* title
-  )
-{
-  Shizu_String* zeroTerminator = Shizu_String_create(state, "", 1);
-  title = Shizu_String_concatenate(state, title, zeroTerminator);
-  
-  XTextProperty prop;
-  prop.value = (char*)Shizu_String_getBytes(state, title);
-  prop.encoding = XA_STRING;
-  prop.format = 8;
-  prop.nitems = Shizu_String_getNumberOfBytes(state, title) - 1;
-  g_oldErrorHandler = XSetErrorHandler(&errorHandler);
-  XSetWMName(g_display, g_window, &prop);
-  XStoreName(g_display, g_window, Shizu_String_getBytes(state, title));
-  XSync(g_display, False);
-  if (g_error) {
-    fprintf(stderr, "failed to set title\n");
-  }
-  XSetErrorHandler(g_oldErrorHandler);
 }
 
 static Shizu_Value
@@ -520,7 +494,57 @@ mapKeyboardKey
   };
 }
 
-void ServiceGlx_update(Shizu_State* state) {
+void
+Visuals_Gl_Glx_Service_startup
+  (
+    Shizu_State2* state
+  )
+{ 
+  startupWindow(state);
+  startupContext(state);
+}
+
+void
+Visuals_Gl_Glx_Service_shutdown
+  (
+    Shizu_State2* state
+  )
+{
+  shutdownContext(state);
+  shutdownWindow(state);
+}
+
+void
+Visuals_Gl_Glx_Service_setTitle
+  (
+    Shizu_State2* state,
+    Shizu_String* title
+  )
+{
+  Shizu_String* zeroTerminator = Shizu_String_create(state, "", 1);
+  title = Shizu_String_concatenate(state, title, zeroTerminator);
+  
+  XTextProperty prop;
+  prop.value = (char*)Shizu_String_getBytes(state, title);
+  prop.encoding = XA_STRING;
+  prop.format = 8;
+  prop.nitems = Shizu_String_getNumberOfBytes(state, title) - 1;
+  g_oldErrorHandler = XSetErrorHandler(&errorHandler);
+  XSetWMName(g_display, g_window, &prop);
+  XStoreName(g_display, g_window, Shizu_String_getBytes(state, title));
+  XSync(g_display, False);
+  if (g_error) {
+    fprintf(stderr, "failed to set title\n");
+  }
+  XSetErrorHandler(g_oldErrorHandler);
+}
+
+void
+Visuals_Gl_Glx_Service_update
+  (
+    Shizu_State2* state
+  )
+{
   XEvent e;
   while (XPending(g_display)) {
     XNextEvent(g_display, &e);
@@ -532,30 +556,30 @@ void ServiceGlx_update(Shizu_State* state) {
       } break;
       case KeyPress: {
         Shizu_JumpTarget jumpTarget;
-        Shizu_State_pushJumpTarget(state, &jumpTarget);
+        Shizu_State2_pushJumpTarget(state, &jumpTarget);
         if (!setjmp(jumpTarget.environment)) {
           Shizu_Value mappedKey = mapKeyboardKey(&e);
           if (Shizu_Value_isInteger32(&mappedKey)) {
             KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Pressed, Shizu_Value_getInteger32(&mappedKey));
             Visuals_Service_emitKeyboardKeyMessage(state, message);
           }
-          Shizu_State_popJumpTarget(state);
+          Shizu_State2_popJumpTarget(state);
         } else {
-          Shizu_State_popJumpTarget(state);
+          Shizu_State2_popJumpTarget(state);
         }
       } break;
       case KeyRelease: {
         Shizu_JumpTarget jumpTarget;
-        Shizu_State_pushJumpTarget(state, &jumpTarget);
+        Shizu_State2_pushJumpTarget(state, &jumpTarget);
         if (!setjmp(jumpTarget.environment)) {
           Shizu_Value mappedKey = mapKeyboardKey(&e);
           if (Shizu_Value_isInteger32(&mappedKey)) {
             KeyboardKeyMessage* message = KeyboardKeyMessage_create(state, KeyboardKey_Action_Released, Shizu_Value_getInteger32(&mappedKey));
             Visuals_Service_emitKeyboardKeyMessage(state, message);
           }
-          Shizu_State_popJumpTarget(state);
+          Shizu_State2_popJumpTarget(state);
         } else {
-          Shizu_State_popJumpTarget(state);
+          Shizu_State2_popJumpTarget(state);
         }
       } break;
     };
@@ -563,16 +587,16 @@ void ServiceGlx_update(Shizu_State* state) {
 }
 
 Shizu_Boolean
-ServiceGlx_quitRequested
+Visuals_Gl_Glx_Service_quitRequested
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 { return g_quitRequested; }
 
 void
-ServiceGlx_getClientSize
+Visuals_Gl_Glx_Service_getClientSize
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     Shizu_Integer32 *width,
     Shizu_Integer32 *height
   )
@@ -584,9 +608,9 @@ ServiceGlx_getClientSize
 }
 
 void*
-ServiceGlx_link
+Visuals_Gl_Glx_Service_link
   (
-    Shizu_State* state,
+    Shizu_State2* state,
     char const* functionName,
     char const* extensionName
   )
@@ -597,30 +621,30 @@ ServiceGlx_link
     if (!isExtensionSupported(extensionNames, extensionName)) {
       extensionNames = glGetString(GL_EXTENSIONS);
       if (!isExtensionSupported(extensionNames, extensionName)) {
-        Shizu_State_setStatus(state, 1);
-        Shizu_State_jump(state);
+        Shizu_State2_setStatus(state, 1);
+        Shizu_State2_jump(state);
       }
     }
   }
   void* p = glXGetProcAddress(functionName);
   if (!p) {
-    Shizu_State_setStatus(state, 1);
-    Shizu_State_jump(state);
+    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_jump(state);
   }
   return p;
 }
 
 void
-ServiceGlx_beginFrame
+Visuals_Gl_Glx_Service_beginFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {/*Intentionally empty.*/}
 
 void
-ServiceGlx_endFrame
+Visuals_Gl_Glx_Service_endFrame
   (
-    Shizu_State* state
+    Shizu_State2* state
   )
 {
   glXSwapBuffers(g_display, g_window);

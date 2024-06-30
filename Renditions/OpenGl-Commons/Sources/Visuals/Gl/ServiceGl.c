@@ -1,4 +1,24 @@
-// Copyright (c) 2024 Michael Heilmann. All rights reserved.
+/*
+  Shizu Visuals
+  Copyright (C) 2024 Michael Heilmann. All rights reserved.
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+*/
+
 
 #include "ServiceGl.h"
 
@@ -20,7 +40,7 @@
   #include <Windows.h>
   #include <GL/gl.h>
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-  #include "Visuals/Gl/Glx/ServiceGlx.h"
+  #include "Visuals/Gl/Glx/Service.h"
   #include <GL/gl.h>
 #else
   #error("operating system not (yet) supported")
@@ -57,7 +77,7 @@ link
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   return Visuals_Gl_Wgl_Service_link(state, functionName, extensionName);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-  return ServiceGlx_link(state, functionName, extensionName);
+  return Visuals_Gl_Glx_Service_link(state, functionName, extensionName);
 #else
   #error("operating system not (yet) supported")
 #endif
@@ -73,7 +93,7 @@ Visuals_Gl_Service_startup
   #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
     Visuals_Gl_Wgl_Service_startup(state);
   #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-    ServiceGlx_startup(state);
+    Visuals_Gl_Glx_Service_startup(state);
   #else
     #error("operating system not (yet) supported")
   #endif
@@ -99,7 +119,7 @@ Visuals_Gl_Service_shutdown
   #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
     Visuals_Gl_Wgl_Service_shutdown(state);
   #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-    ServiceGlx_shutdown(state);
+    Visuals_Gl_Glx_Service_shutdown(state);
   #else
     #error("operating system not (yet) supported")
   #endif
@@ -116,7 +136,7 @@ Visuals_Gl_Service_setTitle
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   Visuals_Gl_Wgl_Service_setTitle(state, title);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-  ServiceGlx_setTitle(state, title);
+  Visuals_Gl_Glx_Service_setTitle(state, title);
 #else
   #error("operating system not (yet) supported")
 #endif
@@ -133,7 +153,7 @@ Visuals_Gl_Service_getClientSize
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   Visuals_Gl_Wgl_Service_getClientSize(state, width, height);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-  ServiceGlx_getClientSize(state, width, height);
+  Visuals_Gl_Glx_Service_getClientSize(state, width, height);
 #else
   #error("operating system not (yet) supported")
 #endif
@@ -148,7 +168,7 @@ Visuals_Gl_Service_beginFrame
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   Visuals_Gl_Wgl_Service_beginFrame(state);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-  ServiceGlx_beginFrame(state);
+  Visuals_Gl_Glx_Service_beginFrame(state);
 #else
   #error("operating system not (yet) supported")
 #endif
@@ -163,7 +183,7 @@ Visuals_Gl_Service_endFrame
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   Visuals_Gl_Wgl_Service_endFrame(state);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-  ServiceGlx_endFrame(state);
+  Visuals_Gl_Glx_Service_endFrame(state);
 #else
   #error("operating system not (yet) supported")
 #endif
@@ -178,7 +198,7 @@ Visuals_Gl_Service_update
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   Visuals_Gl_Wgl_Service_update(state);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-  ServiceGlx_update(state);
+  Visuals_Gl_Glx_Service_update(state);
 #else
   #error("operating system not (yet) supported")
 #endif
@@ -193,7 +213,7 @@ Visuals_Gl_Service_quitRequested
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
   return Visuals_Gl_Wgl_Service_quitRequested(state);
 #elif Shizu_Configuration_OperatingSystem_Linux == Shizu_Configuration_OperatingSystem
-  return ServiceGlx_quitRequested(state);
+  return Visuals_Gl_Glx_Service_quitRequested(state);
 #else
   #error("operating system not (yet) supported")
 #endif
