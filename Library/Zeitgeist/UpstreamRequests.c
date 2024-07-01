@@ -2,11 +2,6 @@
 
 #include "Zeitgeist/UpstreamRequests.h"
 
-#include "Zeitgeist.h"
-
-// malloc, free
-#include <malloc.h>
-
 static Shizu_ObjectTypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
   .preDestroyType = NULL,
   .postCreateType = NULL,

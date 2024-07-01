@@ -58,6 +58,14 @@ static World* g_world = NULL;
 #define LightModel_BlinnPhong (2)
 static Shizu_Integer32 g_lightModel = LightModel_Phong;
 
+/// The "Phong" material expects the program to provide the following constants:
+/// | name                    | GLSL type |
+/// |-------------------------|-----------|
+/// | phongMaterial.ambient   | vec3      |
+/// | phongMaterial.diffuse   | vec3      |
+/// | phongMaterial.specular  | vec3      |
+/// | phongMaterial.shininess | float     |
+
 static void bindPhongMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_PhongMaterial* material) {
   Visuals_Program_bindVector3F32(state, g_program, "phongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)material->ambientR) / 255.f,
                                                                                                      ((Shizu_Float32)material->ambientG) / 255.f,
@@ -71,6 +79,13 @@ static void bindPhongMaterial(Shizu_State2* state, Visuals_Context* context, Vis
   Visuals_Program_bindFloat32(state, g_program, "phongMaterial.shininess", ((Shizu_Float32)material->shininess) / 255.f);
 }
 
+/// The "Blinn-Phong" material expects the program to provide the following constants:
+/// | name                         | GLSL type |
+/// |------------------------------|-----------|
+/// | blinnPhongMaterial.ambient   | vec3      |
+/// | blinnPhongMaterial.diffuse   | vec3      |
+/// | blinnPhongMaterial.specular  | vec3      |
+/// | blinnPhongMaterial.shininess | float     |
 static void bindBlinnPhongMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_BlinnPhongMaterial* material) {
   Visuals_Program_bindVector3F32(state, g_program, "blinnPhongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)material->ambientR) / 255.f,
                                                                                                           ((Shizu_Float32)material->ambientG) / 255.f,

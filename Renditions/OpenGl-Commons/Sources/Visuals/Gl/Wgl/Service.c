@@ -24,9 +24,6 @@
 // fprintf, stdout
 #include <stdio.h>
 
-// malloc, free
-#include <malloc.h>
-
 // Visuals_Service_emitKeyboardKeyMessage
 #include "Visuals/Service.h"
 #include "KeyboardKeyMessage.h"

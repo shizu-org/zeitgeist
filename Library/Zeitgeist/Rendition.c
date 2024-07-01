@@ -2,11 +2,6 @@
 
 #include "Zeitgeist/Rendition.h"
 
-#include "Zeitgeist.h"
-
-// malloc, free
-#include <malloc.h>
-
 // strlen
 #include <string.h>
 
@@ -137,7 +132,7 @@ Zeitgeist_Rendition_getUpdate
   Shizu_JumpTarget jumpTarget;
   Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
-    Shizu_CxxFunction* f = (void (*)(Shizu_State2*))Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_update");
+    Shizu_CxxFunction* f = (Shizu_CxxFunction*)Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_update");
     if (!f) {
       fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_update", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
       Shizu_State2_jump(state);
@@ -161,7 +156,7 @@ Zeitgeist_Rendition_getLoad
   Shizu_JumpTarget jumpTarget;
   Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
-    Shizu_CxxFunction* f = (void (*)(Shizu_State2*))Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_load");
+    Shizu_CxxFunction* f = (Shizu_CxxFunction*)Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_load");
     if (!f) {
       fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_load", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
       Shizu_State2_jump(state);
@@ -185,7 +180,7 @@ Zeitgeist_Rendition_getUnload
   Shizu_JumpTarget jumpTarget;
   Shizu_State2_pushJumpTarget(state, &jumpTarget);
   if (!setjmp(jumpTarget.environment)) {
-    Shizu_CxxFunction* f = (void (*)(Shizu_State2*))Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_unload");
+    Shizu_CxxFunction* f = (Shizu_CxxFunction*)Shizu_State1_getDlSymbol(Shizu_State2_getState1(state), rendition->dl, "Zeitgeist_Rendition_unload");
     if (!f) {
       fprintf(stderr, "unable to link `%s` of `%.*s`\n", "Zeitgeist_Rendition_unload", (int)Shizu_String_getNumberOfBytes(state, rendition->folderPath), Shizu_String_getBytes(state, rendition->folderPath));
       Shizu_State2_jump(state);
