@@ -25,17 +25,17 @@
 #include <X11/Xlib.h>
 #include "Visuals/Object.h"
 
-Shizu_declareType(Visuals_Gl_Glx_VideoMode);
+Shizu_declareObjectType(Visuals_Gl_Glx_VideoMode);
 
 struct Visuals_Gl_Glx_VideoMode {
   Visuals_Object _parent;
-  
+
   /// The horizontal resolution, in pixels.
   Shizu_Integer32 horizontalResolution;
-  
+
   /// The vertical resolution, in pixels.
   Shizu_Integer32 verticalResolution;
-  
+
   /// The refresh rate, in Hertz.
   Shizu_Integer32 refreshRate;
 };
@@ -58,7 +58,7 @@ Visuals_Gl_Glx_VideoMode_construct
     Shizu_Integer32 verticalResolution,
     Shizu_Integer32 refreshRate
   );
-  
+
 Visuals_Gl_Glx_VideoMode*
 Visuals_Gl_Glx_VideoMode_create
   (

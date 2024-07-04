@@ -52,7 +52,7 @@ Visuals_VertexBuffer_setDataImpl
     size_t numberOfBytes
   );
 
-static Shizu_TypeDescriptor const Visuals_VertexBuffer_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_VertexBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -61,10 +61,10 @@ static Shizu_TypeDescriptor const Visuals_VertexBuffer_Type = {
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_VertexBuffer_Dispatch),
   .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&Visuals_VertexBuffer_dispatchInitialize,
-  .dispatchUninitialize = NULL, 
+  .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_VertexBuffer, Visuals_Object);
+Shizu_defineObjectType(Visuals_VertexBuffer, Visuals_Object);
 
 static void
 Visuals_VertexBuffer_finalize
@@ -81,7 +81,7 @@ Visuals_VertexBuffer_finalize
 
   self->numberOfVertices = 0;
 
-  self->flags = 0; 
+  self->flags = 0;
 }
 
 static void
@@ -117,7 +117,7 @@ Visuals_VertexBuffer_setDataImpl
     } break;
     default: {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
-      Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+      Shizu_State2_setStatus(state, Shizu_Status_ArgumentValueInvalid);
       Shizu_State2_jump(state);
     } break;
   };
@@ -125,16 +125,16 @@ Visuals_VertexBuffer_setDataImpl
   size_t newNumberOfBytes = numberOfBytes;
   // Compute new number of vertices.
   size_t newNumberOfVertices = numberOfBytes / newVertexSize;
-  // Warn if this does not hold. 
+  // Warn if this does not hold.
   if (newNumberOfBytes % newVertexSize) {
     fprintf(stderr, "%s:%d: warning: number of Bytes %zu is not a multiple of the vertex size %zu\n", __FILE__, __LINE__, newNumberOfBytes, newVertexSize);
-    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentValueInvalid);
     Shizu_State2_jump(state);
   }
   // Allocate new Bytes.
   void *newBytes = realloc(self->bytes, newNumberOfVertices * newVertexSize > 0 ? newNumberOfVertices * newVertexSize : 1);
   if (!newBytes) {
-    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_setStatus(state, Shizu_Status_AllocationFailed);
     Shizu_State2_jump(state);
   }
   memcpy(newBytes, bytes, newNumberOfVertices * newVertexSize);

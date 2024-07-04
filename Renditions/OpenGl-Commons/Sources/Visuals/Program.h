@@ -31,7 +31,7 @@
  * @since 1.0
  * A program consists of a vertex program and a fragment program.
  */
-Shizu_declareType(Visuals_Program);
+Shizu_declareObjectType(Visuals_Program);
 
 struct Visuals_Program_Dispatch {
   Visuals_Object_Dispatch _parent;

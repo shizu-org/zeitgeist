@@ -24,7 +24,7 @@
 
 #include "Shizu/Runtime/Include.h"
 
-Shizu_declareType(Visuals_Object);
+Shizu_declareObjectType(Visuals_Object);
 
 struct Visuals_Object_Dispatch {
   Shizu_Object_Dispatch _parent;

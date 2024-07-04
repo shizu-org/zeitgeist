@@ -26,7 +26,7 @@
 #include "idlib/math.h"
 typedef struct Vector3F32 Vector3F32;
 
-Shizu_declareType(Matrix4F32)
+Shizu_declareObjectType(Matrix4F32)
 
 struct Matrix4F32_Dispatch {
   Shizu_Object_Dispatch _parent;

@@ -36,12 +36,12 @@ Visuals_BlinnPhongMaterial_unmaterializeImpl
   );
 static void
 Visuals_BlinnPhongMaterial_dispatchInitialize
-  ( 
+  (
     Shizu_State1* state1,
     Visuals_BlinnPhongMaterial_Dispatch* self
   );
 
-static Shizu_TypeDescriptor const Visuals_BlinnPhongMaterial_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_BlinnPhongMaterial_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -53,7 +53,7 @@ static Shizu_TypeDescriptor const Visuals_BlinnPhongMaterial_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_BlinnPhongMaterial, Visuals_Material);
+Shizu_defineObjectType(Visuals_BlinnPhongMaterial, Visuals_Material);
 
 static void
 Visuals_BlinnPhongMaterial_materializeImpl

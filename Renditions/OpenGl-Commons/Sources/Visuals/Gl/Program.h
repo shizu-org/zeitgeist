@@ -25,7 +25,7 @@
 #include "Visuals/Program.h"
 #include "ServiceGl.h"
 
-Shizu_declareType(Visuals_Gl_Program);
+Shizu_declareObjectType(Visuals_Gl_Program);
 
 struct Visuals_Gl_Program_Dispatch {
   Visuals_Program_Dispatch _parent;

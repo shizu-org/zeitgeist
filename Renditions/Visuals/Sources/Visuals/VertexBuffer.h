@@ -31,7 +31,7 @@
 /// @brief Vertices representing a position xyz, a normal xyz, an ambient rgb, a diffuse rgb, a specular rgb, and  shininess.
 #define Visuals_VertexSemantics_PositionXyz_NormalXyz_AmbientRgb_DiffuseRgb_SpecularRgb_Shininess (4)
 
-/// @brief A vertex is one vertex element consisting of three float values. 
+/// @brief A vertex is one vertex element consisting of three float values.
 #define Visuals_VertexSyntactics_Float3 (8)
 /// @brief A vertex is three vertex elements each consisting of three float values.
 #define Visuals_VertexSyntactics_Float3_Float3_Float3 (16)
@@ -46,7 +46,7 @@
 /// Currently, the following formats are supported
 /// - Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3
 /// - Visuals_VertexSemantics_PositionXyz_NormalXyz_ColorRgb | Visuals_VertexSyntactics_Float3_Float3_Float3
-Shizu_declareType(Visuals_VertexBuffer);
+Shizu_declareObjectType(Visuals_VertexBuffer);
 
 struct Visuals_VertexBuffer_Dispatch {
   Visuals_Object_Dispatch _parent;

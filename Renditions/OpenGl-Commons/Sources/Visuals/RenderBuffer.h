@@ -25,8 +25,8 @@
 #include "Visuals/Object.h"
 
 /// @since 1.0
-/// A render buffer.
-Shizu_declareType(Visuals_RenderBuffer);
+/// @brief A render buffer.
+Shizu_declareObjectType(Visuals_RenderBuffer);
 
 struct Visuals_RenderBuffer_Dispatch {
   Visuals_Object_Dispatch _parent;
@@ -46,7 +46,7 @@ Visuals_RenderBuffer_construct
 
 static inline void
 Visuals_RenderBuffer_resize
-  (    
+  (
     Shizu_State2* state,
     Visuals_RenderBuffer* self,
     Shizu_Integer32 width,

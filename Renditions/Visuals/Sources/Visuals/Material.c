@@ -21,7 +21,7 @@
 
 #include "Visuals/Material.h"
 
-static Shizu_TypeDescriptor const Visuals_Material_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Material_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -33,7 +33,7 @@ static Shizu_TypeDescriptor const Visuals_Material_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Material, Visuals_Object);
+Shizu_defineObjectType(Visuals_Material, Visuals_Object);
 
 void
 Visuals_Material_construct

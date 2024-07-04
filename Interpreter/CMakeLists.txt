@@ -15,12 +15,12 @@ add_dependencies(${name} Shizu.Runtime.Modules.FileSystem)
 
 set(modules "")
 get_target_property(modules Shizu.Runtime modules)
-foreach (module ${modules})
-  add_dependencies(${name} ${module})
-endforeach()
+#foreach (module ${modules})
+#add_dependencies(${name} ${module})
+##endforeach()
 
 foreach (module ${modules})
-  copy_plugin(${name} ${module})
+  on_plugin(${name} ${module})
 endforeach()
 
 

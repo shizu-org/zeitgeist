@@ -24,7 +24,7 @@
 
 #include "Visuals/Material.h"
 
-Shizu_declareType(Visuals_BlinnPhongMaterial);
+Shizu_declareObjectType(Visuals_BlinnPhongMaterial);
 
 struct Visuals_BlinnPhongMaterial {
   Visuals_Material _parent;

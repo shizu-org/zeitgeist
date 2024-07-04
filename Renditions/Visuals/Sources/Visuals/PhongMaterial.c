@@ -42,7 +42,7 @@ Visuals_PhongMaterial_dispatchInitialize
     Visuals_PhongMaterial_Dispatch* self
   );
 
-static Shizu_TypeDescriptor const Visuals_PhongMaterial_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_PhongMaterial_Type = {
   .preDestroyType = NULL,
   .postCreateType = NULL,
   .visitType = NULL,
@@ -54,7 +54,7 @@ static Shizu_TypeDescriptor const Visuals_PhongMaterial_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_PhongMaterial, Visuals_Material);
+Shizu_defineObjectType(Visuals_PhongMaterial, Visuals_Material);
 
 static void
 Visuals_PhongMaterial_materializeImpl

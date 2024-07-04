@@ -25,7 +25,7 @@
 #include "Shizu/Runtime/Include.h"
 #include "Visuals/Object.h"
 
-Shizu_declareType(Visuals_Material);
+Shizu_declareObjectType(Visuals_Material);
 
 struct Visuals_Material {
   Visuals_Object _parent;

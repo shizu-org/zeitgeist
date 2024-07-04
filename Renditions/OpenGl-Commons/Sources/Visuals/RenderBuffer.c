@@ -21,7 +21,7 @@
 
 #include "Visuals/RenderBuffer.h"
 
-static Shizu_TypeDescriptor const Visuals_RenderBuffer_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_RenderBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -30,10 +30,10 @@ static Shizu_TypeDescriptor const Visuals_RenderBuffer_Type = {
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_RenderBuffer_Dispatch),
   .dispatchInitialize = NULL,
-  .dispatchUninitialize = NULL, 
+  .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_RenderBuffer, Visuals_Object);
+Shizu_defineObjectType(Visuals_RenderBuffer, Visuals_Object);
 
 void
 Visuals_RenderBuffer_construct

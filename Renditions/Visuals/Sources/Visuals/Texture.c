@@ -37,7 +37,7 @@ Visuals_Texture_dispatchInitialize
     Visuals_Texture_Dispatch* self
   );
 
-static Shizu_TypeDescriptor const Visuals_Texture_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Texture_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -49,7 +49,7 @@ static Shizu_TypeDescriptor const Visuals_Texture_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Texture, Visuals_Object);
+Shizu_defineObjectType(Visuals_Texture, Visuals_Object);
 
 static void
 Visuals_Texture_finalize

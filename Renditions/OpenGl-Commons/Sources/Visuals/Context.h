@@ -32,7 +32,7 @@ typedef enum Visuals_DepthFunction {
 
 /// @since 1.0
 /// @brief A visuals context.
-Shizu_declareType(Visuals_Context);
+Shizu_declareObjectType(Visuals_Context);
 
 struct Visuals_Context_Dispatch {
   Shizu_Object_Dispatch _parent;

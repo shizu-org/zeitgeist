@@ -28,7 +28,7 @@ Visuals_Program_visit
     Visuals_Program* self
   );
 
-Shizu_TypeDescriptor const Visuals_Program_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Program_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -40,7 +40,7 @@ Shizu_TypeDescriptor const Visuals_Program_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Program, Visuals_Object);
+Shizu_defineObjectType(Visuals_Program, Visuals_Object);
 
 static void
 Visuals_Program_visit
@@ -59,7 +59,7 @@ Visuals_Program_visit
 
 void
 Visuals_Program_construct
-  ( 
+  (
     Shizu_State2* state,
     Visuals_Program* self,
     Shizu_String* vertexProgramSource,

@@ -28,7 +28,7 @@
 /// @brief The implementation of Visuals_VertexBuffer for OpenGL.
 /// @details
 /// bufferId and vertexArrayId are the OpenGL representation of the vertices.
-Shizu_declareType(Visuals_Gl_VertexBuffer);
+Shizu_declareObjectType(Visuals_Gl_VertexBuffer);
 
 struct Visuals_Gl_VertexBuffer_Dispatch {
   Visuals_VertexBuffer_Dispatch _parent;

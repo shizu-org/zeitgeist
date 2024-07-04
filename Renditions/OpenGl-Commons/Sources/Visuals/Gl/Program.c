@@ -48,7 +48,7 @@ Visuals_Gl_Program_unmaterializeImpl
     Shizu_State2* state,
     Visuals_Gl_Program* self
   );
-  
+
 static void
 Visuals_Gl_Program_bindMatrix4R32Impl
   (
@@ -87,7 +87,7 @@ Visuals_Gl_Program_bindInteger32Impl
 
 static void
 Visuals_Gl_Program_bindBooleanImpl
-  ( 
+  (
     Shizu_State2* state,
     Visuals_Gl_Program* self,
     char const* name,
@@ -103,7 +103,7 @@ Visuals_Gl_Program_bindFloat32Impl
     Shizu_Float32 value
   );
 
-Shizu_TypeDescriptor const Visuals_Gl_Program_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Gl_Program_Type = {
   .preDestroyType = NULL,
   .postCreateType = NULL,
   .visitType = NULL,
@@ -115,7 +115,7 @@ Shizu_TypeDescriptor const Visuals_Gl_Program_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Gl_Program, Visuals_Program);
+Shizu_defineObjectType(Visuals_Gl_Program, Visuals_Program);
 
 static void
 Visuals_Gl_Program_finalize
@@ -143,8 +143,8 @@ Visuals_Gl_Program_materializeImpl
   (
     Shizu_State2* state,
     Visuals_Gl_Program* self
-  ) 
-{ 
+  )
+{
   Shizu_String* temporary = NULL;
 
   temporary = Shizu_String_concatenate(state, ((Visuals_Program*)self)->vertexProgramSource, Shizu_String_create(state, "", 1));
@@ -251,7 +251,7 @@ Visuals_Gl_Program_bindInteger32Impl
 
 static void
 Visuals_Gl_Program_bindBooleanImpl
-  ( 
+  (
     Shizu_State2* state,
     Visuals_Gl_Program* self,
     char const* name,
@@ -287,7 +287,7 @@ Visuals_Gl_Program_bindFloat32Impl
 
 static void
 Visuals_Gl_Program_dispatchInitialize
-  (            
+  (
     Shizu_State1* state1,
     Visuals_Gl_Program_Dispatch* self
   )

@@ -32,7 +32,7 @@
   #error("operating system not (yet) supported")
 #endif
 
-Shizu_Rendition_Export char const* 
+Shizu_Rendition_Export char const*
 Shizu_ModuleLibrary_getName
   (
   )
@@ -96,7 +96,10 @@ static void bindMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
   (
-    Shizu_State2* state
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
   Visuals_Service_update(state);
@@ -134,12 +137,12 @@ Zeitgeist_Rendition_update
 
   Visuals_Program_bindVector3F32(state, g_program, "viewer.position",
                                  Vector3F32_create(state, g_world->player->position->v.e[0], g_world->player->position->v.e[1], g_world->player->position->v.e[2]));
-  
+
   Matrix4F32* projection = NULL;
   //projection = Matrix4R32_createOrthographic(state, -1.f, +1.f, -1.f, +1.f, -100.f, +100.f);
   projection = Matrix4F32_createPerspective(state, 90.f, canvasHeight > 0.f ? canvasWidth / canvasHeight : 16.f/9.f, 0.1f, 100.f);
   Visuals_Program_bindMatrix4F32(state, g_program, "matrices.projection", projection);
- 
+
   Visuals_Program_bindInteger32(state, g_program, "currentNumberOfLights", 3);
   // Define an ambient light source.
   Visuals_Program_bindInteger32(state, g_program, "g_lights[0].type", 4);
@@ -176,7 +179,7 @@ Zeitgeist_Rendition_update
       } break;
       default: {
         fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
-        Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+        Shizu_State2_setStatus(state, Shizu_Status_ArgumentValueInvalid);
         Shizu_State2_jump(state);
       } break;
     };
@@ -189,31 +192,31 @@ Zeitgeist_Rendition_update
 static void
 onKeyboardKeyMessage
   (
-    Shizu_State2* state
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
-  if (Shizu_Stack_getSize(Shizu_State2_getState1(state), Shizu_State2_getStack(state)) < 2) {
-    fprintf(stderr, "%s:%d: too few arguments\n", __FILE__, __LINE__);
-    Shizu_State2_setStatus(state, 1);
-    Shizu_State2_jump(state);
-  }
-  if (!Shizu_Stack_isInteger32(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 0)) {
-    fprintf(stderr, "%s:%d: invalid argument type\n", __FILE__, __LINE__);
-    Shizu_State2_setStatus(state, 1);
-    Shizu_State2_jump(state);
-  }
-  if (1 != Shizu_Stack_getInteger32(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 0)) {
+  if (1 != numberOfArgumentValues) {
     fprintf(stderr, "%s:%d: invalid number of arguments\n", __FILE__, __LINE__);
-    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
     Shizu_State2_jump(state);
   }
-  if (!Shizu_Stack_isObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 1)) {
+  if (!Shizu_Value_isObject(&argumentValues[0])) {
     fprintf(stderr, "%s:%d: invalid argument type\n", __FILE__, __LINE__);
-    Shizu_State2_setStatus(state, 1);
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Object* object = Shizu_Value_getObject(&argumentValues[0]);
+  if (!Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), object->type,
+                               KeyboardKeyMessage_getType(state))) {
+    fprintf(stderr, "%s:%d: invalid argument type\n", __FILE__, __LINE__);
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
     Shizu_State2_jump(state);
   }
   fprintf(stdout, "%s:%d: keyboard key message received\n", __FILE__, __LINE__);
-  KeyboardKeyMessage* message = (KeyboardKeyMessage*)Shizu_Stack_getObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), 1);
+  KeyboardKeyMessage* message = (KeyboardKeyMessage*)object;
   if (KeyboardKey_Escape == KeyboardKeyMessage_getKey(state, message)) {
     if (KeyboardKey_Action_Released == KeyboardKeyMessage_getAction(state, message)) {
       Zeitgeist_UpstreamRequest* request = Zeitgeist_UpstreamRequest_createExitProcessRequest(state);
@@ -233,14 +236,15 @@ onKeyboardKeyMessage
   } else {
     Player_onKeyboardKeyMessage(state, g_world->player, message);
   }
-  Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
-  Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
 }
 
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_load
   (
-    Shizu_State2* state
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
   Visuals_Service_startup(state);
@@ -306,7 +310,10 @@ Zeitgeist_Rendition_load
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_unload
   (
-    Shizu_State2* state
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
   for (size_t i = 0, n = Shizu_List_getSize(state, g_world->geometries); i < n; ++i) {

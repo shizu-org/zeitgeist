@@ -25,7 +25,7 @@
 #include "Visuals/RenderBuffer.h"
 #include "ServiceGl.h"
 
-Shizu_declareType(Visuals_Gl_RenderBuffer);
+Shizu_declareObjectType(Visuals_Gl_RenderBuffer);
 
 struct Visuals_Gl_RenderBuffer_Dispatch {
   Visuals_RenderBuffer_Dispatch _parent;

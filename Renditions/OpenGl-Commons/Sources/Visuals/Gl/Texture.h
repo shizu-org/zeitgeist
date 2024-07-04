@@ -8,7 +8,7 @@
 /// @brief The implementation of Visuals_Texture for OpenGL.
 /// @details
 /// textureId is the OpenGL representation of the texture.
-Shizu_declareType(Visuals_Gl_Texture);
+Shizu_declareObjectType(Visuals_Gl_Texture);
 
 struct Visuals_Gl_Texture_Dispatch {
   Visuals_Texture_Dispatch _parent;

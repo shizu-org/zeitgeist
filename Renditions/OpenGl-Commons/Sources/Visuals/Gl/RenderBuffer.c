@@ -51,14 +51,14 @@ Visuals_Gl_RenderBuffer_unmaterializeImpl
 
 static void
 Visuals_Gl_RenderBuffer_resizeImpl
-  (   
+  (
     Shizu_State2* state,
     Visuals_Gl_RenderBuffer* self,
     Shizu_Integer32 width,
     Shizu_Integer32 height
   );
 
-static Shizu_TypeDescriptor const Visuals_Gl_RenderBuffer_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Gl_RenderBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -67,10 +67,10 @@ static Shizu_TypeDescriptor const Visuals_Gl_RenderBuffer_Type = {
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_Gl_RenderBuffer_Dispatch),
   .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&Visuals_Gl_RenderBuffer_dispatchInitialize,
-  .dispatchUninitialize = NULL, 
+  .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Gl_RenderBuffer, Visuals_RenderBuffer);
+Shizu_defineObjectType(Visuals_Gl_RenderBuffer, Visuals_RenderBuffer);
 
 static void
 Visuals_Gl_RenderBuffer_dispatchInitialize
@@ -78,7 +78,7 @@ Visuals_Gl_RenderBuffer_dispatchInitialize
     Shizu_State2* state,
     Visuals_Gl_RenderBuffer_Dispatch* self
   )
-{ 
+{
   ((Visuals_Object_Dispatch*)self)->materialize = (void(*)(Shizu_State2*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_materializeImpl;
   ((Visuals_Object_Dispatch*)self)->unmaterialize = (void(*)(Shizu_State2*,Visuals_Object*)) & Visuals_Gl_RenderBuffer_unmaterializeImpl;
   ((Visuals_RenderBuffer_Dispatch*)self)->resize = (void(*)(Shizu_State2*,Visuals_RenderBuffer*,Shizu_Integer32,Shizu_Integer32)) & Visuals_Gl_RenderBuffer_resizeImpl;
@@ -231,7 +231,7 @@ Visuals_Gl_RenderBuffer_construct
   Visuals_RenderBuffer_construct(state, (Visuals_RenderBuffer*)self);
   self->width = 640;
   self->height = 480;
-  self->frameBufferId = 0; 
+  self->frameBufferId = 0;
   self->colorTextureId = 0;
   self->depthStencilTextureId = 0;
   ((Shizu_Object*)self)->type = TYPE;
@@ -245,5 +245,5 @@ Visuals_Gl_RenderBuffer_create
 {
   Visuals_Gl_RenderBuffer* self = (Visuals_Gl_RenderBuffer*)Shizu_Gc_allocateObject(state, sizeof(Visuals_Gl_RenderBuffer));
   Visuals_Gl_RenderBuffer_construct(state, self);
-  return self;  
+  return self;
 }

@@ -35,7 +35,7 @@ enum Visuals_PixelFormat {
   Visuals_PixelFormat_RGBU8,
 };
 
-Shizu_declareType(Visuals_Texture);
+Shizu_declareObjectType(Visuals_Texture);
 
 struct Visuals_Texture_Dispatch {
   Visuals_Object_Dispatch _parent;
@@ -91,5 +91,5 @@ Visuals_Texture_getHeight
     Visuals_Texture* self
   )
 { Shizu_VirtualCallWithReturn(Visuals_Texture, getHeight, self); }
-  
+
 #endif // VISUALS_TEXTURE_H_INCLUDED

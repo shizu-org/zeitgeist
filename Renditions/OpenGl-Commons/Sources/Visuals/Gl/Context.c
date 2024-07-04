@@ -115,7 +115,7 @@ Visuals_Gl_Context_renderImpl
     Visuals_Gl_Program* program
   );
 
-static Shizu_TypeDescriptor const Visuals_Gl_Context_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Gl_Context_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -127,7 +127,7 @@ static Shizu_TypeDescriptor const Visuals_Gl_Context_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Gl_Context, Visuals_Context);
+Shizu_defineObjectType(Visuals_Gl_Context, Visuals_Context);
 
 static void
 Visuals_Gl_Context_finalize
@@ -253,7 +253,7 @@ Visuals_Gl_Context_setBlendFactorsImpl
   )
 {
   GLenum sourceGl;
-  
+
   switch (source) {
     case Visuals_BlendFactor_SourceAlpha: {
       sourceGl = GL_SRC_ALPHA;
@@ -262,7 +262,7 @@ Visuals_Gl_Context_setBlendFactorsImpl
       sourceGl = GL_ONE_MINUS_SRC_ALPHA;
     } break;
     default: {
-      Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+      Shizu_State2_setStatus(state, Shizu_Status_ArgumentValueInvalid);
       Shizu_State2_jump(state);
     } break;
   };
@@ -275,7 +275,7 @@ Visuals_Gl_Context_setBlendFactorsImpl
       targetGl = GL_ONE_MINUS_SRC_ALPHA;
     } break;
     default: {
-      Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+      Shizu_State2_setStatus(state, Shizu_Status_ArgumentValueInvalid);
       Shizu_State2_jump(state);
     } break;
   };
@@ -285,7 +285,7 @@ Visuals_Gl_Context_setBlendFactorsImpl
 
 static void
 Visuals_Gl_Context_setCullModeImpl
-  ( 
+  (
     Shizu_State2* state,
     Visuals_Gl_Context* self,
     Visuals_CullMode cullMode
@@ -309,7 +309,7 @@ Visuals_Gl_Context_setCullModeImpl
       glCullFace(GL_BACK);
     } break;
     default: {
-      Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+      Shizu_State2_setStatus(state, Shizu_Status_ArgumentValueInvalid);
       Shizu_State2_jump(state);
     } break;
   };
@@ -357,7 +357,7 @@ Visuals_Gl_Context_setDepthFunctionImpl
       glDepthFunc(GL_NEVER);
     } break;
     default: {
-      Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+      Shizu_State2_setStatus(state, Shizu_Status_ArgumentValueInvalid);
       Shizu_State2_jump(state);
     } break;
   };
@@ -394,7 +394,7 @@ Visuals_Gl_Context_clearImpl
     Shizu_Boolean depthBuffer
   )
 {
-  GLbitfield mask = 0; 
+  GLbitfield mask = 0;
   if (colorBuffer) {
     mask |= GL_COLOR_BUFFER_BIT;
   }
@@ -403,12 +403,12 @@ Visuals_Gl_Context_clearImpl
   }
   Shizu_Integer32 clientWidth, clientHeight;
   Visuals_Gl_Service_getClientSize(state, &clientWidth, &clientHeight);
-  
+
   glViewport(self->viewport.left * clientWidth, self->viewport.bottom * clientHeight, self->viewport.width * clientWidth, self->viewport.height * clientHeight);
 
   glEnable(GL_SCISSOR_TEST);
   glScissor(self->viewport.left * clientWidth, self->viewport.bottom * clientHeight, self->viewport.width * clientWidth, self->viewport.height * clientHeight);
-  
+
   glClear(mask);
 }
 

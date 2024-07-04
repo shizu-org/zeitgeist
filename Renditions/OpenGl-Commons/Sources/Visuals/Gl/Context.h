@@ -5,7 +5,7 @@
 
 /// @since 1.0
 /// @brief The implementation of Visuals_Context for OpenGL.
-Shizu_declareType(Visuals_Gl_Context);
+Shizu_declareObjectType(Visuals_Gl_Context);
 
 struct Visuals_Gl_Context_Dispatch {
   Visuals_Context_Dispatch _parent;
@@ -27,7 +27,7 @@ Visuals_Gl_Context_construct
     Shizu_State2* state,
     Visuals_Gl_Context* self
   );
-  
+
 Visuals_Gl_Context*
 Visuals_Gl_Context_create
   (

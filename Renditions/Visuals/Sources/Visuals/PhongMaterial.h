@@ -24,11 +24,11 @@
 
 #include "Visuals/Material.h"
 
-Shizu_declareType(Visuals_PhongMaterial);
+Shizu_declareObjectType(Visuals_PhongMaterial);
 
 struct Visuals_PhongMaterial {
   Visuals_Material _parent;
-  
+
   /// The specular reflectance for the red component of light.
   /// [0,255].
   Shizu_Integer32 specularR;

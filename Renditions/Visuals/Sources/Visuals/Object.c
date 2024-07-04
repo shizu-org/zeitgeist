@@ -35,7 +35,7 @@ notifyVisualsShutdownImpl
     Visuals_Object* self
   );
 
-static Shizu_TypeDescriptor const Visuals_Object_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Object_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -47,7 +47,7 @@ static Shizu_TypeDescriptor const Visuals_Object_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Object, Shizu_Object);
+Shizu_defineObjectType(Visuals_Object, Shizu_Object);
 
 static void
 dispatchInitialize

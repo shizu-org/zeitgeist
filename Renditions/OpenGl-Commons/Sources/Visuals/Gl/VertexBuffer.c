@@ -27,7 +27,7 @@ Visuals_Gl_VertexBuffer_finalize
     Shizu_State2* state,
     Visuals_Gl_VertexBuffer* self
   );
-  
+
 static void
 Visuals_Gl_VertexBuffer_materializeImpl
   (
@@ -59,7 +59,7 @@ Visuals_Gl_VertexBuffer_dispatchInitialize
     Visuals_Gl_VertexBuffer_Dispatch* self
   );
 
-static Shizu_TypeDescriptor const Visuals_Gl_VertexBuffer_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Gl_VertexBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -71,7 +71,7 @@ static Shizu_TypeDescriptor const Visuals_Gl_VertexBuffer_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Gl_VertexBuffer, Visuals_VertexBuffer);
+Shizu_defineObjectType(Visuals_Gl_VertexBuffer, Visuals_VertexBuffer);
 
 static void
 Visuals_Gl_VertexBuffer_finalize
@@ -80,14 +80,14 @@ Visuals_Gl_VertexBuffer_finalize
     Visuals_Gl_VertexBuffer* self
   )
 {
-	if (self->vertexArrayId) {
-		glDeleteVertexArrays(1, &self->vertexArrayId);
-		self->vertexArrayId = 0;
-	}
-	if (self->bufferId) {
-		glDeleteBuffers(1, &self->bufferId);
-		self->bufferId = 0;
-	} 
+  if (self->vertexArrayId) {
+    glDeleteVertexArrays(1, &self->vertexArrayId);
+    self->vertexArrayId = 0;
+  }
+  if (self->bufferId) {
+    glDeleteBuffers(1, &self->bufferId);
+    self->bufferId = 0;
+  }
 }
 
 static void

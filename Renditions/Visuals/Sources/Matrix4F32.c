@@ -33,7 +33,7 @@
 
 #endif
 
-static Shizu_TypeDescriptor const Matrix4F32_Type = {
+static Shizu_ObjectTypeDescriptor const Matrix4F32_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -45,7 +45,7 @@ static Shizu_TypeDescriptor const Matrix4F32_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Matrix4F32, Shizu_Object);
+Shizu_defineObjectType(Matrix4F32, Shizu_Object);
 
 Matrix4F32*
 Matrix4F32_createIdentity

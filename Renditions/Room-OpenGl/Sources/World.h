@@ -67,42 +67,42 @@
 /// - a floor of a room
 /// - a ceiling of a room
 /// - a west, north, east, or south walls of a room
-Shizu_declareType(StaticGeometry)
+Shizu_declareObjectType(StaticGeometry)
 
 struct StaticGeometry_Dispatch {
-	Shizu_Object_Dispatch _parent;
+  Shizu_Object_Dispatch _parent;
 };
 
 struct StaticGeometry {
-	Shizu_Object parent;
+  Shizu_Object parent;
 
-	/// @brief
-	/// A pointer to a list of materials. Must not be null.
-	/// @remarks
-	/// The supported materials are Visuals_PhongMaterial and Visuals_BlinnPhongMaterial.
-	/// The first material in the list is used.
-	Shizu_List* materials;
-	
-	/// @brief The vertex buffer.
-	Visuals_VertexBuffer* vertexBuffer;
+  /// @brief
+  /// A pointer to a list of materials. Must not be null.
+  /// @remarks
+  /// The supported materials are Visuals_PhongMaterial and Visuals_BlinnPhongMaterial.
+  /// The first material in the list is used.
+  Shizu_List* materials;
 
-	/// @brief The number of vertices of this wall.
-	size_t numberOfVertices;
-	
-	/// @brief The number of Bytes of this wall.
-	size_t numberOfBytes;
-	
-	/// @brief Either FLOOR or CEILING, WEST_WALL, NORTH_WALL, EAST_WALL, or SOUTH_WALL.
-	uint8_t flags;
+  /// @brief The vertex buffer.
+  Visuals_VertexBuffer* vertexBuffer;
+
+  /// @brief The number of vertices of this wall.
+  size_t numberOfVertices;
+
+  /// @brief The number of Bytes of this wall.
+  size_t numberOfBytes;
+
+  /// @brief Either FLOOR or CEILING, WEST_WALL, NORTH_WALL, EAST_WALL, or SOUTH_WALL.
+  uint8_t flags;
 
 };
 
 void
 StaticGeometry_unmaterialize
-	(
-		Shizu_State2* state,
-		StaticGeometry* self
-	);
+  (
+    Shizu_State2* state,
+    StaticGeometry* self
+  );
 
 /// @brief Set the vertex data.
 /// @param state A pointer to the state.
@@ -112,14 +112,14 @@ StaticGeometry_unmaterialize
 /// @param bytes A pointer to the data.
 void
 StaticGeometry_setData
-	(
-		Shizu_State2* state,
-		StaticGeometry* self,
-		uint8_t flags,
-		size_t numberOfVertices,
-		size_t numberOfBytes,
-		void const* bytes
-	);
+  (
+    Shizu_State2* state,
+    StaticGeometry* self,
+    uint8_t flags,
+    size_t numberOfVertices,
+    size_t numberOfBytes,
+    void const* bytes
+  );
 
 /// @brief Set the vertex data for the geometry of the north wall (12 o'clock).
 /// The north wall has the normal (0,0,+1).
@@ -129,13 +129,13 @@ StaticGeometry_setData
 /// @param height The extend along the y-axis. Must be positive.
 void
 StaticGeometry_setDataNorthWall
-	(
-		Shizu_State2* state,
-		StaticGeometry* self,
-		Vector3F32* translation,
-		Shizu_Float32 breadth,
-		Shizu_Float32 height
-	);
+  (
+    Shizu_State2* state,
+    StaticGeometry* self,
+    Vector3F32* translation,
+    Shizu_Float32 breadth,
+    Shizu_Float32 height
+  );
 
 /// @brief Set the vertex data for the geometry of the south wall (6 o'clock).
 /// The south wall has the normal (0,0,-1).
@@ -145,13 +145,13 @@ StaticGeometry_setDataNorthWall
 /// @param height The extend along the y-axis. Must be positive.
 void
 StaticGeometry_setDataSouthWall
-	(
-		Shizu_State2* state,
-		StaticGeometry* self,
-		Vector3F32* translation,
-		Shizu_Float32 breadth,
-		Shizu_Float32 height
-	);
+  (
+    Shizu_State2* state,
+    StaticGeometry* self,
+    Vector3F32* translation,
+    Shizu_Float32 breadth,
+    Shizu_Float32 height
+  );
 
 /// @brief Set the vertex data for the geometry of the east wall (3 o'clock).
 /// The east wall has the normal (-1,0,0).
@@ -161,13 +161,13 @@ StaticGeometry_setDataSouthWall
 /// @param height The extend along the y-axis. Must be positive.
 void
 StaticGeometry_setDataEastWall
-	(
-		Shizu_State2* state,
-		StaticGeometry* self,
-		Vector3F32* translation,
-		Shizu_Float32 breadth,
-		Shizu_Float32 height
-	);
+  (
+    Shizu_State2* state,
+    StaticGeometry* self,
+    Vector3F32* translation,
+    Shizu_Float32 breadth,
+    Shizu_Float32 height
+  );
 
 /// @brief Set the vertex data for the geometry of the west wall (9 o'clock).
 /// The west wall has the normal (+1,0,0).
@@ -177,13 +177,13 @@ StaticGeometry_setDataEastWall
 /// @param height The extend along the y-axis. Must be positive.
 void
 StaticGeometry_setDataWestWall
-	(
-		Shizu_State2* state,
-		StaticGeometry* self,
-		Vector3F32* translation,
-		Shizu_Float32 breadth,
-		Shizu_Float32 height
-	);
+  (
+    Shizu_State2* state,
+    StaticGeometry* self,
+    Vector3F32* translation,
+    Shizu_Float32 breadth,
+    Shizu_Float32 height
+  );
 
 /// @brief Set the vertex data for the geometry of the floor.
 /// The floor has the normal (0,+1,0).
@@ -193,13 +193,13 @@ StaticGeometry_setDataWestWall
 /// @param length The length (the extend along the z-axis). Must be positive.
 void
 StaticGeometry_setDataFloor
-	(
-		Shizu_State2* state,
-		StaticGeometry* self,
-		Vector3F32* translation,
-		Shizu_Float32 breadth,
-		Shizu_Float32 length
-	);
+  (
+    Shizu_State2* state,
+    StaticGeometry* self,
+    Vector3F32* translation,
+    Shizu_Float32 breadth,
+    Shizu_Float32 length
+  );
 
 /// @brief Set the vertex data for the geometry of the ceiling.
 /// The ceiling has the normal (0,+1,0).
@@ -209,50 +209,50 @@ StaticGeometry_setDataFloor
 /// @param length The length (the extend along the z-axis). Must be positive.
 void
 StaticGeometry_setDataCeiling
-	(
-		Shizu_State2* state,
-		StaticGeometry* self,
-		Vector3F32* translation,
-		Shizu_Float32 breadth,
-		Shizu_Float32 length
-	);
+  (
+    Shizu_State2* state,
+    StaticGeometry* self,
+    Vector3F32* translation,
+    Shizu_Float32 breadth,
+    Shizu_Float32 length
+  );
 
 StaticGeometry*
 StaticGeometry_create
-	(
-		Shizu_State2* state,
-		Visuals_Context* visualsContext
-	);
+  (
+    Shizu_State2* state,
+    Visuals_Context* visualsContext
+  );
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-Shizu_declareType(World)
+Shizu_declareObjectType(World)
 
 struct World_Dispatch {
-	Shizu_Object_Dispatch _parent;
+  Shizu_Object_Dispatch _parent;
 };
 
 struct World {
-	Shizu_Object _parent;
-	/// @brief Pointer to the list of StaticGeometryGl objects.
-	Shizu_List* geometries;
-	/// @brief Information on the player.
-	Player* player;
+  Shizu_Object _parent;
+  /// @brief Pointer to the list of StaticGeometryGl objects.
+  Shizu_List* geometries;
+  /// @brief Information on the player.
+  Player* player;
 };
 
 World*
 World_create
-	(
-		Shizu_State2* state,
-		Visuals_Context* visualsContext
-	);
+  (
+    Shizu_State2* state,
+    Visuals_Context* visualsContext
+  );
 
 void
 World_update
-	(
-		Shizu_State2* state,
-		World* self,
-		Shizu_Float32 tick
-	);
+  (
+    Shizu_State2* state,
+    World* self,
+    Shizu_Float32 tick
+  );
 
 #endif // WORLD_H_INCLUDED

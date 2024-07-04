@@ -21,7 +21,7 @@
 
 #include "Visuals/Gl/Glx/VideoMode.h"
 
-static Shizu_TypeDescriptor const Visuals_Gl_Glx_VideoMode_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Gl_Glx_VideoMode_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -33,7 +33,7 @@ static Shizu_TypeDescriptor const Visuals_Gl_Glx_VideoMode_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Gl_Glx_VideoMode, Visuals_Object);
+Shizu_defineObjectType(Visuals_Gl_Glx_VideoMode, Visuals_Object);
 
 void
 Visuals_Gl_Glx_VideoMode_construct
@@ -52,7 +52,7 @@ Visuals_Gl_Glx_VideoMode_construct
   self->refreshRate = refreshRate;
   ((Shizu_Object*)self)->type = TYPE;
 }
-  
+
 Visuals_Gl_Glx_VideoMode*
 Visuals_Gl_Glx_VideoMode_create
   (

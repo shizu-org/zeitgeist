@@ -34,7 +34,10 @@ Zeitgeist_Rendition_getName
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
   (
-    Shizu_State2* state
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
   fprintf(stdout, "Hello, World!\n");
@@ -45,13 +48,19 @@ Zeitgeist_Rendition_update
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_load
   (
-    Shizu_State2* state
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {/*Intentionally empty.*/}
 
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_unload
   (
-    Shizu_State2* state
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {/*Intentionally empty.*/}

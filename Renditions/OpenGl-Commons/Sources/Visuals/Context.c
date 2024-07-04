@@ -14,7 +14,7 @@ Visuals_Context_dispatchInitialize
     Visuals_Context_Dispatch* self
   );
 
-static Shizu_TypeDescriptor const Visuals_Context_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_Context_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -26,7 +26,7 @@ static Shizu_TypeDescriptor const Visuals_Context_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Visuals_Context, Shizu_Object);
+Shizu_defineObjectType(Visuals_Context, Shizu_Object);
 
 static void
 Visuals_Context_finalize

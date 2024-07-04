@@ -55,7 +55,10 @@ static Visuals_RenderBuffer* g_renderBuffer = NULL;
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_update
   (
-    Shizu_State2* state
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
   Visuals_Service_update(state);
@@ -72,7 +75,7 @@ Zeitgeist_Rendition_update
   Visuals_Service_beginFrame(state);
 
   Visuals_Context_clear(state, visualsContext, true, true);
-    
+
   Matrix4F32* m = Matrix4F32_createScale(state, Vector3F32_create(state, 0.75f, 0.75f, 1.f));
   Visuals_Program_bindMatrix4F32(state, g_program, "scale", m);
 
@@ -88,7 +91,10 @@ Zeitgeist_Rendition_update
 Shizu_Rendition_Export void
 Zeitgeist_Rendition_load
   (
-    Shizu_State2* state
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
   Shizu_JumpTarget jumpTarget;
