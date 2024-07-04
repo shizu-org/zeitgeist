@@ -27,7 +27,7 @@ Zeitgeist_Rendition_visit
     Zeitgeist_Rendition* rendition
   );
 
-static Shizu_TypeDescriptor const Zeitgeist_Rendition_Type = {
+static Shizu_ObjectTypeDescriptor const Zeitgeist_Rendition_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
@@ -39,7 +39,7 @@ static Shizu_TypeDescriptor const Zeitgeist_Rendition_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Zeitgeist_Rendition, Shizu_Object);
+Shizu_defineObjectType(Zeitgeist_Rendition, Shizu_Object);
 
 static void
 Zeitgeist_Rendition_finalize
@@ -47,7 +47,7 @@ Zeitgeist_Rendition_finalize
     Shizu_State2* state,
     Zeitgeist_Rendition* self
   )
-{ 
+{
   if (self->dl) {
     Shizu_State1_unrefDl(Shizu_State2_getState1(state), self->dl);
     self->dl = NULL;

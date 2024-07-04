@@ -7,14 +7,17 @@
 
 /**
  * @since 0.1
- * @brief An upstream request is send from an Rendition to Zeitgeist.
+ * @brief
+ * An upstream request is send from an Rendition to Zeitgeist.
  * The only upstream
  */
-Shizu_declareType(Zeitgeist_UpstreamRequest);
+Shizu_declareObjectType(Zeitgeist_UpstreamRequest);
 
 /**
  * @since 0.1
- * Symbolic constant that when assigned to Zeitgeist_UpstreamRequest indicates that it is a "exit process request" upstream request.
+ * @brief
+ * Symbolic constant that when assigned to Zeitgeist_UpstreamRequest indicates that it is a "exit process request"
+ * upstream request.
  */
 #define Zeitgeist_UpstreamRequestType_ExitProcessRequest (1)
 

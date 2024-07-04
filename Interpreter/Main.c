@@ -6,7 +6,6 @@
 #include "idlib/file_system.h"
 #include "Zeitgeist/Rendition.h"
 
-// Must be FileSystem.getWorkingDirectory instead of just "getWorkingDirectory".
 static Shizu_String* getWorkingDirectory(Shizu_State2* state) {
   Shizu_Value returnValue;
   Shizu_Value argumentValues[2];
@@ -16,11 +15,11 @@ static Shizu_String* getWorkingDirectory(Shizu_State2* state) {
   p = Shizu_Environment_getCxxProcedure(state, environment, Shizu_String_create(state, "getWorkingDirectory", strlen("getWorkingDirectory")));
   p->f(state, &returnValue, 0, argumentValues);
   if (!Shizu_Value_isObject(&returnValue)) {
-    Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
     Shizu_State2_jump(state);
   }
   if (!Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), Shizu_Value_getObject(&returnValue)->type, Shizu_String_getType(state))) {
-    Shizu_State2_setStatus(state, Shizu_Status_ArgumentInvalid);
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
     Shizu_State2_jump(state);
   }
   Shizu_String* path = (Shizu_String*)Shizu_Value_getObject(&returnValue);
@@ -115,30 +114,40 @@ onRendition1
     fprintf(stderr, "unable to acquire update function of rendition `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, renditionName), Shizu_String_getBytes(state, renditionName));
     Shizu_State2_jump(state);
   }
-  (*loadFunction)(state);
+  Shizu_Value returnValue = Shizu_Value_Initializer();
+  Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+  (*loadFunction)(state, &returnValue, 0, &argumentValues[0]);
   Shizu_JumpTarget jumpTarget1;
   Shizu_State2_pushJumpTarget(state, &jumpTarget1);
   if (!setjmp(jumpTarget1.environment)) {
-    Shizu_Stack_pushObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), (Shizu_Object*)rendition);
+	Shizu_Value returnValue = Shizu_Value_Initializer();
+	Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+	Shizu_Value_setObject(&argumentValues[0], (Shizu_Object*)rendition);
+	//Shizu_Stack_pushObject(Shizu_State2_getState1(state), Shizu_State2_getStack(state), (Shizu_Object*)rendition);
+    //Shizu_
     Shizu_JumpTarget jumpTarget2;
     Shizu_State2_pushJumpTarget(state, &jumpTarget2);
     if (!setjmp(jumpTarget1.environment)) {
       while (!Shizu_State2_getProcessExitRequested(state)) {
-        (*updateFunction)(state);
+        (*updateFunction)(state, &returnValue, 1, &argumentValues[0]);
         Shizu_Gc_run(state, Shizu_State2_getGc(state), NULL);
       }
       Shizu_State2_popJumpTarget(state);
-      (*unloadFunction)(state);
+	  Shizu_Value returnValue = Shizu_Value_Initializer();
+	  Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+      (*unloadFunction)(state, &returnValue, 0, &argumentValues[0]);
     } else {
       Shizu_State2_popJumpTarget(state);
-      (*unloadFunction)(state);
+	  Shizu_Value returnValue = Shizu_Value_Initializer();
+	  Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+      (*unloadFunction)(state, &returnValue, 0, &argumentValues[0]);
       Shizu_State2_jump(state);
     }
     Shizu_State2_popJumpTarget(state);
-    Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
+    //Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
   } else {
     Shizu_State2_popJumpTarget(state);
-    Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
+    //Shizu_Stack_pop(Shizu_State2_getState1(state), Shizu_State2_getStack(state));
     Shizu_State2_jump(state);
   }
 }

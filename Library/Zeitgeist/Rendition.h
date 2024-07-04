@@ -5,7 +5,7 @@
 
 #include "Zeitgeist.h"
 
-Shizu_declareType(Zeitgeist_Rendition);
+Shizu_declareObjectType(Zeitgeist_Rendition);
 
 struct Zeitgeist_Rendition_Dispatch {
   Shizu_Object_Dispatch _parent;
@@ -14,10 +14,10 @@ struct Zeitgeist_Rendition_Dispatch {
 struct Zeitgeist_Rendition {
   Shizu_Object _parent;
 
-  /** The path to the folder of the rendition. */
+  /** @brief The path to the folder of the rendition. */
   Shizu_String* folderPath;
 
-  /** The library handle if the library is loaded. The null pointer otherwise. */
+  /** @brief The library handle if the library is loaded. The null pointer otherwise. */
   Shizu_Dl* dl;
 
   Shizu_String*(*getName)(Shizu_State2* state, Zeitgeist_Rendition* rendition);

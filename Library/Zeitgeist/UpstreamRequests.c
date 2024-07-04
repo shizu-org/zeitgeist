@@ -7,7 +7,7 @@
 // malloc, free
 #include <malloc.h>
 
-static Shizu_TypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
+static Shizu_ObjectTypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
   .preDestroyType = NULL,
   .postCreateType = NULL,
   .visitType = NULL,
@@ -19,7 +19,7 @@ static Shizu_TypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineType(Zeitgeist_UpstreamRequest, Shizu_Object);
+Shizu_defineObjectType(Zeitgeist_UpstreamRequest, Shizu_Object);
 
 Zeitgeist_UpstreamRequest*
 Zeitgeist_UpstreamRequest_createExitProcessRequest
@@ -39,7 +39,7 @@ Zeitgeist_sendUpstreamRequest
     Shizu_State2* state,
     Zeitgeist_UpstreamRequest* request
   )
-{ 
+{
   if (Zeitgeist_UpstreamRequestType_ExitProcessRequest == request->type) {
     Shizu_State2_setProcessExitRequested(state, Shizu_Boolean_True);
   }
