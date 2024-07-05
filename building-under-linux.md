@@ -5,7 +5,7 @@
 *Zeitgeist* requires
 - *make* Version 4.3.0 or better.
 - *gcc* Version 11.4.0 or better.
-- *cmake* Version 3.22.1 or better.
+- *cmake* Version 3.29.6 or better.
 - Optional: *gdb* Version 12.1 or better.
 
 ## Building the program
@@ -13,7 +13,7 @@ The following instructions will perform an out-of-source build. An out-of-source
 by storing any build file, intermediate file, or product file in a dedicated build directory outside of the source directory.
 An out of source build is the recommended way of building *Zeitgeist*.
 
-- Checkout `zeitgeist` [https://github.com/michaelheilmann/zeitgeist.git](https://github.com/michaelheilmann/zeitgeist.git) into a directory in your file system.
+- Checkout `zeitgeist` [https://github.com/shizu-org/zeitgeist.git](https://github.com/shizu-org/zeitgeist.git) into a directory in your file system.
   For the remainder of this manual, we call this directory *source directory* and denote it in command-line prompts by the meta variable `<source-directory>`.
 - Create a directory outside of the *source directory* in which the build will be performed.
   That directory *must not* reside in the source directory `<source-directory>`.
