@@ -60,7 +60,7 @@ loadRenditions
   path = Shizu_String_concatenate(state, path, Shizu_String_create(state, Shizu_OperatingSystem_DirectorySeparator "Renditions", strlen(Shizu_OperatingSystem_DirectorySeparator "Renditions")));
 
 
-  Shizu_List* renditions = Shizu_List_create(state);
+  Shizu_List* renditions = Shizu_Runtime_Extensions_createList(state);
   LoadRenditionsContext context;
   context.state = state;
   context.list = renditions;

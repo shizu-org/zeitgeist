@@ -88,7 +88,7 @@ StaticGeometry_create
   Shizu_Type* type = StaticGeometryGl_getType(state);
   StaticGeometry* self = (StaticGeometry*)Shizu_Gc_allocateObject(state, sizeof(StaticGeometry));
   self->vertexBuffer = (Visuals_VertexBuffer*)Visuals_Context_createVertexBuffer(state, visualsContext);
-  self->materials = Shizu_List_create(state);
+  self->materials = Shizu_Runtime_Extensions_createList(state);
   {
     Shizu_List_appendObject(state, self->materials, (Shizu_Object*)Visuals_PhongMaterial_create(state));
     Shizu_List_appendObject(state, self->materials, (Shizu_Object*)Visuals_BlinnPhongMaterial_create(state));
@@ -448,7 +448,7 @@ World_create
   self->player = NULL;
   self->geometries = NULL;
 
-  self->geometries = Shizu_List_create(state);
+  self->geometries = Shizu_Runtime_Extensions_createList(state);
 
   StaticGeometry* geometry = NULL;
 

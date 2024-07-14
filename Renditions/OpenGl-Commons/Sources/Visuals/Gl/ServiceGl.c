@@ -275,7 +275,7 @@ Visuals_Gl_Service_registerVisualsObject
   )
 {
   if (!g_service.objects) {
-    g_service.objects = Shizu_List_create(state);
+    g_service.objects = Shizu_Runtime_Extensions_createList(state);
     Shizu_JumpTarget jumpTarget;
     Shizu_State2_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
@@ -288,7 +288,7 @@ Visuals_Gl_Service_registerVisualsObject
     }   
   }
   Shizu_Value temporary;
-  Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)object));
+  Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_Runtime_Extensions_createWeakReference(state, (Shizu_Object*)object));
   Shizu_List_appendValue(state, g_service.objects, &temporary);
 }
 

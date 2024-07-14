@@ -220,7 +220,7 @@ Visuals_Service_addKeyboardKeyCallback
   )
 {
   if (!g_keyboardKeyListeners) {
-    g_keyboardKeyListeners = Shizu_List_create(state);
+    g_keyboardKeyListeners = Shizu_Runtime_Extensions_createList(state);
     Shizu_JumpTarget jumpTarget;
     Shizu_State2_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
@@ -238,7 +238,7 @@ Visuals_Service_addKeyboardKeyCallback
     Shizu_List_appendValue(state, g_keyboardKeyListeners, value);
   } else if (Shizu_Value_isObject(value)) {
     Shizu_Value temporary;
-    Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)Shizu_Value_getObject(value)));
+    Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_Runtime_Extensions_createWeakReference(state, (Shizu_Object*)Shizu_Value_getObject(value)));
     Shizu_List_appendValue(state, g_keyboardKeyListeners, &temporary);
   } else {
     Shizu_State2_setStatus(state, 1);
@@ -254,7 +254,7 @@ Visuals_Service_addMouseButtonCallback
   )
 {
   if (!g_mouseButtonListeners) {
-    g_mouseButtonListeners = Shizu_List_create(state);
+    g_mouseButtonListeners = Shizu_Runtime_Extensions_createList(state);
     Shizu_JumpTarget jumpTarget;
     Shizu_State2_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
@@ -272,7 +272,7 @@ Visuals_Service_addMouseButtonCallback
     Shizu_List_appendValue(state, g_mouseButtonListeners, value);
   } else if (Shizu_Value_isObject(value)) {
     Shizu_Value temporary;
-    Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)Shizu_Value_getObject(value)));
+    Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_Runtime_Extensions_createWeakReference(state, (Shizu_Object*)Shizu_Value_getObject(value)));
     Shizu_List_appendValue(state, g_mouseButtonListeners, &temporary);
   } else {
     Shizu_State2_setStatus(state, 1);
@@ -288,7 +288,7 @@ Visuals_Service_addMousePointerCallback
   )
 {
   if (!g_mousePointerListeners) {
-    g_mousePointerListeners = Shizu_List_create(state);
+    g_mousePointerListeners = Shizu_Runtime_Extensions_createList(state);
     Shizu_JumpTarget jumpTarget;
     Shizu_State2_pushJumpTarget(state, &jumpTarget);
     if (!setjmp(jumpTarget.environment)) {
@@ -306,7 +306,7 @@ Visuals_Service_addMousePointerCallback
     Shizu_List_appendValue(state, g_mousePointerListeners, value);
   } else if (Shizu_Value_isObject(value)) {
     Shizu_Value temporary;
-    Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_WeakReference_create(state, (Shizu_Object*)Shizu_Value_getObject(value)));
+    Shizu_Value_setObject(&temporary, (Shizu_Object*)Shizu_Runtime_Extensions_createWeakReference(state, (Shizu_Object*)Shizu_Value_getObject(value)));
     Shizu_List_appendValue(state, g_mousePointerListeners, &temporary);
   } else {
     Shizu_State2_setStatus(state, 1);
