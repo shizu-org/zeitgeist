@@ -123,6 +123,28 @@ Visuals_Service_emitKeyboardKeyMessage
   );
 
 /// @since 0.1
+/// @brief Emit a mouse button message.
+/// @param state A pointer to a Shizu_State2 value.
+/// @param message A pointer to the MouseButtonMessage object.
+void
+Visuals_Service_emitMouseButtonMessage
+  (
+    Shizu_State2* state,
+    MouseButtonMessage* message
+  );
+
+/// @since 0.1
+/// @brief Emit a mouse pointer message.
+/// @param state A pointer to a Shizu_State2 value.
+/// @param message A pointer to the MousePointerMessage object.
+void
+Visuals_Service_emitMousePointerMessage
+  (
+    Shizu_State2* state,
+    MousePointerMessage* message
+  );
+
+/// @since 0.1
 /// @brief Add a keyboard key callback.
 /// @param state A pointer to a Shizu_State2 value.
 /// @param value The value to be used as a callback.

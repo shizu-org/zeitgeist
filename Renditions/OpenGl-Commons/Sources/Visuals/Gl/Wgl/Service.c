@@ -27,11 +27,17 @@
 // Visuals_Service_emitKeyboardKeyMessage
 #include "Visuals/Service.h"
 #include "KeyboardKeyMessage.h"
+#include "MouseButtonMessage.h"
+#include "MousePointerMessage.h"
 
 #if Zeitgeist_Configuration_OperatingSystem_Windows == Zeitgeist_Configuration_OperatingSystem
 
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
+
+	// GET_X_LPARAM, GET_Y_LPARAM
+	#include <Windowsx.h>
+
 	#pragma comment (lib, "gdi32.lib")
 	#pragma comment (lib, "user32.lib")
 	#pragma comment (lib, "opengl32.lib")
@@ -499,6 +505,188 @@ windowCallback
 			}
 			return 0;
 		} break;
+		case WM_MOUSEMOVE: {
+			// https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-mousemove
+			Shizu_State2* state = (Shizu_State2*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (state) {
+				Shizu_JumpTarget jumpTarget;
+				Shizu_State2_pushJumpTarget(state, &jumpTarget);
+				if (!setjmp(jumpTarget.environment)) {
+					int x = GET_X_LPARAM(lParam);
+					int y = GET_Y_LPARAM(lParam);
+					if (x < Shizu_Integer32_Minimum || x > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					if (y < Shizu_Integer32_Minimum || y > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					MousePointerMessage* message = MousePointerMessage_create(state, MousePointer_Action_Moved, x, y);
+					Visuals_Service_emitMousePointerMessage(state, message);
+					Shizu_State2_popJumpTarget(state);
+				} else {
+					Shizu_State2_popJumpTarget(state);
+				}
+			}
+			return 0;
+		} break;
+		case WM_LBUTTONDOWN: {
+			// https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttondown
+			Shizu_State2* state = (Shizu_State2*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (state) {
+				Shizu_JumpTarget jumpTarget;
+				Shizu_State2_pushJumpTarget(state, &jumpTarget);
+				if (!setjmp(jumpTarget.environment)) {
+					int x = GET_X_LPARAM(lParam);
+					int y = GET_Y_LPARAM(lParam);
+					if (x < Shizu_Integer32_Minimum || x > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					if (y < Shizu_Integer32_Minimum || y > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					MouseButtonMessage* message = MouseButtonMessage_create(state, MouseButton_Action_Pressed, 0, x, y);
+					Visuals_Service_emitMouseButtonMessage(state, message);
+					Shizu_State2_popJumpTarget(state);
+				} else {
+					Shizu_State2_popJumpTarget(state);
+				}
+			}
+			return 0;
+		}	break;
+		case WM_LBUTTONUP: {
+			// https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup
+			Shizu_State2* state = (Shizu_State2*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (state) {
+				Shizu_JumpTarget jumpTarget;
+				Shizu_State2_pushJumpTarget(state, &jumpTarget);
+				if (!setjmp(jumpTarget.environment)) {
+					int x = GET_X_LPARAM(lParam);
+					int y = GET_Y_LPARAM(lParam);
+					if (x < Shizu_Integer32_Minimum || x > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					if (y < Shizu_Integer32_Minimum || y > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					MouseButtonMessage* message = MouseButtonMessage_create(state, MouseButton_Action_Released, 0, x, y);
+					Visuals_Service_emitMouseButtonMessage(state, message);
+					Shizu_State2_popJumpTarget(state);
+				} else {
+					Shizu_State2_popJumpTarget(state);
+				}
+			}
+			return 0;
+		}	break;
+		case WM_MBUTTONDOWN: {
+			// https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttondown
+			Shizu_State2* state = (Shizu_State2*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (state) {
+				Shizu_JumpTarget jumpTarget;
+				Shizu_State2_pushJumpTarget(state, &jumpTarget);
+				if (!setjmp(jumpTarget.environment)) {
+					int x = GET_X_LPARAM(lParam);
+					int y = GET_Y_LPARAM(lParam);
+					if (x < Shizu_Integer32_Minimum || x > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					if (y < Shizu_Integer32_Minimum || y > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					MouseButtonMessage* message = MouseButtonMessage_create(state, MouseButton_Action_Pressed, 1, x, y);
+					Visuals_Service_emitMouseButtonMessage(state, message);
+					Shizu_State2_popJumpTarget(state);
+				} else {
+					Shizu_State2_popJumpTarget(state);
+				}
+			}
+			return 0;
+		}	break;
+		case WM_MBUTTONUP: {
+			// https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttonup
+			Shizu_State2* state = (Shizu_State2*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (state) {
+				Shizu_JumpTarget jumpTarget;
+				Shizu_State2_pushJumpTarget(state, &jumpTarget);
+				if (!setjmp(jumpTarget.environment)) {
+					int x = GET_X_LPARAM(lParam);
+					int y = GET_Y_LPARAM(lParam);
+					if (x < Shizu_Integer32_Minimum || x > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					if (y < Shizu_Integer32_Minimum || y > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					MouseButtonMessage* message = MouseButtonMessage_create(state, MouseButton_Action_Released, 1, x, y);
+					Visuals_Service_emitMouseButtonMessage(state, message);
+					Shizu_State2_popJumpTarget(state);
+				} else {
+					Shizu_State2_popJumpTarget(state);
+				}
+			}
+			return 0;
+		}	break;
+		case WM_RBUTTONDOWN: {
+			// https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttondown
+			Shizu_State2* state = (Shizu_State2*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (state) {
+				Shizu_JumpTarget jumpTarget;
+				Shizu_State2_pushJumpTarget(state, &jumpTarget);
+				if (!setjmp(jumpTarget.environment)) {
+					int x = GET_X_LPARAM(lParam);
+					int y = GET_Y_LPARAM(lParam);
+					if (x < Shizu_Integer32_Minimum || x > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					if (y < Shizu_Integer32_Minimum || y > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					MouseButtonMessage* message = MouseButtonMessage_create(state, MouseButton_Action_Pressed, 2, x, y);
+					Visuals_Service_emitMouseButtonMessage(state, message);
+					Shizu_State2_popJumpTarget(state);
+				} else {
+					Shizu_State2_popJumpTarget(state);
+				}
+			}
+			return 0;
+		}	break;
+		case WM_RBUTTONUP: {
+				// https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttonup
+			Shizu_State2* state = (Shizu_State2*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (state) {
+				Shizu_JumpTarget jumpTarget;
+				Shizu_State2_pushJumpTarget(state, &jumpTarget);
+				if (!setjmp(jumpTarget.environment)) {
+					int x = GET_X_LPARAM(lParam);
+					int y = GET_Y_LPARAM(lParam);
+					if (x < Shizu_Integer32_Minimum || x > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					if (y < Shizu_Integer32_Minimum || y > Shizu_Integer32_Maximum) {
+						Shizu_State2_setStatus(state, Shizu_Status_EnvironmentFailed);
+						Shizu_State2_jump(state);
+					}
+					MouseButtonMessage* message = MouseButtonMessage_create(state, MouseButton_Action_Released, 2, x, y);
+					Visuals_Service_emitMouseButtonMessage(state, message);
+					Shizu_State2_popJumpTarget(state);
+				} else {
+					Shizu_State2_popJumpTarget(state);
+				}
+			}
+			return 0;
+		}	break;
 		case WM_DESTROY: {
 			PostQuitMessage(0);
 			return 0;

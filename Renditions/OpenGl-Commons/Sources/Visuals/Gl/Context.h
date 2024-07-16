@@ -4,7 +4,17 @@
 #include "Visuals/Context.h"
 
 /// @since 1.0
-/// @brief The implementation of Visuals_Context for OpenGL.
+/// @brief
+/// The implementation of Visuals.Context for OpenGL.
+/// @details
+/// The type is
+/// @code
+/// class Visuals.Gl.Context
+/// @endcode
+/// Its constructor is
+/// @code
+/// Visuals.Gl.Context.construct()
+/// @endcode
 Shizu_declareObjectType(Visuals_Gl_Context);
 
 struct Visuals_Gl_Context_Dispatch {
@@ -20,13 +30,6 @@ struct Visuals_Gl_Context {
     Shizu_Float32 height;
   } viewport;
 };
-
-void
-Visuals_Gl_Context_construct
-  (
-    Shizu_State2* state,
-    Visuals_Gl_Context* self
-  );
 
 Visuals_Gl_Context*
 Visuals_Gl_Context_create

@@ -59,11 +59,21 @@ Visuals_Gl_VertexBuffer_dispatchInitialize
     Visuals_Gl_VertexBuffer_Dispatch* self
   );
 
+static void
+Visuals_Gl_VertexBuffer_constructImpl
+  (
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
+  );
+
 static Shizu_ObjectTypeDescriptor const Visuals_Gl_VertexBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
   .size = sizeof(Visuals_Gl_VertexBuffer),
+  .construct = &Visuals_Gl_VertexBuffer_constructImpl,
   .finalize = (Shizu_OnFinalizeCallback*)&Visuals_Gl_VertexBuffer_finalize,
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_Gl_VertexBuffer_Dispatch),
@@ -71,7 +81,7 @@ static Shizu_ObjectTypeDescriptor const Visuals_Gl_VertexBuffer_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Visuals_Gl_VertexBuffer, Visuals_VertexBuffer);
+Shizu_defineObjectType("Zeitgeist.Visuals.Gl.VertexBuffer", Visuals_Gl_VertexBuffer, Visuals_VertexBuffer);
 
 static void
 Visuals_Gl_VertexBuffer_finalize
@@ -385,18 +395,31 @@ Visuals_Gl_VertexBuffer_dispatchInitialize
   ((Visuals_VertexBuffer_Dispatch*)self)->setData = (void(*)(Shizu_State2*, Visuals_VertexBuffer*, uint8_t,void const*,size_t)) & Visuals_Gl_VertexBuffer_setDataImpl;
 }
 
-void
-Visuals_Gl_VertexBuffer_construct
+static void
+Visuals_Gl_VertexBuffer_constructImpl
   (
     Shizu_State2* state,
-    Visuals_Gl_VertexBuffer* self
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
-  Shizu_Type* type = Visuals_Gl_VertexBuffer_getType(state);
-  Visuals_VertexBuffer_construct(state, (Visuals_VertexBuffer*)self);
-  self->bufferId = 0;
-  self->vertexArrayId = 0;
-  ((Shizu_Object*)self)->type = type;
+  if (1 != numberOfArgumentValues) {
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Type* TYPE = Visuals_Gl_VertexBuffer_getType(state);
+  Visuals_Gl_VertexBuffer* SELF = (Visuals_Gl_VertexBuffer*)Shizu_Value_getObject(&argumentValues[0]);
+  {
+    Shizu_Type* PARENTTYPE = Shizu_Types_getParentType(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), TYPE);
+    Shizu_Value returnValue = Shizu_Value_Initializer();
+    Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+    Shizu_Value_setObject(&argumentValues[0], (Shizu_Object*)SELF);
+    Shizu_Type_getObjectTypeDescriptor(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), PARENTTYPE)->construct(state, &returnValue, 1, &argumentValues[0]);
+  }
+  SELF->bufferId = 0;
+  SELF->vertexArrayId = 0;
+  ((Shizu_Object*)SELF)->type = TYPE;
 }
 
 Visuals_Gl_VertexBuffer*
@@ -405,7 +428,9 @@ Visuals_Gl_VertexBuffer_create
     Shizu_State2* state
   )
 {
-  Visuals_Gl_VertexBuffer* self = (Visuals_Gl_VertexBuffer*)Shizu_Gc_allocateObject(state, sizeof(Visuals_Gl_VertexBuffer));
-  Visuals_Gl_VertexBuffer_construct(state, self);
-  return self;
+  Shizu_Value returnValue = Shizu_Value_Initializer();
+  Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+  Shizu_Value_setType(&argumentValues[0], Visuals_Gl_VertexBuffer_getType(state));
+  Shizu_Operations_create(state, &returnValue, 1, &argumentValues[0]);
+  return (Visuals_Gl_VertexBuffer*)Shizu_Value_getObject(&returnValue);
 }

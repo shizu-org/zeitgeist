@@ -40,7 +40,7 @@ static Shizu_ObjectTypeDescriptor const Visuals_Program_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Visuals_Program, Visuals_Object);
+Shizu_defineObjectType("Zeitgeist.Visuals.Program", Visuals_Program, Visuals_Object);
 
 static void
 Visuals_Program_visit

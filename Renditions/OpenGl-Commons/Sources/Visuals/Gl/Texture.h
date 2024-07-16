@@ -5,9 +5,18 @@
 #include "Visuals/Texture.h"
 #include "Visuals/Gl/ServiceGl.h"
 
-/// @brief The implementation of Visuals_Texture for OpenGL.
+/// @brief
+/// The implementation of Visuals.Texture for OpenGL.
 /// @details
 /// textureId is the OpenGL representation of the texture.
+/// The type is
+/// @code
+/// class Visuals.Gl.Texture
+/// @endcode
+/// Its constructor is
+/// @code
+/// Visuals.Gl.Texture.construct()
+/// @endcode
 Shizu_declareObjectType(Visuals_Gl_Texture);
 
 struct Visuals_Gl_Texture_Dispatch {
@@ -19,13 +28,6 @@ struct Visuals_Gl_Texture {
   /// @brief The OpenGL ID of the texture.
   GLuint textureId;
 };
-
-void
-Visuals_Gl_Texture_construct
-  (
-    Shizu_State2* state,
-    Visuals_Gl_Texture* self
-  );
 
 Visuals_Gl_Texture*
 Visuals_Gl_Texture_create

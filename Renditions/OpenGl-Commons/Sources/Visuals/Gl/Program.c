@@ -115,7 +115,7 @@ static Shizu_ObjectTypeDescriptor const Visuals_Gl_Program_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Visuals_Gl_Program, Visuals_Program);
+Shizu_defineObjectType("Zeitgeist.Visuals.Gl.Program", Visuals_Gl_Program, Visuals_Program);
 
 static void
 Visuals_Gl_Program_finalize

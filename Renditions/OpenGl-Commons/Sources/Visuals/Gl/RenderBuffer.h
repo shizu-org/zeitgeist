@@ -25,6 +25,17 @@
 #include "Visuals/RenderBuffer.h"
 #include "ServiceGl.h"
 
+/// @brief
+/// The implementation of Visuals.RenderBuffer for OpenGL.
+/// @details
+/// The type is
+/// @code
+/// class Visuals.Gl.RenderBuffer
+/// @endcode
+/// Its constructor is
+/// @code
+/// Visuals.Gl.RenderBuffer.construct()
+/// @endcode
 Shizu_declareObjectType(Visuals_Gl_RenderBuffer);
 
 struct Visuals_Gl_RenderBuffer_Dispatch {
@@ -39,13 +50,6 @@ struct Visuals_Gl_RenderBuffer {
   GLuint colorTextureId;
   GLuint depthStencilTextureId;
 };
-
-void
-Visuals_Gl_RenderBuffer_construct
-  (
-    Shizu_State2* state,
-    Visuals_Gl_RenderBuffer* self
-  );
 
 Visuals_Gl_RenderBuffer*
 Visuals_Gl_RenderBuffer_create

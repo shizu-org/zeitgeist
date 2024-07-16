@@ -25,9 +25,18 @@
 #include "Visuals/VertexBuffer.h"
 #include "Visuals/Gl/ServiceGl.h"
 
-/// @brief The implementation of Visuals_VertexBuffer for OpenGL.
+/// @brief
+/// The implementation of Visuals.VertexBuffer for OpenGL.
 /// @details
 /// bufferId and vertexArrayId are the OpenGL representation of the vertices.
+/// The type is
+/// @code
+/// class Visuals.Gl.VertexBuffer
+/// @endcode
+/// Its constructor is
+/// @code
+/// Visuals.Gl.VertexBuffer.construct()
+/// @endcode
 Shizu_declareObjectType(Visuals_Gl_VertexBuffer);
 
 struct Visuals_Gl_VertexBuffer_Dispatch {
@@ -41,13 +50,6 @@ struct Visuals_Gl_VertexBuffer {
   /// @brief The OpenGL ID of the vertex array.
   GLuint vertexArrayId;
 };
-
-void
-Visuals_Gl_VertexBuffer_construct
-  (
-    Shizu_State2* state,
-    Visuals_Gl_VertexBuffer* self
-  );
 
 Visuals_Gl_VertexBuffer*
 Visuals_Gl_VertexBuffer_create

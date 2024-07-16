@@ -33,20 +33,11 @@ list(APPEND ${name}.header_files Sources/Visuals/Service.h)
 list(APPEND ${name}.source_files Sources/Visuals/Service.package.c)
 list(APPEND ${name}.header_files Sources/Visuals/Service.package.h)
 
-list(APPEND ${name}.source_files Sources/RenderBuffer.c)
-list(APPEND ${name}.header_files Sources/RenderBuffer.h)
-
-list(APPEND ${name}.source_files Sources/Visuals/Context.c)
-list(APPEND ${name}.header_files Sources/Visuals/Context.h)
-
 list(APPEND ${name}.source_files Sources/Visuals/Program.c)
 list(APPEND ${name}.header_files Sources/Visuals/Program.h)
 
 list(APPEND ${name}.source_files Sources/Visuals/DefaultPrograms.c)
 list(APPEND ${name}.header_files Sources/Visuals/DefaultPrograms.h)
-
-list(APPEND ${name}.source_files Sources/Visuals/RenderBuffer.c)
-list(APPEND ${name}.header_files Sources/Visuals/RenderBuffer.h)
 
 list(APPEND ${name}.source_files Sources/Visuals/Gl/Context.c)
 list(APPEND ${name}.header_files Sources/Visuals/Gl/Context.h)

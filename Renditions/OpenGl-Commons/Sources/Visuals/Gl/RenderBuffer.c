@@ -58,11 +58,21 @@ Visuals_Gl_RenderBuffer_resizeImpl
     Shizu_Integer32 height
   );
 
+static void
+Visuals_Gl_RenderBuffer_constructImpl
+  (
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
+  );
+
 static Shizu_ObjectTypeDescriptor const Visuals_Gl_RenderBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
   .size = sizeof(Visuals_Gl_RenderBuffer),
+  .construct = &Visuals_Gl_RenderBuffer_constructImpl,
   .finalize = (Shizu_OnFinalizeCallback*)&Visuals_Gl_RenderBuffer_finalize,
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_Gl_RenderBuffer_Dispatch),
@@ -70,7 +80,7 @@ static Shizu_ObjectTypeDescriptor const Visuals_Gl_RenderBuffer_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Visuals_Gl_RenderBuffer, Visuals_RenderBuffer);
+Shizu_defineObjectType("Zeitgeist.Visuals.Gl.RenderBuffer", Visuals_Gl_RenderBuffer, Visuals_RenderBuffer);
 
 static void
 Visuals_Gl_RenderBuffer_dispatchInitialize
@@ -220,21 +230,34 @@ Visuals_Gl_RenderBuffer_resizeImpl
   }
 }
 
-void
-Visuals_Gl_RenderBuffer_construct
+static void
+Visuals_Gl_RenderBuffer_constructImpl
   (
     Shizu_State2* state,
-    Visuals_Gl_RenderBuffer* self
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
-  Shizu_Type *TYPE = Visuals_Gl_RenderBuffer_getType(state);
-  Visuals_RenderBuffer_construct(state, (Visuals_RenderBuffer*)self);
-  self->width = 640;
-  self->height = 480;
-  self->frameBufferId = 0;
-  self->colorTextureId = 0;
-  self->depthStencilTextureId = 0;
-  ((Shizu_Object*)self)->type = TYPE;
+  if (1 != numberOfArgumentValues) {
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Type* TYPE = Visuals_Gl_RenderBuffer_getType(state);
+  Visuals_Gl_RenderBuffer* SELF = (Visuals_Gl_RenderBuffer*)Shizu_Value_getObject(&argumentValues[0]);
+  {
+    Shizu_Type* PARENTTYPE = Shizu_Types_getParentType(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), TYPE);
+    Shizu_Value returnValue = Shizu_Value_Initializer();
+    Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+    Shizu_Value_setObject(&argumentValues[0], (Shizu_Object*)SELF);
+    Shizu_Type_getObjectTypeDescriptor(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), PARENTTYPE)->construct(state, &returnValue, 1, &argumentValues[0]);
+  }
+  SELF->width = 640;
+  SELF->height = 480;
+  SELF->frameBufferId = 0;
+  SELF->colorTextureId = 0;
+  SELF->depthStencilTextureId = 0;
+  ((Shizu_Object*)SELF)->type = TYPE;
 }
 
 Visuals_Gl_RenderBuffer*
@@ -243,7 +266,9 @@ Visuals_Gl_RenderBuffer_create
     Shizu_State2* state
   )
 {
-  Visuals_Gl_RenderBuffer* self = (Visuals_Gl_RenderBuffer*)Shizu_Gc_allocateObject(state, sizeof(Visuals_Gl_RenderBuffer));
-  Visuals_Gl_RenderBuffer_construct(state, self);
-  return self;
+  Shizu_Value returnValue = Shizu_Value_Initializer();
+  Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+  Shizu_Value_setType(&argumentValues[0], Visuals_Gl_RenderBuffer_getType(state));
+  Shizu_Operations_create(state, &returnValue, 1, &argumentValues[0]);
+  return (Visuals_Gl_RenderBuffer*)Shizu_Value_getObject(&returnValue);
 }

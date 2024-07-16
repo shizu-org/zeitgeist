@@ -107,6 +107,14 @@ Visuals_Gl_Context_clearImpl
   );
 
 static inline void
+Visuals_Gl_Context_setRenderBufferImpl
+  (
+    Shizu_State2* state,
+    Visuals_Gl_Context* self,
+    Visuals_Gl_RenderBuffer* renderBuffer
+  );
+
+static inline void
 Visuals_Gl_Context_renderImpl
   (
     Shizu_State2* state,
@@ -115,11 +123,21 @@ Visuals_Gl_Context_renderImpl
     Visuals_Gl_Program* program
   );
 
+static void
+Visuals_Gl_Context_constructImpl
+  (
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
+  );
+
 static Shizu_ObjectTypeDescriptor const Visuals_Gl_Context_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
   .size = sizeof(Visuals_Gl_Context),
+  .construct = &Visuals_Gl_Context_constructImpl,
   .finalize = (Shizu_OnFinalizeCallback*)&Visuals_Gl_Context_finalize,
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_Gl_Context_Dispatch),
@@ -127,7 +145,7 @@ static Shizu_ObjectTypeDescriptor const Visuals_Gl_Context_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Visuals_Gl_Context, Visuals_Context);
+Shizu_defineObjectType("Zeitgeist.Visuals.Gl.Context", Visuals_Gl_Context, Visuals_Context);
 
 static void
 Visuals_Gl_Context_finalize
@@ -154,6 +172,7 @@ Visuals_Gl_Context_dispatchInitialize
   ((Visuals_Context_Dispatch*)self)->setDepthFunction = (void (*)(Shizu_State2*, Visuals_Context*, Visuals_DepthFunction)) & Visuals_Gl_Context_setDepthFunctionImpl;
   ((Visuals_Context_Dispatch*)self)->setViewport = (void (*)(Shizu_State2*, Visuals_Context*, Shizu_Float32, Shizu_Float32, Shizu_Float32, Shizu_Float32)) & Visuals_Gl_Context_setViewportImpl;
   ((Visuals_Context_Dispatch*)self)->clear = (void (*)(Shizu_State2*, Visuals_Context*, bool, bool)) & Visuals_Gl_Context_clearImpl;
+  ((Visuals_Context_Dispatch*)self)->setRenderBuffer = (void (*)(Shizu_State2*, Visuals_Context*, Visuals_RenderBuffer*)) & Visuals_Gl_Context_setRenderBufferImpl;
   ((Visuals_Context_Dispatch*)self)->render = (void (*)(Shizu_State2*, Visuals_Context*, Visuals_VertexBuffer*, Visuals_Program*)) & Visuals_Gl_Context_renderImpl;
 }
 
@@ -413,6 +432,25 @@ Visuals_Gl_Context_clearImpl
 }
 
 static inline void
+Visuals_Gl_Context_setRenderBufferImpl
+  (
+    Shizu_State2* state,
+    Visuals_Gl_Context* self,
+    Visuals_Gl_RenderBuffer* renderBuffer
+  )
+{
+  if (!renderBuffer) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  } else {
+    if (!renderBuffer->frameBufferId) {
+      Shizu_State2_setStatus(state, Shizu_Status_OperationInvalid);
+      Shizu_State2_jump(state);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, renderBuffer->frameBufferId);
+  }
+}
+
+static inline void
 Visuals_Gl_Context_renderImpl
   (
     Shizu_State2* state,
@@ -426,20 +464,33 @@ Visuals_Gl_Context_renderImpl
   glDrawArrays(GL_TRIANGLE_STRIP, 0, ((Visuals_VertexBuffer*)vertexBuffer)->numberOfVertices);
 }
 
-void
-Visuals_Gl_Context_construct
+static void
+Visuals_Gl_Context_constructImpl
   (
     Shizu_State2* state,
-    Visuals_Gl_Context* self
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
-  Shizu_Type* type = Visuals_Gl_Context_getType(state);
-  Visuals_Context_construct(state, (Visuals_Context*)self);
-  self->viewport.left = 0.f;
-  self->viewport.bottom = 0.f;
-  self->viewport.width = 1.f;
-  self->viewport.height = 1.f;
-  ((Shizu_Object*)self)->type = type;
+  if (1 != numberOfArgumentValues) {
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Type* TYPE = Visuals_Gl_Context_getType(state);
+  Visuals_Gl_Context* SELF = (Visuals_Gl_Context*)Shizu_Value_getObject(&argumentValues[0]);
+  {
+    Shizu_Type* PARENTTYPE = Shizu_Types_getParentType(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), TYPE);
+    Shizu_Value returnValue = Shizu_Value_Initializer();
+    Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+    Shizu_Value_setObject(&argumentValues[0], (Shizu_Object*)SELF);
+    Shizu_Type_getObjectTypeDescriptor(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), PARENTTYPE)->construct(state, &returnValue, 1, &argumentValues[0]);
+  }
+  SELF->viewport.left = 0.f;
+  SELF->viewport.bottom = 0.f;
+  SELF->viewport.width = 1.f;
+  SELF->viewport.height = 1.f;
+  ((Shizu_Object*)SELF)->type = TYPE;
 }
 
 Visuals_Gl_Context*
@@ -448,7 +499,9 @@ Visuals_Gl_Context_create
     Shizu_State2* state
   )
 {
-  Visuals_Gl_Context* self = (Visuals_Gl_Context*)Shizu_Gc_allocateObject(state, sizeof(Visuals_Gl_Context));
-  Visuals_Gl_Context_construct(state, self);
-  return self;
+  Shizu_Value returnValue = Shizu_Value_Initializer();
+  Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+  Shizu_Value_setType(&argumentValues[0], Visuals_Gl_Context_getType(state));
+  Shizu_Operations_create(state, &returnValue, 1, &argumentValues[0]);
+  return (Visuals_Gl_Context*)Shizu_Value_getObject(&returnValue);
 }
