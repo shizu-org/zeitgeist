@@ -22,7 +22,7 @@
 #if !defined(VISUALS_OBJECT_H_INCLUDED)
 #define VISUALS_OBJECT_H_INCLUDED
 
-#include "Shizu/Runtime/Include.h"
+#include "Zeitgeist.h"
 
 Shizu_declareObjectType(Visuals_Object);
 

@@ -22,8 +22,16 @@
 #if !defined(COLORGBU8_H_INCLUDED)
 #define COLORGBU8_H_INCLUDED
 
-#include "Shizu/Runtime/Include.h"
+#include "Zeitgeist.h"
 
+/// The type
+/// @code
+/// class ColorRGBU8
+/// @endcode
+/// Its constructor is
+/// @code
+/// ColorRGBU8.construct(Integer32 r, Integer32 g, Integer32 b)
+/// @endcode
 Shizu_declareObjectType(ColorRGBU8);
 
 struct ColorRGBU8_Dispatch {
@@ -36,16 +44,6 @@ struct ColorRGBU8 {
   Shizu_Integer32 g;
   Shizu_Integer32 b;
 };
-
-void
-ColorRGBU8_construct
-  (
-    Shizu_State2* state,
-    ColorRGBU8* self,
-    Shizu_Integer32 r,
-    Shizu_Integer32 g,
-    Shizu_Integer32 b
-  );
 
 ColorRGBU8*
 ColorRGBU8_create

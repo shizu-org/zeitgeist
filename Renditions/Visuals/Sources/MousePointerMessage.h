@@ -19,13 +19,21 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(KEYBOARDKEYMESSAGE_H_INCLUDED)
-#define KEYBOARDKEYMESSAGE_H_INCLUDED
+#if !defined(MOUSEPOINTERMESSAGE_H_INCLUDED)
+#define MOUSEPOINTERMESSAGE_H_INCLUDED
 
 #include "Zeitgeist.h"
 
 #define MousePointer_Action_Moved (0)
 
+/// The type
+/// @code
+/// class MousePointerMessage
+/// @endcode
+/// Its constructor is
+/// @code
+/// MousePointerMessage.construct(Integer32 action, Integer32 x, Integer32 y)
+/// @endcode
 Shizu_declareObjectType(MousePointerMessage)
 
 struct MousePointerMessage_Dispatch {
@@ -38,16 +46,6 @@ struct MousePointerMessage {
   Shizu_Integer32 x;
   Shizu_Integer32 y;
 };
-
-void
-MousePointerMessage_construct
-  (
-    Shizu_State2* state,
-    MousePointerMessage* self,
-    Shizu_Integer32 action,
-    Shizu_Integer32 x,
-    Shizu_Integer32 y
-  );
 
 MousePointerMessage*
 MousePointerMessage_create
@@ -79,4 +77,4 @@ MousePointerMessage_getY
     MousePointerMessage* self
   );
 
-#endif // KEYBOARDKEYMESSAGE_H_INCLUDED
+#endif // MOUSEPOINTERMESSAGE_H_INCLUDED

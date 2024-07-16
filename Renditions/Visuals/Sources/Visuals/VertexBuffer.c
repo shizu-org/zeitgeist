@@ -52,11 +52,21 @@ Visuals_VertexBuffer_setDataImpl
     size_t numberOfBytes
   );
 
+static void
+Visuals_VertexBuffer_constructImpl
+  (
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
+  );
+
 static Shizu_ObjectTypeDescriptor const Visuals_VertexBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
   .size = sizeof(Visuals_VertexBuffer),
+  .construct = &Visuals_VertexBuffer_constructImpl,
   .finalize = (Shizu_OnFinalizeCallback*)&Visuals_VertexBuffer_finalize,
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_VertexBuffer_Dispatch),
@@ -64,7 +74,7 @@ static Shizu_ObjectTypeDescriptor const Visuals_VertexBuffer_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Visuals_VertexBuffer, Visuals_Object);
+Shizu_defineObjectType("Zeitgeist.Visuals.VertexBuffer", Visuals_VertexBuffer, Visuals_Object);
 
 static void
 Visuals_VertexBuffer_finalize
@@ -147,22 +157,29 @@ Visuals_VertexBuffer_setDataImpl
   self->numberOfBytes = newNumberOfBytes;
 }
 
-void
-Visuals_VertexBuffer_construct
+static void
+Visuals_VertexBuffer_constructImpl
   (
     Shizu_State2* state,
-    Visuals_VertexBuffer* self
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
-  Shizu_Type* type = Visuals_VertexBuffer_getType(state);
-  Visuals_Object_construct(state, (Visuals_Object*)self);
-  self->bytes = malloc(sizeof(char));
-  if (!self->bytes) {
+  if (1 != numberOfArgumentValues) {
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Type* TYPE = Visuals_VertexBuffer_getType(state);
+  Visuals_VertexBuffer* SELF = (Visuals_VertexBuffer*)Shizu_Value_getObject(&argumentValues[0]);
+  Visuals_Object_construct(state, (Visuals_Object*)SELF);
+  SELF->bytes = malloc(sizeof(char));
+  if (!SELF->bytes) {
     Shizu_State2_setStatus(state, Shizu_Status_AllocationFailed);
     Shizu_State2_jump(state);
   }
-  self->numberOfBytes = 0;
-  self->numberOfVertices = 0;
-  self->flags = Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3;
-  ((Shizu_Object*)self)->type = type;
+  SELF->numberOfBytes = 0;
+  SELF->numberOfVertices = 0;
+  SELF->flags = Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3;
+  ((Shizu_Object*)SELF)->type = TYPE;
 }

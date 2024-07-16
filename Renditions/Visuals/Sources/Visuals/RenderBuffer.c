@@ -19,62 +19,47 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "Visuals/Object.h"
+#include "Visuals/RenderBuffer.h"
 
 static void
-dispatchInitialize
-  (
-    Shizu_State1* state1,
-    Visuals_Object_Dispatch* self
-  );
-
-static void
-notifyVisualsShutdownImpl
+Visuals_RenderBuffer_constructImpl
   (
     Shizu_State2* state,
-    Visuals_Object* self
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   );
 
-static Shizu_ObjectTypeDescriptor const Visuals_Object_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_RenderBuffer_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
-  .size = sizeof(Visuals_Object),
+  .size = sizeof(Visuals_RenderBuffer),
+  .construct = &Visuals_RenderBuffer_constructImpl,
   .finalize = NULL,
   .visit = NULL,
-  .dispatchSize = sizeof(Visuals_Object_Dispatch),
-  .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&dispatchInitialize,
+  .dispatchSize = sizeof(Visuals_RenderBuffer_Dispatch),
+  .dispatchInitialize = NULL,
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType("Zeitgeist.Visuals.Object", Visuals_Object, Shizu_Object);
+Shizu_defineObjectType("Zeitgeist.Visuals.RenderBuffer", Visuals_RenderBuffer, Visuals_Object);
 
 static void
-dispatchInitialize
-  (
-    Shizu_State1* stat1e,
-    Visuals_Object_Dispatch* self
-  )
-{
-  self->notifyVisualsShutdown = &notifyVisualsShutdownImpl;
-}
-
-static void
-notifyVisualsShutdownImpl
+Visuals_RenderBuffer_constructImpl
   (
     Shizu_State2* state,
-    Visuals_Object* self
-  )
-{ Visuals_Object_unmaterialize(state, self); }
-
-void
-Visuals_Object_construct
-  (
-    Shizu_State2* state,
-    Visuals_Object* self
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
-  Shizu_Type* type = Visuals_Object_getType(state);
-  Shizu_Object_construct(state, (Shizu_Object*)self);
-  ((Shizu_Object*)self)->type = type;
+  if (1 != numberOfArgumentValues) {
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Type* TYPE = Visuals_RenderBuffer_getType(state);
+  Visuals_RenderBuffer* SELF = (Visuals_RenderBuffer*)Shizu_Value_getObject(&argumentValues[0]);
+  Visuals_Object_construct(state, (Visuals_Object*)SELF);
+  ((Shizu_Object*)SELF)->type = TYPE;
 }

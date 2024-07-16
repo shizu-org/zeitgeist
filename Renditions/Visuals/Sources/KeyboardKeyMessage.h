@@ -41,6 +41,14 @@
 
 #define KeyboardKey_L (12)
 
+/// The type
+/// @code
+/// class KeyboardKeyMessage
+/// @endcode
+/// Its constructor is
+/// @code
+/// KeyboardKeyMessage.construct(Integer32 action, Integer32 key)
+/// @endcode
 Shizu_declareObjectType(KeyboardKeyMessage)
 
 struct KeyboardKeyMessage_Dispatch {
@@ -52,18 +60,6 @@ struct KeyboardKeyMessage {
   Shizu_Integer32 action;
   Shizu_Integer32 key;
 };
-
-/// @code
-/// construct(Shizu.Integer32 action, Shizu.Integer32 key)
-/// @endcode
-void
-KeyboardKeyMessage_construct
-  (
-    Shizu_State2* state,
-    KeyboardKeyMessage* self,
-    Shizu_Integer32 action,
-    Shizu_Integer32 key
-  );
 
 KeyboardKeyMessage*
 KeyboardKeyMessage_create

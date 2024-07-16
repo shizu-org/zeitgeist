@@ -19,27 +19,32 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VISUALS_MATERIAL_H_INCLUDED)
-#define VISUALS_MATERIAL_H_INCLUDED
+#if !defined(VISUALS_RENDERBUFFER_H_INCLUDED)
+#define VISUALS_RENDERBUFFER_H_INCLUDED
 
-#include "Zeitgeist.h"
 #include "Visuals/Object.h"
 
-Shizu_declareObjectType(Visuals_Material);
+/// @since 1.0
+/// @brief A render buffer.
+Shizu_declareObjectType(Visuals_RenderBuffer);
 
-struct Visuals_Material {
+struct Visuals_RenderBuffer_Dispatch {
+  Visuals_Object_Dispatch _parent;
+  void (*resize)(Shizu_State2* state, Visuals_RenderBuffer* self, Shizu_Integer32 width, Shizu_Integer32 height);
+};
+
+struct Visuals_RenderBuffer {
   Visuals_Object _parent;
 };
 
-struct Visuals_Material_Dispatch {
-  Visuals_Object_Dispatch _parent;
-};
-
-void
-Visuals_Material_construct
+static inline void
+Visuals_RenderBuffer_resize
   (
     Shizu_State2* state,
-    Visuals_Material* self
-  );
+    Visuals_RenderBuffer* self,
+    Shizu_Integer32 width,
+    Shizu_Integer32 height
+  )
+{ Shizu_VirtualCall(Visuals_RenderBuffer, resize, self, width, height); }
 
-#endif // VISUALS_MATERIAL_H_INCLUDED
+#endif // VISUALS_RENDERBUFFER_H_INCLUDED

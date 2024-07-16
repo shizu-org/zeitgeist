@@ -40,6 +40,14 @@
 #define MouseButton_Eleven (11)
 #define MouseButton_Twelve (12)
 
+/// The type
+/// @code
+/// class MouseButtonMessage
+/// @endcode
+/// Its constructor is
+/// @code
+/// MouseButtonMessage.construct(Integer32 action, Integer32 button)
+/// @endcode
 Shizu_declareObjectType(MouseButtonMessage)
 
 struct MouseButtonMessage_Dispatch {
@@ -50,23 +58,18 @@ struct MouseButtonMessage {
   Shizu_Object _parent;
   Shizu_Integer32 action;
   Shizu_Integer32 button;
+  Shizu_Integer32 x;
+  Shizu_Integer32 y;
 };
-
-void
-MouseButtonMessage_construct
-  (
-    Shizu_State2* state,
-    MouseButtonMessage* self,
-    Shizu_Integer32 action,
-    Shizu_Integer32 button
-  );
 
 MouseButtonMessage*
 MouseButtonMessage_create
   (
     Shizu_State2* state,
     Shizu_Integer32 action,
-    Shizu_Integer32 button
+    Shizu_Integer32 button,
+    Shizu_Integer32 x,
+    Shizu_Integer32 y
   );
 
 Shizu_Integer32

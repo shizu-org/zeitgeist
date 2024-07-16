@@ -23,11 +23,21 @@
 
 #include "Shizu/Runtime/CxxUtilities.h"
 
+static void
+MousePointerMessage_constructImpl
+  (
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
+  );
+
 static Shizu_ObjectTypeDescriptor const MousePointerMessage_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
   .size = sizeof(MousePointerMessage),
+  .construct = &MousePointerMessage_constructImpl,
   .finalize = NULL,
   .visit = NULL,
   .dispatchSize = sizeof(MousePointerMessage_Dispatch),
@@ -35,24 +45,28 @@ static Shizu_ObjectTypeDescriptor const MousePointerMessage_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(MousePointerMessage, Shizu_Object);
+Shizu_defineObjectType("Zeitgeist.MousePointerMessage", MousePointerMessage, Shizu_Object);
 
-void
-MousePointerMessage_construct
+static void
+MousePointerMessage_constructImpl
   (
     Shizu_State2* state,
-    MousePointerMessage* self,
-    Shizu_Integer32 action,
-    Shizu_Integer32 x,
-    Shizu_Integer32 y
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
+  if (4 != numberOfArgumentValues) {
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
+    Shizu_State2_jump(state);
+  }
   Shizu_Type* TYPE = MousePointerMessage_getType(state);
-  Shizu_Object_construct(state, (Shizu_Object*)self);
-  self->action = action;
-  self->x = x;
-  self->y = y;
-  ((Shizu_Object*)self)->type = TYPE;
+  MousePointerMessage* SELF = (MousePointerMessage*)Shizu_Value_getObject(&argumentValues[0]);
+  Shizu_Object_construct(state, (Shizu_Object*)SELF);
+  SELF->action = Shizu_Runtime_Extensions_getInteger32Value(state, &argumentValues[1]);
+  SELF->x = Shizu_Runtime_Extensions_getFloat32Value(state, &argumentValues[2]);
+  SELF->y = Shizu_Runtime_Extensions_getFloat32Value(state, &argumentValues[3]);
+  ((Shizu_Object*)SELF)->type = TYPE;
 }
 
 MousePointerMessage*
@@ -64,10 +78,17 @@ MousePointerMessage_create
     Shizu_Integer32 y
   )
 {
-  Shizu_Type* TYPE = MousePointerMessage_getType(state);
-  MousePointerMessage* self = (MousePointerMessage*)Shizu_Gc_allocateObject(state, sizeof(MousePointerMessage));
-  MousePointerMessage_construct(state, self, action, x, y);
-  return self;
+  Shizu_Value returnValue = Shizu_Value_Initializer();
+  Shizu_Value argumentValues[] = { Shizu_Value_Initializer(),
+                                   Shizu_Value_Initializer(),
+                                   Shizu_Value_Initializer(),
+                                   Shizu_Value_Initializer(), };
+  Shizu_Value_setType(&argumentValues[0], MousePointerMessage_getType(state));
+  Shizu_Value_setInteger32(&argumentValues[1], action);
+  Shizu_Value_setInteger32(&argumentValues[2], x);
+  Shizu_Value_setInteger32(&argumentValues[3], y);
+  Shizu_Operations_create(state, &returnValue, 4, &argumentValues[0]);
+  return (MousePointerMessage*)Shizu_Value_getObject(&returnValue);
 }
 
 Shizu_Integer32

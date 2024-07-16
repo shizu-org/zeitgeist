@@ -35,6 +35,16 @@ enum Visuals_PixelFormat {
   Visuals_PixelFormat_RGBU8,
 };
 
+/// @brief
+/// A texture.
+/// The type is
+/// @code
+/// class Visuals.Texture
+/// @endcode
+/// Its constructor is
+/// @code
+/// Visuals.Texture.construct()
+/// @endcode
 Shizu_declareObjectType(Visuals_Texture);
 
 struct Visuals_Texture_Dispatch {
@@ -48,13 +58,6 @@ struct Visuals_Texture_Dispatch {
 struct Visuals_Texture {
   Visuals_Object parent;
 };
-
-void
-Visuals_Texture_construct
-  (
-    Shizu_State2* state,
-    Visuals_Texture* self
-  );
 
 static inline void
 Visuals_Texture_setData

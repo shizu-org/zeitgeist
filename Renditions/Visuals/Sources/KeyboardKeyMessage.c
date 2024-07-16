@@ -23,11 +23,21 @@
 
 #include "Shizu/Runtime/CxxUtilities.h"
 
+static void
+KeyboardKeyMessage_constructImpl
+  (
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
+  );
+
 static Shizu_ObjectTypeDescriptor const KeyboardKeyMessage_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
   .size = sizeof(KeyboardKeyMessage),
+  .construct = KeyboardKeyMessage_constructImpl,
   .finalize = NULL,
   .visit = NULL,
   .dispatchSize = sizeof(KeyboardKeyMessage_Dispatch),
@@ -35,22 +45,27 @@ static Shizu_ObjectTypeDescriptor const KeyboardKeyMessage_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(KeyboardKeyMessage, Shizu_Object);
+Shizu_defineObjectType("Zeitgeist.KeyboardKeyMessage", KeyboardKeyMessage, Shizu_Object);
 
-void
-KeyboardKeyMessage_construct
+static void
+KeyboardKeyMessage_constructImpl
   (
     Shizu_State2* state,
-    KeyboardKeyMessage* self,
-    Shizu_Integer32 action,
-    Shizu_Integer32 key
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
+  if (3 != numberOfArgumentValues) {
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
+    Shizu_State2_jump(state);
+  }
   Shizu_Type* TYPE = KeyboardKeyMessage_getType(state);
-  Shizu_Object_construct(state, (Shizu_Object*)self);
-  self->action = action;
-  self->key = key;
-  ((Shizu_Object*)self)->type = TYPE;
+  KeyboardKeyMessage* SELF = (KeyboardKeyMessage*)Shizu_Value_getObject(&argumentValues[0]);
+  Shizu_Object_construct(state, (Shizu_Object*)SELF);
+  SELF->action = Shizu_Runtime_Extensions_getInteger32Value(state, &argumentValues[1]);
+  SELF->key = Shizu_Runtime_Extensions_getInteger32Value(state, &argumentValues[2]);
+  ((Shizu_Object*)SELF)->type = TYPE;
 }
 
 KeyboardKeyMessage*
@@ -61,10 +76,15 @@ KeyboardKeyMessage_create
     Shizu_Integer32 key
   )
 {
-  Shizu_Type* type = KeyboardKeyMessage_getType(state);
-  KeyboardKeyMessage* self = (KeyboardKeyMessage*)Shizu_Gc_allocateObject(state, sizeof(KeyboardKeyMessage));
-  KeyboardKeyMessage_construct(state, self, action, key);
-  return self;
+  Shizu_Value returnValue = Shizu_Value_Initializer();
+  Shizu_Value argumentValues[] = { Shizu_Value_Initializer(),
+                                   Shizu_Value_Initializer(),
+                                   Shizu_Value_Initializer(), };
+  Shizu_Value_setType(&argumentValues[0], KeyboardKeyMessage_getType(state));
+  Shizu_Value_setInteger32(&argumentValues[1], action);
+  Shizu_Value_setInteger32(&argumentValues[2], key);
+  Shizu_Operations_create(state, &returnValue, 3, &argumentValues[0]);
+  return (KeyboardKeyMessage*)Shizu_Value_getObject(&returnValue);
 }
 
 Shizu_Integer32

@@ -25,6 +25,14 @@
 #include "Zeitgeist.h"
 #include "idlib/math.h"
 
+/// The type
+/// @code
+/// class Vector3F32
+/// @endcode
+/// Its constructor is
+/// @code
+/// Vector3F32.construct(Float32 x, Float32 y, Float32 z)
+/// @endcode
 Shizu_declareObjectType(Vector3F32)
 
 struct Vector3F32_Dispatch {

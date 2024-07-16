@@ -40,12 +40,26 @@
 
 /// @since 1.0
 /// @brief
+/// A vertex buffer.
+/// @details
 /// A vertex buffer comprises
 /// - n vertices all of the same vertex semantics and vertex syntactics
 /// - the vertex semantics and vertex syntactics of its vertices
 /// Currently, the following formats are supported
 /// - Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3
 /// - Visuals_VertexSemantics_PositionXyz_NormalXyz_ColorRgb | Visuals_VertexSyntactics_Float3_Float3_Float3
+/// @details
+/// The type is
+/// @code
+/// class Visuals.VertexBuffer
+/// @endcode
+/// Its constructor is
+/// @code
+/// Visuals.VertexBuffer.construct()
+/// @endcode
+/// which initializes the vertex buffer with default values. The default values are
+/// - zero vertices
+/// - of the format Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3
 Shizu_declareObjectType(Visuals_VertexBuffer);
 
 struct Visuals_VertexBuffer_Dispatch {
@@ -64,19 +78,6 @@ struct Visuals_VertexBuffer {
   /// @brief The number of Bytes in the array pointed to by @a bytes.
   size_t numberOfBytes;
 };
-
-/**
- * @brief Construct a vertex buffer with default values.
- * The default values are
- * - zero vertices
- * - of the format Visuals_VertexSemantics_PositionXyz | Visuals_VertexSyntactics_Float3
- */
-void
-Visuals_VertexBuffer_construct
-  (
-    Shizu_State2* state,
-    Visuals_VertexBuffer* self
-  );
 
 static inline void
 Visuals_VertexBuffer_setData

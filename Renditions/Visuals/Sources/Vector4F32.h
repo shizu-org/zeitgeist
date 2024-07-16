@@ -25,6 +25,14 @@
 #include "Zeitgeist.h"
 #include "idlib/math.h"
 
+/// The type
+/// @code
+/// class Vector4F32
+/// @endcode
+/// Its constructor is
+/// @code
+/// Vector4F32.construct(Float32 x, Float32 y, Float32 z, Float32 w)
+/// @endcode
 Shizu_declareObjectType(Vector4F32)
 
 struct Vector4F32_Dispatch {

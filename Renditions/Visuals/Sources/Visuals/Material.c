@@ -21,11 +21,21 @@
 
 #include "Visuals/Material.h"
 
+static void
+Visuals_Material_constructImpl
+  (
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
+  );
+
 static Shizu_ObjectTypeDescriptor const Visuals_Material_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
   .size = sizeof(Visuals_Material),
+  .construct = &Visuals_Material_constructImpl,
   .finalize = NULL,
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_Material_Dispatch),
@@ -33,7 +43,26 @@ static Shizu_ObjectTypeDescriptor const Visuals_Material_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Visuals_Material, Visuals_Object);
+Shizu_defineObjectType("Zeitgeist.Visuals.Material", Visuals_Material, Visuals_Object);
+
+static void
+Visuals_Material_constructImpl
+  (
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
+  )
+{
+  if (1 != numberOfArgumentValues) {
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Type* TYPE = Visuals_Material_getType(state);
+  Visuals_Material* SELF = (Visuals_Material*)Shizu_Value_getObject(&argumentValues[0]);
+  Visuals_Object_construct(state, (Visuals_Object*)SELF);
+  ((Shizu_Object*)SELF)->type = TYPE;
+}
 
 void
 Visuals_Material_construct

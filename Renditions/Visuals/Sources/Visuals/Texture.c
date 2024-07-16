@@ -21,7 +21,7 @@
 
 #include "Visuals/Texture.h"
 
-Shizu_defineEnumerationType(Visuals_PixelFormat);
+Shizu_defineEnumerationType("Zeitgeist.Visuals.PixelFormat", Visuals_PixelFormat);
 
 static void
 Visuals_Texture_finalize
@@ -35,6 +35,15 @@ Visuals_Texture_dispatchInitialize
   (
     Shizu_State1* state1,
     Visuals_Texture_Dispatch* self
+  );
+
+static void
+Visuals_Texture_constructImpl
+  (
+    Shizu_State2* state,
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   );
 
 static Shizu_ObjectTypeDescriptor const Visuals_Texture_Type = {
@@ -42,6 +51,7 @@ static Shizu_ObjectTypeDescriptor const Visuals_Texture_Type = {
   .preDestroyType = NULL,
   .visitType = NULL,
   .size = sizeof(Visuals_Texture),
+  .construct = &Visuals_Texture_constructImpl,
   .finalize = (Shizu_OnFinalizeCallback*)&Visuals_Texture_finalize,
   .visit = NULL,
   .dispatchSize = sizeof(Visuals_Texture_Dispatch),
@@ -49,7 +59,7 @@ static Shizu_ObjectTypeDescriptor const Visuals_Texture_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Visuals_Texture, Visuals_Object);
+Shizu_defineObjectType("Zeitgeist.Visuals.Texture", Visuals_Texture, Visuals_Object);
 
 static void
 Visuals_Texture_finalize
@@ -67,14 +77,21 @@ Visuals_Texture_dispatchInitialize
   )
 {/*Intentionally empty.*/}
 
-void
-Visuals_Texture_construct
+static void
+Visuals_Texture_constructImpl
   (
     Shizu_State2* state,
-    Visuals_Texture* self
+    Shizu_Value* returnValue,
+    Shizu_Integer32 numberOfArgumentValues,
+    Shizu_Value* argumentValues
   )
 {
-  Shizu_Type* type = Visuals_Texture_getType(state);
-  Visuals_Object_construct(state, (Visuals_Object*)self);
-  ((Shizu_Object*)self)->type = type;
+  if (1 != numberOfArgumentValues) {
+    Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Type* TYPE = Visuals_Texture_getType(state);
+  Visuals_Texture* SELF = (Visuals_Texture*)Shizu_Value_getObject(&argumentValues[0]);
+  Visuals_Object_construct(state, (Visuals_Object*)SELF);
+  ((Shizu_Object*)SELF)->type = TYPE;
 }
