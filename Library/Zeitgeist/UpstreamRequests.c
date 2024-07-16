@@ -14,7 +14,7 @@ static Shizu_ObjectTypeDescriptor const Zeitgeist_UpstreamRequest_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Zeitgeist_UpstreamRequest, Shizu_Object);
+Shizu_defineObjectType("Zeitgeist.UpstreamRequest", Zeitgeist_UpstreamRequest, Shizu_Object);
 
 Zeitgeist_UpstreamRequest*
 Zeitgeist_UpstreamRequest_createExitProcessRequest

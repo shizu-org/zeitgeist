@@ -3,26 +3,28 @@
 cmake_minimum_required(VERSION 3.20)
 
 include(${idlib-process.source-dir}/cmake/all.cmake)
+include(${Shizu.Runtime.source-dir}/cmake/all.cmake)
 
 set(name ${project_name}-Interpreter)
-begin_executable()
+Shizu_beginExecutable()
 
 list(APPEND ${name}.source_files Main.c)
 
-end_executable()
+Shizu_endExecutable()
 target_link_libraries(${name} ${project_name}-Library idlib-process idlib-file-system)
 add_dependencies(${name} Shizu.Runtime.Modules.FileSystem)
 
-set(modules "")
-get_target_property(modules Shizu.Runtime modules)
-#foreach (module ${modules})
-#add_dependencies(${name} ${module})
-##endforeach()
+get_target_property(prerequisiteModules ${name} prerequisiteModules)
+list(APPEND prerequisiteModules Shizu.Runtime.Modules.FileSystem)
+list(APPEND prerequisiteModules Shizu.Runtime.Modules.DataDefinitionLanguage)
+list(APPEND prerequisiteModules Shizu.Runtime.Modules.MachineLanguage)
+set_target_properties(${name} PROPERTIES prerequisiteModules "${prerequisiteModules}")
 
-foreach (module ${modules})
-  on_plugin(${name} ${module})
-endforeach()
+#set(prerequisiteModules "")
+#get_target_property(prerequisiteModules Shizu.Runtime prerequisiteModules)
+#set_target_properties(${name} PROPERTIES prerequisiteModules ${prerequisiteModules})
 
+on_executable(${name})
 
 # We must link libm under Linux.
 if (${${name}.operating_system_id} EQUAL ${${name}.operating_system_id_linux})

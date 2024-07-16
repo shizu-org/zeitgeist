@@ -34,7 +34,7 @@ static Shizu_ObjectTypeDescriptor const Zeitgeist_Rendition_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Zeitgeist_Rendition, Shizu_Object);
+Shizu_defineObjectType("Zeitgeist.Rendition", Zeitgeist_Rendition, Shizu_Object);
 
 static void
 Zeitgeist_Rendition_finalize
