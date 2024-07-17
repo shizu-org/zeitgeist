@@ -34,7 +34,7 @@ static Shizu_ObjectTypeDescriptor const StaticGeometryGl_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(StaticGeometryGl, Shizu_Object);
+Shizu_defineObjectType("Zeitgeist.StaticGeometryGl", StaticGeometryGl, Shizu_Object);
 
 static void
 StaticGeometry_finalize
@@ -419,7 +419,7 @@ static Shizu_ObjectTypeDescriptor const World_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(World, Shizu_Object);
+Shizu_defineObjectType("Zeitgeist.World", World, Shizu_Object);
 
 static void
 World_visit

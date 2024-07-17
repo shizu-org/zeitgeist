@@ -21,7 +21,7 @@ static Shizu_ObjectTypeDescriptor const Player_Type = {
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType(Player, Shizu_Object);
+Shizu_defineObjectType("Zeitgeist.Player", Player, Shizu_Object);
 
 static void
 Player_visit
