@@ -152,9 +152,8 @@ Visuals_Service_emitKeyboardKeyMessage
     Shizu_Value temporary = Shizu_List_getValue(state, g_keyboardKeyListeners, i);
     if (Shizu_Value_isCxxFunction(&temporary)) {
       Shizu_CxxFunction* cxxFunction = Shizu_Value_getCxxFunction(&temporary);
-      Shizu_Value returnValue = Shizu_Value_Initializer();
-      Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
-      Shizu_Value_setObject(&argumentValues[0], (Shizu_Object*)message);
+      Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+      Shizu_Value argumentValues[] = { Shizu_Value_InitializerObject(message) };
       (*cxxFunction)(state, &returnValue, 1, &argumentValues[0]);
     } else {
       Shizu_unreachableCodeReached(__FILE__, __LINE__);
@@ -176,9 +175,8 @@ Visuals_Service_emitMouseButtonMessage
     Shizu_Value temporary = Shizu_List_getValue(state, g_mouseButtonListeners, i);
     if (Shizu_Value_isCxxFunction(&temporary)) {
       Shizu_CxxFunction* cxxFunction = Shizu_Value_getCxxFunction(&temporary);
-      Shizu_Value returnValue = Shizu_Value_Initializer();
-      Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
-      Shizu_Value_setObject(&argumentValues[0], (Shizu_Object*)message);
+      Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+      Shizu_Value argumentValues[] = { Shizu_Value_InitializerObject(message) };
       (*cxxFunction)(state, &returnValue, 1, &argumentValues[0]);
     } else {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);
@@ -201,9 +199,8 @@ Visuals_Service_emitMousePointerMessage
     Shizu_Value temporary = Shizu_List_getValue(state, g_mousePointerListeners, i);
     if (Shizu_Value_isCxxFunction(&temporary)) {
       Shizu_CxxFunction* cxxFunction = Shizu_Value_getCxxFunction(&temporary);
-      Shizu_Value returnValue = Shizu_Value_Initializer();
-      Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
-      Shizu_Value_setObject(&argumentValues[0], (Shizu_Object*)message);
+      Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+      Shizu_Value argumentValues[] = { Shizu_Value_InitializerObject(message) };
       (*cxxFunction)(state, &returnValue, 1, &argumentValues[0]);
     } else {
       fprintf(stderr, "%s:%d: unreachable code reached\n", __FILE__, __LINE__);

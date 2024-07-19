@@ -412,9 +412,8 @@ Visuals_Gl_VertexBuffer_constructImpl
   Visuals_Gl_VertexBuffer* SELF = (Visuals_Gl_VertexBuffer*)Shizu_Value_getObject(&argumentValues[0]);
   {
     Shizu_Type* PARENTTYPE = Shizu_Types_getParentType(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), TYPE);
-    Shizu_Value returnValue = Shizu_Value_Initializer();
-    Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
-    Shizu_Value_setObject(&argumentValues[0], (Shizu_Object*)SELF);
+    Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+    Shizu_Value argumentValues[] = { Shizu_Value_InitializerObject(SELF) };
     Shizu_Type_getObjectTypeDescriptor(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), PARENTTYPE)->construct(state, &returnValue, 1, &argumentValues[0]);
   }
   SELF->bufferId = 0;
@@ -428,9 +427,8 @@ Visuals_Gl_VertexBuffer_create
     Shizu_State2* state
   )
 {
-  Shizu_Value returnValue = Shizu_Value_Initializer();
-  Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
-  Shizu_Value_setType(&argumentValues[0], Visuals_Gl_VertexBuffer_getType(state));
+  Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+  Shizu_Value argumentValues[] = { Shizu_Value_InitializerType(Visuals_Gl_VertexBuffer_getType(state)) };
   Shizu_Operations_create(state, &returnValue, 1, &argumentValues[0]);
   return (Visuals_Gl_VertexBuffer*)Shizu_Value_getObject(&returnValue);
 }
