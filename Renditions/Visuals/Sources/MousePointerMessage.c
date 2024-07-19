@@ -78,15 +78,11 @@ MousePointerMessage_create
     Shizu_Integer32 y
   )
 {
-  Shizu_Value returnValue = Shizu_Value_Initializer();
-  Shizu_Value argumentValues[] = { Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer(), };
-  Shizu_Value_setType(&argumentValues[0], MousePointerMessage_getType(state));
-  Shizu_Value_setInteger32(&argumentValues[1], action);
-  Shizu_Value_setInteger32(&argumentValues[2], x);
-  Shizu_Value_setInteger32(&argumentValues[3], y);
+  Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+  Shizu_Value argumentValues[] = { Shizu_Value_InitializerType(MousePointerMessage_getType(state)),
+                                   Shizu_Value_InitializerInteger32(action),
+                                   Shizu_Value_InitializerInteger32(x),
+                                   Shizu_Value_InitializerInteger32(y), };
   Shizu_Operations_create(state, &returnValue, 4, &argumentValues[0]);
   return (MousePointerMessage*)Shizu_Value_getObject(&returnValue);
 }

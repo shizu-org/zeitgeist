@@ -19,24 +19,10 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "Visuals/Object.h"
+#include "Visuals/MaterialTechnique.h"
 
 static void
-Visuals_Object_dispatchInitialize
-  (
-    Shizu_State1* state1,
-    Visuals_Object_Dispatch* self
-  );
-
-static void
-Visuals_Object_notifyVisualsShutdownImpl
-  (
-    Shizu_State2* state,
-    Visuals_Object* self
-  );
-
-static void
-Visuals_Object_constructImpl
+Visuals_MaterialTechnique_constructImpl
   (
     Shizu_State2* state,
     Shizu_Value* returnValue,
@@ -44,41 +30,23 @@ Visuals_Object_constructImpl
     Shizu_Value* argumentValues
   );
 
-static Shizu_ObjectTypeDescriptor const Visuals_Object_Type = {
+static Shizu_ObjectTypeDescriptor const Visuals_MaterialTechnique_Type = {
   .postCreateType = NULL,
   .preDestroyType = NULL,
   .visitType = NULL,
-  .size = sizeof(Visuals_Object),
-  .construct = &Visuals_Object_constructImpl,
+  .size = sizeof(Visuals_MaterialTechnique),
+  .construct = &Visuals_MaterialTechnique_constructImpl,
   .finalize = NULL,
   .visit = NULL,
-  .dispatchSize = sizeof(Visuals_Object_Dispatch),
-  .dispatchInitialize = (Shizu_OnDispatchInitializeCallback*)&Visuals_Object_dispatchInitialize,
+  .dispatchSize = sizeof(Visuals_MaterialTechnique_Dispatch),
+  .dispatchInitialize = NULL,
   .dispatchUninitialize = NULL,
 };
 
-Shizu_defineObjectType("Zeitgeist.Visuals.Object", Visuals_Object, Shizu_Object);
+Shizu_defineObjectType("Zeitgeist.Visuals.MaterialTechnique", Visuals_MaterialTechnique, Visuals_Object);
 
 static void
-Visuals_Object_dispatchInitialize
-  (
-    Shizu_State1* stat1e,
-    Visuals_Object_Dispatch* self
-  )
-{
-  self->notifyVisualsShutdown = &Visuals_Object_notifyVisualsShutdownImpl;
-}
-
-static void
-Visuals_Object_notifyVisualsShutdownImpl
-  (
-    Shizu_State2* state,
-    Visuals_Object* self
-  )
-{ Visuals_Object_unmaterialize(state, self); }
-
-static void
-Visuals_Object_constructImpl
+Visuals_MaterialTechnique_constructImpl
   (
     Shizu_State2* state,
     Shizu_Value* returnValue,
@@ -90,20 +58,14 @@ Visuals_Object_constructImpl
     Shizu_State2_setStatus(state, Shizu_Status_NumberOfArgumentsInvalid);
     Shizu_State2_jump(state);
   }
-  Shizu_Type* TYPE = Visuals_Object_getType(state);
-  Visuals_Object* SELF = (Visuals_Object*)Shizu_Value_getObject(&argumentValues[0]);
-  Shizu_Object_construct(state, (Shizu_Object*)SELF);
+  Shizu_Type* TYPE = Visuals_MaterialTechnique_getType(state);
+  Visuals_MaterialTechnique* SELF = (Visuals_MaterialTechnique*)Shizu_Value_getObject(&argumentValues[0]);
+  {
+    Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+    Shizu_Value argumentValues[] = { Shizu_Value_InitializerObject(SELF) };
+    Shizu_Type* PARENTTYPE = Shizu_Types_getParentType(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), TYPE);
+    Shizu_Type_getObjectTypeDescriptor(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), PARENTTYPE)->construct
+    (state, &returnValue, 1, &argumentValues[0]);
+  }
   ((Shizu_Object*)SELF)->type = TYPE;
-}
-
-void
-Visuals_Object_construct
-  (
-    Shizu_State2* state,
-    Visuals_Object* self
-  )
-{
-  Shizu_Type* type = Visuals_Object_getType(state);
-  Shizu_Object_construct(state, (Shizu_Object*)self);
-  ((Shizu_Object*)self)->type = type;
 }

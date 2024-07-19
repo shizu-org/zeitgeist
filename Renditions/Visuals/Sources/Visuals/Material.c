@@ -22,6 +22,13 @@
 #include "Visuals/Material.h"
 
 static void
+Visuals_Material_visit
+  (
+    Shizu_State2* state,
+    Visuals_Material* self
+  );
+
+static void
 Visuals_Material_constructImpl
   (
     Shizu_State2* state,
@@ -37,13 +44,29 @@ static Shizu_ObjectTypeDescriptor const Visuals_Material_Type = {
   .size = sizeof(Visuals_Material),
   .construct = &Visuals_Material_constructImpl,
   .finalize = NULL,
-  .visit = NULL,
+  .visit = (Shizu_OnVisitCallback*)&Visuals_Material_visit,
   .dispatchSize = sizeof(Visuals_Material_Dispatch),
   .dispatchInitialize = NULL,
   .dispatchUninitialize = NULL,
 };
 
 Shizu_defineObjectType("Zeitgeist.Visuals.Material", Visuals_Material, Visuals_Object);
+
+static void
+Visuals_Material_visit
+  (
+    Shizu_State2* state,
+    Visuals_Material* self
+  )
+{
+  if (self->phongTechnique) {
+    Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->phongTechnique);
+
+  }
+  if (self->blinnPhongTechnique) {
+    Shizu_Gc_visitObject(Shizu_State2_getState1(state), Shizu_State2_getGc(state), (Shizu_Object*)self->blinnPhongTechnique);
+  }
+}
 
 static void
 Visuals_Material_constructImpl
@@ -60,18 +83,26 @@ Visuals_Material_constructImpl
   }
   Shizu_Type* TYPE = Visuals_Material_getType(state);
   Visuals_Material* SELF = (Visuals_Material*)Shizu_Value_getObject(&argumentValues[0]);
-  Visuals_Object_construct(state, (Visuals_Object*)SELF);
+  {
+    Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+    Shizu_Value argumentValues[] = { Shizu_Value_InitializerObject(SELF) };
+    Shizu_Type* PARENTTYPE = Shizu_Types_getParentType(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), TYPE);
+    Shizu_Type_getObjectTypeDescriptor(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), PARENTTYPE)->construct
+    (state, &returnValue, 1, &argumentValues[0]);
+  }
+  SELF->phongTechnique = NULL;
+  SELF->blinnPhongTechnique = NULL;
   ((Shizu_Object*)SELF)->type = TYPE;
 }
 
-void
-Visuals_Material_construct
+Visuals_Material*
+Visuals_Material_create
   (
-    Shizu_State2* state,
-    Visuals_Material* self
+    Shizu_State2* state
   )
 {
-  Shizu_Type* type = Visuals_Material_getType(state);
-  Visuals_Object_construct(state, (Visuals_Object*)self);
-  ((Shizu_Object*)self)->type = type;
+  Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+  Shizu_Value argumentValues[] = { Shizu_Value_InitializerType(Visuals_Material_getType(state)), };
+  Shizu_Operations_create(state, &returnValue, 1, &argumentValues[0]);
+  return (Visuals_Material*)Shizu_Value_getObject(&returnValue);
 }

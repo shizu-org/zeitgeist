@@ -60,6 +60,12 @@ Visuals_RenderBuffer_constructImpl
   }
   Shizu_Type* TYPE = Visuals_RenderBuffer_getType(state);
   Visuals_RenderBuffer* SELF = (Visuals_RenderBuffer*)Shizu_Value_getObject(&argumentValues[0]);
-  Visuals_Object_construct(state, (Visuals_Object*)SELF);
+  {
+    Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+    Shizu_Value argumentValues[] = { Shizu_Value_InitializerObject(SELF) };
+    Shizu_Type* PARENTTYPE = Shizu_Types_getParentType(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), TYPE);
+    Shizu_Type_getObjectTypeDescriptor(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), PARENTTYPE)->construct
+    (state, &returnValue, 1, &argumentValues[0]);
+  }
   ((Shizu_Object*)SELF)->type = TYPE;
 }

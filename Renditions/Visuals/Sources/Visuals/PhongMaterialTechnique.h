@@ -19,15 +19,30 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VISUALS_PHONGMATERIAL_H_INCLUDED)
-#define VISUALS_PHONGMATERIAL_H_INCLUDED
+#if !defined(VISUALS_PHONGMATERIALTECHNIQUE_H_INCLUDED)
+#define VISUALS_PHONGMATERIALTECHNIQUE_H_INCLUDED
 
-#include "Visuals/Material.h"
+#include "Visuals/MaterialTechnique.h"
 
-Shizu_declareObjectType(Visuals_PhongMaterial);
+/// @brief
+/// A material technique for "Phong" technique.
+/// @details
+/// The type is
+/// @code
+/// class Visuals.PhongMaterialTechnique
+/// @endcode
+/// Its constructor is
+/// @code
+/// Visuals.PhongMaterialTechnique.construct()
+/// @endcode
+/// constructing the material technique with default values.
+/// The default values are
+/// - diffuse = ambient = specular = (85,85,85)
+/// - shininesss = 230
+Shizu_declareObjectType(Visuals_PhongMaterialTechnique);
 
-struct Visuals_PhongMaterial {
-  Visuals_Material _parent;
+struct Visuals_PhongMaterialTechnique {
+  Visuals_MaterialTechnique _parent;
 
   /// The specular reflectance for the red component of light.
   /// [0,255].
@@ -65,28 +80,14 @@ struct Visuals_PhongMaterial {
 
 };
 
-struct Visuals_PhongMaterial_Dispatch {
-  Visuals_Material_Dispatch _parent;
+struct Visuals_PhongMaterialTechnique_Dispatch {
+  Visuals_MaterialTechnique_Dispatch _parent;
 };
 
-/// @brief Construct this Phong material with default values.
-/// @param state A pointer to a Shizu_State2 value.
-/// @param self A pointer to this Phong material.
-/// @remarks
-/// The default values are
-/// diffuse = ambient = specular = (85,85,85)
-/// shininess = 230
-void
-Visuals_PhongMaterial_construct
-  (
-    Shizu_State2* state,
-    Visuals_PhongMaterial* self
-  );
-
-Visuals_PhongMaterial*
-Visuals_PhongMaterial_create
+Visuals_PhongMaterialTechnique*
+Visuals_PhongMaterialTechnique_create
   (
     Shizu_State2* state
   );
 
-#endif // VISUALS_PHONGMATERIAL_H_INCLUDED
+#endif // VISUALS_PHONGMATERIALTECHNIQUE_H_INCLUDED

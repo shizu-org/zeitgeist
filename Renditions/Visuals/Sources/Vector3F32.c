@@ -76,15 +76,11 @@ Vector3F32_create
     Shizu_Float32 z
   )
 {
-  Shizu_Value returnValue = Shizu_Value_Initializer();
-  Shizu_Value argumentValues[] = { Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer() };
-  Shizu_Value_setType(&argumentValues[0], Vector3F32_getType(state));
-  Shizu_Value_setFloat32(&argumentValues[1], x);
-  Shizu_Value_setFloat32(&argumentValues[2], y);
-  Shizu_Value_setFloat32(&argumentValues[3], z);
+  Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+  Shizu_Value argumentValues[] = { Shizu_Value_InitializerType(Vector3F32_getType(state)),
+                                   Shizu_Value_InitializerFloat32(x),
+                                   Shizu_Value_InitializerFloat32(y),
+                                   Shizu_Value_InitializerFloat32(z) };
   Shizu_Operations_create(state, &returnValue, 4, &argumentValues[0]);
   return (Vector3F32*)Shizu_Value_getObject(&returnValue);
 }

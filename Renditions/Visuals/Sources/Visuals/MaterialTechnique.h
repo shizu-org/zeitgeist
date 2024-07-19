@@ -19,28 +19,27 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(VISUALS_MATERIAL_H_INCLUDED)
-#define VISUALS_MATERIAL_H_INCLUDED
+#if !defined(VISUALS_MATERIALTECHNIQUE_H_INCLUDED)
+#define VISUALS_MATERIALTECHNIQUE_H_INCLUDED
 
 #include "Visuals/Object.h"
-typedef struct Visuals_MaterialTechnique Visuals_MaterialTechnique;
 
-Shizu_declareObjectType(Visuals_Material);
+/// The type is
+/// @code
+/// class Visuals.MaterialTechnique
+/// @endcode
+/// Its constructor is
+/// @code
+/// Visuals.MaterialTechnique.construct
+/// @endcode
+Shizu_declareObjectType(Visuals_MaterialTechnique);
 
-struct Visuals_Material {
+struct Visuals_MaterialTechnique {
   Visuals_Object _parent;
-  Visuals_MaterialTechnique* phongTechnique;
-  Visuals_MaterialTechnique* blinnPhongTechnique;
 };
 
-struct Visuals_Material_Dispatch {
+struct Visuals_MaterialTechnique_Dispatch {
   Visuals_Object_Dispatch _parent;
 };
 
-Visuals_Material*
-Visuals_Material_create
-  (
-    Shizu_State2* state
-  );
-
-#endif // VISUALS_MATERIAL_H_INCLUDED
+#endif // VISUALS_MATERIALTECHNIQUE_H_INCLUDED

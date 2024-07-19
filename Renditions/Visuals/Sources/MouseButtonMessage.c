@@ -80,17 +80,12 @@ MouseButtonMessage_create
     Shizu_Integer32 y
   )
 {
-  Shizu_Value returnValue = Shizu_Value_Initializer();
-  Shizu_Value argumentValues[] = { Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer(),
-                                   Shizu_Value_Initializer(), };
-  Shizu_Value_setType(&argumentValues[0], MouseButtonMessage_getType(state));
-  Shizu_Value_setInteger32(&argumentValues[1], action);
-  Shizu_Value_setInteger32(&argumentValues[2], button);
-  Shizu_Value_setInteger32(&argumentValues[3], x);
-  Shizu_Value_setInteger32(&argumentValues[4], y);
+  Shizu_Value returnValue = Shizu_Value_InitializerVoid(Shizu_Void_Void);
+  Shizu_Value argumentValues[] = { Shizu_Value_InitializerType(MouseButtonMessage_getType(state)),
+                                   Shizu_Value_InitializerInteger32(action),
+                                   Shizu_Value_InitializerInteger32(button),
+                                   Shizu_Value_InitializerInteger32(x),
+                                   Shizu_Value_InitializerInteger32(y), };
   Shizu_Operations_create(state, &returnValue, 5, &argumentValues[0]);
   return (MouseButtonMessage*)Shizu_Value_getObject(&returnValue);
 }
