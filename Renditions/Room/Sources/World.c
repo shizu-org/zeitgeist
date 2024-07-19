@@ -1,8 +1,8 @@
 #include "World.h"
 
-#include "Visuals/BlinnPhongMaterial.h"
+#include "Visuals/BlinnPhongMaterialTechnique.h"
 #include "Visuals/Context.h"
-#include "Visuals/PhongMaterial.h"
+#include "Visuals/PhongMaterialTechnique.h"
 #include "Visuals/VertexBuffer.h"
 
 
@@ -90,8 +90,8 @@ StaticGeometry_create
   self->vertexBuffer = (Visuals_VertexBuffer*)Visuals_Context_createVertexBuffer(state, visualsContext);
   self->materials = Shizu_Runtime_Extensions_createList(state);
   {
-    Shizu_List_appendObject(state, self->materials, (Shizu_Object*)Visuals_PhongMaterial_create(state));
-    Shizu_List_appendObject(state, self->materials, (Shizu_Object*)Visuals_BlinnPhongMaterial_create(state));
+    Shizu_List_appendObject(state, self->materials, (Shizu_Object*)Visuals_PhongMaterialTechnique_create(state));
+    Shizu_List_appendObject(state, self->materials, (Shizu_Object*)Visuals_BlinnPhongMaterialTechnique_create(state));
   }
   self->numberOfVertices = 0;
   Visuals_Object_materialize(state, (Visuals_Object*)self->vertexBuffer);

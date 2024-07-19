@@ -19,9 +19,9 @@
 #include "Visuals/Program.h"
 #include "Visuals/RenderBuffer.h"
 #include "Visuals/VertexBuffer.h"
-#include "Visuals/Material.h"
-#include "Visuals/PhongMaterial.h"
-#include "Visuals/BlinnPhongMaterial.h"
+#include "Visuals/MaterialTechnique.h"
+#include "Visuals/PhongMaterialTechnique.h"
+#include "Visuals/BlinnPhongMaterialTechnique.h"
 #include "Visuals/Gl/Context.h"
 
 #if Shizu_Configuration_OperatingSystem_Windows == Shizu_Configuration_OperatingSystem
@@ -66,7 +66,7 @@ static Shizu_Integer32 g_lightModel = LightModel_Phong;
 /// | phongMaterial.specular  | vec3      |
 /// | phongMaterial.shininess | float     |
 
-static void bindPhongMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_PhongMaterial* material) {
+static void bindPhongMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_PhongMaterialTechnique* material) {
   Visuals_Program_bindVector3F32(state, g_program, "phongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)material->ambientR) / 255.f,
                                                                                                      ((Shizu_Float32)material->ambientG) / 255.f,
                                                                                                      ((Shizu_Float32)material->ambientB) / 255.f));
@@ -86,7 +86,7 @@ static void bindPhongMaterial(Shizu_State2* state, Visuals_Context* context, Vis
 /// | blinnPhongMaterial.diffuse   | vec3      |
 /// | blinnPhongMaterial.specular  | vec3      |
 /// | blinnPhongMaterial.shininess | float     |
-static void bindBlinnPhongMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_BlinnPhongMaterial* material) {
+static void bindBlinnPhongMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_BlinnPhongMaterialTechnique* material) {
   Visuals_Program_bindVector3F32(state, g_program, "blinnPhongMaterial.ambient", Vector3F32_create(state, ((Shizu_Float32)material->ambientR) / 255.f,
                                                                                                           ((Shizu_Float32)material->ambientG) / 255.f,
                                                                                                           ((Shizu_Float32)material->ambientB) / 255.f));
@@ -99,12 +99,12 @@ static void bindBlinnPhongMaterial(Shizu_State2* state, Visuals_Context* context
   Visuals_Program_bindFloat32(state, g_program, "blinnPhongMaterial.shininess", ((Shizu_Float32)material->shininess) / 255.f);
 }
 
-static void bindMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_Material* material) {
-  if (Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), ((Shizu_Object*)material)->type, Visuals_PhongMaterial_getType(state))) {
-    bindPhongMaterial(state, context, program, (Visuals_PhongMaterial*)material);
+static void bindMaterial(Shizu_State2* state, Visuals_Context* context, Visuals_Program* program, Visuals_MaterialTechnique* material) {
+  if (Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), ((Shizu_Object*)material)->type, Visuals_PhongMaterialTechnique_getType(state))) {
+    bindPhongMaterial(state, context, program, (Visuals_PhongMaterialTechnique*)material);
   }
-  if (Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), ((Shizu_Object*)material)->type, Visuals_BlinnPhongMaterial_getType(state))) {
-    bindBlinnPhongMaterial(state, context, program, (Visuals_BlinnPhongMaterial*)material);
+  if (Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), ((Shizu_Object*)material)->type, Visuals_BlinnPhongMaterialTechnique_getType(state))) {
+    bindBlinnPhongMaterial(state, context, program, (Visuals_BlinnPhongMaterialTechnique*)material);
   }
 }
 
@@ -178,7 +178,7 @@ Zeitgeist_Rendition_update
     // Bind materials.
     for (size_t i = 0, n = Shizu_List_getSize(state, element->materials); i < n; ++i) {
       Shizu_Value elementValue = Shizu_List_getValue(state, element->materials, i);
-      Visuals_Material* element = (Visuals_Material*)Shizu_Value_getObject(&elementValue);
+      Visuals_MaterialTechnique* element = (Visuals_MaterialTechnique*)Shizu_Value_getObject(&elementValue);
       bindMaterial(state, visualsContext, g_program, element);
     }
     // Bind vertices.
