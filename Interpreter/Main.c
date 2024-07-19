@@ -6,7 +6,6 @@
 #include "idlib/file_system.h"
 #include "Zeitgeist/Rendition.h"
 
-// Must be FileSystem.getWorkingDirectory instead of just "getWorkingDirectory".
 static Shizu_String* getWorkingDirectory(Shizu_State2* state) {
   Shizu_Value returnValue;
   Shizu_Value argumentValues[2];
@@ -116,7 +115,7 @@ onRendition1
     Shizu_State2_jump(state);
   }
   Shizu_Value returnValue;
-  Shizu_Value argumentValues[] = { Shizu_Value_Initializer() };
+  Shizu_Value argumentValues[] = { Shizu_Value_InitializerVoid(Shizu_Void_Void) };
   (*loadFunction)(state, &returnValue, 0, &argumentValues[0]);
   Shizu_JumpTarget jumpTarget1;
   Shizu_State2_pushJumpTarget(state, &jumpTarget1);
@@ -162,7 +161,8 @@ onRendition
     }
     Zeitgeist_Rendition* loadedRendition = (Zeitgeist_Rendition*)Shizu_Value_getObject(&value);
     Shizu_String* loadedRenditionName = Zeitgeist_Rendition_getName(state, loadedRendition);
-    if (Shizu_Object_isEqualTo(state, (Shizu_Object*)renditionName, (Shizu_Object*)loadedRenditionName)) {
+    Shizu_Value temporary = Shizu_Value_InitializerObject(loadedRenditionName);
+    if (Shizu_Object_isEqualTo(state, (Shizu_Object*)renditionName, &temporary)) {
       onRendition1(state, loadedRendition);
       return;
     }
@@ -189,9 +189,9 @@ main1
     char** argv
   )
 {
-  Shizu_String* listRenditions = Shizu_String_create(state, "--list-renditions", strlen("--list-renditions"));
-  Shizu_String* rendition = Shizu_String_create(state, "--rendition", strlen("--rendition"));
-  Shizu_String* help = Shizu_String_create(state, "--help", strlen("--help"));
+  Shizu_Value listRenditions = Shizu_Value_InitializerObject(Shizu_String_create(state, "--list-renditions", strlen("--list-renditions")));
+  Shizu_Value rendition = Shizu_Value_InitializerObject(Shizu_String_create(state, "--rendition", strlen("--rendition")));
+  Shizu_Value help = Shizu_Value_InitializerObject(Shizu_String_create(state, "--help", strlen("--help")));
   if (argc < 2) {
     fprintf(stderr, "error: no command specified\n");
     Shizu_State2_jump(state);
@@ -202,7 +202,7 @@ main1
       fprintf(stderr, "error: command `%.*s` too long\n", (int)64, Shizu_String_getBytes(state, arg));
       Shizu_State2_jump(state);
     }
-    if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, (Shizu_Object*)listRenditions)) {
+    if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, &listRenditions)) {
       if (argc != 2) {
         fprintf(stderr, "error: unknown arguments to command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
         Shizu_State2_jump(state);
@@ -210,7 +210,7 @@ main1
       fprintf(stdout, "listing renditions\n");
       onListRenditions(state);
       break;
-    } else if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, (Shizu_Object*)rendition)) {
+    } else if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, &rendition)) {
       if (argc != 3) {
         fprintf(stderr, "error: missing argument for command `%.*s`\n", (int)Shizu_String_getNumberOfBytes(state, arg), Shizu_String_getBytes(state, arg));
         Shizu_State2_jump(state);
@@ -218,7 +218,7 @@ main1
       fprintf(stdout, "executing rendition\n");
       onRendition(state, Shizu_String_create(state, argv[argi + 1], strlen(argv[argi + 1])));
       break;
-    } else if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, (Shizu_Object*)help)) {
+    } else if (Shizu_Object_isEqualTo(state, (Shizu_Object*)arg, &help)) {
       onHelp(state);
       Shizu_State2_setProcessExitRequested(state, Shizu_Boolean_True);
     } else {

@@ -20,10 +20,6 @@ list(APPEND prerequisiteModules Shizu.Runtime.Modules.DataDefinitionLanguage)
 list(APPEND prerequisiteModules Shizu.Runtime.Modules.MachineLanguage)
 set_target_properties(${name} PROPERTIES prerequisiteModules "${prerequisiteModules}")
 
-#set(prerequisiteModules "")
-#get_target_property(prerequisiteModules Shizu.Runtime prerequisiteModules)
-#set_target_properties(${name} PROPERTIES prerequisiteModules ${prerequisiteModules})
-
 on_executable(${name})
 
 # We must link libm under Linux.
