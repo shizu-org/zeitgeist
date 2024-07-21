@@ -8,101 +8,7 @@ project(${project_name})
 
 include(FetchContent)
 
-#######################################################################################################################
-
-set(idlib-math.repository CACHE STRING "IdLib Math: The Git repository to check out")
-if (NOT idlib-math.repository)
-  set(idlib-math.repository https://github.com/shizu-org/idlib-math.git)
-endif()
-
-set(idlib-math.tag CACHE STRING "IdLib Math: The Git tag to check out")
-if (NOT idlib-math.tag)
-  set(idlib-math.tag 1.9)
-endif()
-
-set(idlib-math.source-dir CACHE STRING "IdLib Math: Path to the source directory")
-if (NOT idlib-math.source-dir)
-  set(idlib-math.source-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-math-1.6-src")
-endif()
-
-set(idlib-math.binary-dir CACHE STRING "IdLib Math: Path to the build directory")
-if (NOT idlib-math.binary-dir)
-  set(idlib-math.binary-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-math-1.6-bld")
-endif()
-
-FetchContent_Declare(idlib-math
-                     GIT_REPOSITORY ${idlib-math.repository}
-                     GIT_TAG ${idlib-math.tag}
-                     SOURCE_DIR ${idlib-math.source-dir}
-                     BINARY_DIR ${idlib-math.binary-dir})
-
-#######################################################################################################################
-
-set(idlib-process.repository CACHE STRING "IdLib Process: The Git repository to check out")
-if (NOT idlib-process.repository)
-  set(idlib-process.repository https://github.com/shizu-org/idlib-process.git)
-endif()
-
-set(idlib-process.tag CACHE STRING "IdLib Process: The Git tag to check out")
-if (NOT idlib-process.tag)
-  set(idlib-process.tag 1.4)
-endif()
-
-set(idlib-process.source-dir CACHE STRING "IdLib Process: Path to the source directory")
-if (NOT idlib-process.source-dir)
-  set(idlib-process.source-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-process-1.4-src")
-endif()
-
-set(idlib-process.binary-dir CACHE STRING "IdLib Process: Path to the build directory")
-if (NOT idlib-process.binary-dir)
-  set(idlib-process.binary-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-process-1.4-bld")
-endif()
-                 
-#######################################################################################################################
-
-set(idlib-bit-scan.repository CACHE STRING "IdLib Bit Scan: The Git repository to check out")
-if (NOT idlib-bit-scan.repository)
-  set(idlib-bit-scan.repository https://github.com/shizu-org/idlib-bit-scan.git)
-endif()
-
-set(idlib-bit-scan.tag CACHE STRING "IdLib Bit Scan: The Git tag to check out")
-if (NOT idlib-bit-scan.tag)
-  set(idlib-bit-scan.tag 1.5)
-endif()
-
-set(idlib-bit-scan.source-dir CACHE STRING "IdLib Bit Scan: Path to the source directory")
-if (NOT idlib-bit-scan.source-dir)
-  set(idlib-bit-scan.source-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-bit-scan-1.5-src")
-endif()
-
-set(idlib-bit-scan.binary-dir CACHE STRING "IdLib Bit Scan: Path to the build directory")
-if (NOT idlib-bit-scan.binary-dir)
-  set(idlib-bit-scan.binary-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-bit-scan-1.5-bld")
-endif()
-
-#######################################################################################################################
-
-set(idlib-file-system.repository CACHE STRING "IdLib File System: The Git repository to check out")
-if (NOT idlib-file-systme.repository)
-  set(idlib-file-system.repository https://github.com/shizu-org/idlib-file-system.git)
-endif()
-
-set(idlib-file-system.tag CACHE STRING "IdLib File System: The Git tag to check out")
-if (NOT idlib-file-system.tag)
-  set(idlib-file-system.tag 1.12)
-endif()
-
-set(idlib-file-system.source-dir CACHE STRING "IdLib File System: Path to the source directory")
-if (NOT idlib-file-system.source-dir)
-  set(idlib-file-system.source-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-file-system-1.12-src")
-endif()
-
-set(idlib-file-system.binary-dir CACHE STRING "IdLib File System: Path to the build directory")
-if (NOT idlib-file-system.binary-dir)
-  set(idlib-file-system.binary-dir "${CMAKE_CURRENT_BINARY_DIR}/idlib-file-system-1.12-bld")
-endif()
-                     
-#######################################################################################################################
+#######################################################################################################################               
 
 set(Shizu.Runtime.repository CACHE STRING "Shizu Runtime: The Git repository to check out")
 if (NOT Shizu.Runtime.repository)
@@ -129,10 +35,36 @@ FetchContent_Declare(Shizu.Runtime
                      GIT_TAG ${Shizu.Runtime.tag}
                      SOURCE_DIR ${Shizu.Runtime.source-dir}
                      BINARY_DIR ${Shizu.Runtime.binary-dir})
+
+FetchContent_MakeAvailable(Shizu.Runtime)                     
+                     
+#######################################################################################################################
+set(idlib-process.source-dir CACHE STRING "IdLib Process: Path to the source directory")
+if (NOT idlib-process.source-dir)
+  set(idlib-process.source-dir "${Shizu.Runtime.source-dir}/Libraries/idlib-process")
+endif()               
+
+set(idlib-bit-scan.source-dir CACHE STRING "IdLib Bit Scan: Path to the source directory")
+if (NOT idlib-bit-scan.source-dir)
+  set(idlib-bit-scan.source-dir "${Shizu.Runtime.source-dir}/Libraries/idlib-bit-scan")
+endif()
+
+set(idlib-file-system.source-dir CACHE STRING "IdLib File System: Path to the source directory")
+if (NOT idlib-file-system.source-dir)
+  set(idlib-file-system.source-dir "${Shizu.Runtime.source-dir}/Libraries/idlib-file-system")
+endif()   
+
+#######################################################################################################################
+
+set(idlib-math.source-dir CACHE STRING "IdLib Math: Path to the source directory")
+if (NOT idlib-math.source-dir)
+  set(idlib-math.source-dir "${CMAKE_CURRENT_SOURCE_DIR}/Libraries/idlib-math")
+endif()
+
+add_subdirectory(${idlib-math.source-dir})
                      
 #######################################################################################################################
 
-FetchContent_MakeAvailable(Shizu.Runtime idlib-math)
  
 # Copy the files of the rendition to the interpreter binary directory.
 # rendition_name The rendition name.
