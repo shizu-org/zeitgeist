@@ -41,6 +41,8 @@ list(APPEND ${name}.source_files Sources/Visuals/Context.c)
 list(APPEND ${name}.header_files Sources/Visuals/Context.h)
 list(APPEND ${name}.source_files Sources/Visuals/RenderBuffer.c)
 list(APPEND ${name}.header_files Sources/Visuals/RenderBuffer.h)
+list(APPEND ${name}.source_files Sources/Visuals/PixelFormat.c)
+list(APPEND ${name}.header_files Sources/Visuals/PixelFormat.h)
 
 list(APPEND ${name}.source_files Sources/ColorRGBU8.c)
 list(APPEND ${name}.header_files Sources/ColorRGBU8.h)
