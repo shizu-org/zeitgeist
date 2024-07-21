@@ -10,48 +10,48 @@ include(FetchContent)
 
 #######################################################################################################################               
 
-set(Shizu.Runtime.repository CACHE STRING "Shizu Runtime: The Git repository to check out")
-if (NOT Shizu.Runtime.repository)
-  set(Shizu.Runtime.repository https://github.com/shizu-org/shizu-runtime.git)
+set(Shizu.repository CACHE STRING "Shizu: The Git repository to check out")
+if (NOT Shizu.repository)
+  set(Shizu.repository https://github.com/shizu-org/shizu.git)
 endif()
 
-set(Shizu.Runtime.tag CACHE STRING "Shizu Runtime: The Git tag to check out")
-if (NOT Shizu.Runtime.tag)
-  set(Shizu.Runtime.tag develop)
+set(Shizu.tag CACHE STRING "Shizu: The Git tag to check out")
+if (NOT Shizu.tag)
+  set(Shizu.tag develop)
 endif()
 
-set(Shizu.Runtime.source-dir CACHE STRING "Shizu Runtime: Path to the source directory")
-if (NOT Shizu.Runtime.source-dir)
-  set(Shizu.Runtime.source-dir "${CMAKE_CURRENT_BINARY_DIR}/shizu-runtime-develop-src")
+set(Shizu.source-dir CACHE STRING "Shizu: Path to the source directory")
+if (NOT Shizu.source-dir)
+  set(Shizu.source-dir "${CMAKE_CURRENT_BINARY_DIR}/shizu-develop-src")
 endif()
 
-set(Shizu.Runtime.binary-dir CACHE STRING "Shizu Runtime: Path to the build directory")
-if (NOT Shizu.Runtime.binary-dir)
-  set(Shizu.Runtime.binary-dir "${CMAKE_CURRENT_BINARY_DIR}/shizu-runtime-develop-bld")
+set(Shizu.binary-dir CACHE STRING "Shizu: Path to the build directory")
+if (NOT Shizu.binary-dir)
+  set(Shizu.binary-dir "${CMAKE_CURRENT_BINARY_DIR}/shizu-develop-bld")
 endif()
 
-FetchContent_Declare(Shizu.Runtime
-                     GIT_REPOSITORY ${Shizu.Runtime.repository}
-                     GIT_TAG ${Shizu.Runtime.tag}
-                     SOURCE_DIR ${Shizu.Runtime.source-dir}
-                     BINARY_DIR ${Shizu.Runtime.binary-dir})
+FetchContent_Declare(Shizu
+                     GIT_REPOSITORY ${Shizu.repository}
+                     GIT_TAG ${Shizu.tag}
+                     SOURCE_DIR ${Shizu.source-dir}
+                     BINARY_DIR ${Shizu.binary-dir})
 
-FetchContent_MakeAvailable(Shizu.Runtime)                     
+FetchContent_MakeAvailable(Shizu)                     
                      
 #######################################################################################################################
 set(idlib-process.source-dir CACHE STRING "IdLib Process: Path to the source directory")
 if (NOT idlib-process.source-dir)
-  set(idlib-process.source-dir "${Shizu.Runtime.source-dir}/Libraries/idlib-process")
+  set(idlib-process.source-dir "${Shizu.source-dir}/Libraries/idlib-process")
 endif()               
 
 set(idlib-bit-scan.source-dir CACHE STRING "IdLib Bit Scan: Path to the source directory")
 if (NOT idlib-bit-scan.source-dir)
-  set(idlib-bit-scan.source-dir "${Shizu.Runtime.source-dir}/Libraries/idlib-bit-scan")
+  set(idlib-bit-scan.source-dir "${Shizu.source-dir}/Libraries/idlib-bit-scan")
 endif()
 
 set(idlib-file-system.source-dir CACHE STRING "IdLib File System: Path to the source directory")
 if (NOT idlib-file-system.source-dir)
-  set(idlib-file-system.source-dir "${Shizu.Runtime.source-dir}/Libraries/idlib-file-system")
+  set(idlib-file-system.source-dir "${Shizu.source-dir}/Libraries/idlib-file-system")
 endif()   
 
 #######################################################################################################################
