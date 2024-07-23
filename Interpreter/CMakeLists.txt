@@ -11,7 +11,7 @@ Shizu_beginExecutable()
 list(APPEND ${name}.source_files Main.c)
 
 Shizu_endExecutable()
-target_link_libraries(${name} ${project_name}-Library idlib-process idlib-file-system)
+target_link_libraries(${name} ${project_name}-Library idlib-process)
 add_dependencies(${name} Shizu.Modules.FileSystem)
 
 get_target_property(prerequisiteModules ${name} prerequisiteModules)

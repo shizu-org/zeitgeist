@@ -41,17 +41,17 @@ FetchContent_MakeAvailable(Shizu)
 #######################################################################################################################
 set(idlib-process.source-dir CACHE STRING "IdLib Process: Path to the source directory")
 if (NOT idlib-process.source-dir)
-  set(idlib-process.source-dir "${Shizu.source-dir}/Libraries/idlib-process")
+  set(idlib-process.source-dir "${Shizu.source-dir}/Libraries/IdLib.Process")
 endif()               
 
 set(idlib-bit-scan.source-dir CACHE STRING "IdLib Bit Scan: Path to the source directory")
 if (NOT idlib-bit-scan.source-dir)
-  set(idlib-bit-scan.source-dir "${Shizu.source-dir}/Libraries/idlib-bit-scan")
+  set(idlib-bit-scan.source-dir "${Shizu.source-dir}/Libraries/IdLib.BitScan")
 endif()
 
 set(idlib-file-system.source-dir CACHE STRING "IdLib File System: Path to the source directory")
 if (NOT idlib-file-system.source-dir)
-  set(idlib-file-system.source-dir "${Shizu.source-dir}/Libraries/idlib-file-system")
+  set(idlib-file-system.source-dir "${Shizu.source-dir}/Libraries/IdLib.FileSystem")
 endif()   
 
 #######################################################################################################################
