@@ -156,7 +156,7 @@ Visuals_Service_emitKeyboardKeyMessage
       Shizu_Value argumentValues[] = { Shizu_Value_InitializerObject(message) };
       (*cxxFunction)(state, &returnValue, 1, &argumentValues[0]);
     } else {
-      Shizu_unreachableCodeReached(__FILE__, __LINE__);
+      Shizu_Cxx_unreachableCodeReached(__FILE__, __LINE__);
     }
   }
 }

@@ -21,7 +21,7 @@
 
 #include "KeyboardKeyMessage.h"
 
-#include "Shizu/Runtime/CxxUtilities.h"
+#include "Shizu/Cxx/Include.h"
 
 static void
 KeyboardKeyMessage_constructImpl
@@ -91,8 +91,8 @@ KeyboardKeyMessage_getAction
     KeyboardKeyMessage* self
   )
 {
-  Shizu_debugAssert(NULL != state);
-  Shizu_debugAssert(NULL != self);
+  Shizu_Cxx_Debug_assert(NULL != state);
+  Shizu_Cxx_Debug_assert(NULL != self);
   return self->action;
 }
 
@@ -103,7 +103,7 @@ KeyboardKeyMessage_getKey
     KeyboardKeyMessage* self
   )
 {
-  Shizu_debugAssert(NULL != state);
-  Shizu_debugAssert(NULL != self);
+  Shizu_Cxx_Debug_assert(NULL != state);
+  Shizu_Cxx_Debug_assert(NULL != self);
   return self->key;
 }

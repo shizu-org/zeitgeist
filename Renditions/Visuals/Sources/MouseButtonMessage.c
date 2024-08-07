@@ -21,7 +21,7 @@
 
 #include "MouseButtonMessage.h"
 
-#include "Shizu/Runtime/CxxUtilities.h"
+#include "Shizu/Cxx/Include.h"
 
 static void
 MouseButtonMessage_constructImpl
@@ -97,8 +97,8 @@ MouseButtonMessage_getAction
     MouseButtonMessage* self
   )
 {
-  Shizu_debugAssert(NULL != state);
-  Shizu_debugAssert(NULL != self);
+  Shizu_Cxx_Debug_assert(NULL != state);
+  Shizu_Cxx_Debug_assert(NULL != self);
   return self->action;
 }
 
@@ -109,7 +109,7 @@ MouseButtonMessage_getButton
     MouseButtonMessage* self
   )
 {
-  Shizu_debugAssert(NULL != state);
-  Shizu_debugAssert(NULL != self);
+  Shizu_Cxx_Debug_assert(NULL != state);
+  Shizu_Cxx_Debug_assert(NULL != self);
   return self->button;
 }

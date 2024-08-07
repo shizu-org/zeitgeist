@@ -21,7 +21,7 @@
 
 #include "MousePointerMessage.h"
 
-#include "Shizu/Runtime/CxxUtilities.h"
+#include "Shizu/Cxx/Include.h"
 
 static void
 MousePointerMessage_constructImpl
@@ -94,8 +94,8 @@ MousePointerMessage_getAction
     MousePointerMessage* self
   )
 {
-  Shizu_debugAssert(NULL != state);
-  Shizu_debugAssert(NULL != self);
+  Shizu_Cxx_Debug_assert(NULL != state);
+  Shizu_Cxx_Debug_assert(NULL != self);
   return self->action;
 }
 
@@ -106,8 +106,8 @@ MousePointerMessage_getX
     MousePointerMessage* self
   )
 {
-  Shizu_debugAssert(NULL != state);
-  Shizu_debugAssert(NULL != self);
+  Shizu_Cxx_Debug_assert(NULL != state);
+  Shizu_Cxx_Debug_assert(NULL != self);
   return self->x;
 }
 
@@ -118,7 +118,7 @@ MousePointerMessage_getY
     MousePointerMessage* self
   )
 {
-  Shizu_debugAssert(NULL != state);
-  Shizu_debugAssert(NULL != self);
+  Shizu_Cxx_Debug_assert(NULL != state);
+  Shizu_Cxx_Debug_assert(NULL != self);
   return self->y;
 }
