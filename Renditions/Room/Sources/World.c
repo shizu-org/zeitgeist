@@ -5,8 +5,76 @@
 #include "Visuals/PhongMaterialTechnique.h"
 #include "Visuals/VertexBuffer.h"
 
+#include "Loader.h"
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+static Shizu_ByteArray* getFileContents(Shizu_State2* state, Shizu_String* relativePath) {
+  Shizu_Value returnValue;
+  Shizu_Value argumentValues[2];
+  Shizu_Environment* environment = Shizu_Environment_getEnvironment(state, Shizu_State2_getGlobalEnvironment(state), Shizu_String_create(state, "FileSystem", strlen("FileSystem")));
+  Shizu_CxxProcedure* p = Shizu_Environment_getCxxProcedure(state, environment, Shizu_String_create(state, "getWorkingDirectory", strlen("getWorkingDirectory")));
+  p->f(state, &returnValue, 0, argumentValues);
+  if (!Shizu_Value_isObject(&returnValue)) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+  if (!Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), Shizu_Value_getObject(&returnValue)->type,
+    Shizu_String_getType(state))) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_String* path = (Shizu_String*)Shizu_Value_getObject(&returnValue);
+  // Get the directory separator.
+  Shizu_String* directorySeparator = Shizu_Environment_getString(state, environment, Shizu_String_create(state, "directorySeparator", strlen("directorySeparator")));
+  path = Shizu_String_concatenate(state, path, directorySeparator);
+  path = Shizu_String_concatenate(state, path, relativePath);
+  // Get the file contents.
+  p = Shizu_Environment_getCxxProcedure(state, environment, Shizu_String_create(state, "getFileContents", strlen("getFileContents")));
+  Shizu_Value_setObject(&argumentValues[0], (Shizu_Object*)path);
+  p->f(state, &returnValue, 1, &argumentValues[0]);
+  if (!Shizu_Value_isObject(&returnValue)) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+  if (!Shizu_Types_isSubTypeOf(Shizu_State2_getState1(state), Shizu_State2_getTypes(state), Shizu_Value_getObject(&returnValue)->type,
+    Shizu_ByteArray_getType(state))) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_ByteArray* received = (Shizu_ByteArray*)Shizu_Value_getObject(&returnValue);
+  return received;
+}
+
+static Shizu_Object* parse(Shizu_State2* state, Shizu_ByteArray* inputByteArray) {
+  Shizu_String* inputString = NULL;
+  inputString = Shizu_String_create(state, Shizu_ByteArray_getRawBytes(state, inputByteArray), Shizu_ByteArray_getNumberOfRawBytes(state, inputByteArray));
+  Shizu_Environment* environment = Shizu_Environment_getEnvironment(state, Shizu_State2_getGlobalEnvironment(state), Shizu_String_create(state, "DataDefinitionLanguage", strlen("DataDefinitionLanguage")));
+  Shizu_CxxProcedure* p = Shizu_Environment_getCxxProcedure(state, environment, Shizu_String_create(state, "createParser", strlen("createParser")));
+  Shizu_Value returnValue; Shizu_Value arguments[1];
+  p->f(state, &returnValue, 0, &arguments[0]);
+  Shizu_Value self = returnValue;
+  // set the input
+  {
+    Shizu_Value returnValue;
+    Shizu_Value arguments[1];
+    Shizu_Value_setObject(&arguments[0], (Shizu_Object*)inputString);
+    uint8_t const methodNameBytes[] = "setInput";
+    Shizu_Object_call(state, Shizu_Value_getObject(&self), &methodNameBytes[0], sizeof(methodNameBytes) - 1, &returnValue, 1, &arguments[0]);
+  }
+  // run
+  {
+    Shizu_Value returnValue;
+    Shizu_Value arguments[1];
+    uint8_t const methodNameBytes[] = "run";
+    Shizu_Object_call(state, Shizu_Value_getObject(&self), &methodNameBytes[0], sizeof(methodNameBytes) - 1, &returnValue, 0, &arguments[0]);
+    if (!Shizu_Value_isObject(&returnValue)) {
+      Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+      Shizu_State2_jump(state);
+    }
+    return Shizu_Value_getObject(&returnValue);
+  }
+}
 
 static void
 StaticGeometry_finalize
@@ -458,6 +526,62 @@ World_create
   static const Shizu_Float32 length = 5.f;
   // Extend along the y-axis in metres.
   static const Shizu_Float32 height = 4.f;
+
+  Reader reader = { 
+    .file = { 
+      .path = NULL,
+      .contents = NULL,
+    },
+    .names = {
+      .astType = NULL,
+      .astTypeFile = 0,
+      .astTypeList = 0,
+      .astTypeMap = 0,
+    },
+    .environment = NULL,
+    .ast = NULL,
+  };
+  reader.file.path = Shizu_String_create(state, "Renditions", strlen("Renditions"));
+  reader.file.path = Shizu_String_concatenate(state, reader.file.path, Shizu_String_create(state, Shizu_OperatingSystem_DirectorySeparator "Zeitgeist-Room", strlen(Shizu_OperatingSystem_DirectorySeparator "Zeitgeist-Room")));
+  reader.file.path = Shizu_String_concatenate(state, reader.file.path, Shizu_String_create(state, Shizu_OperatingSystem_DirectorySeparator "Assets", strlen(Shizu_OperatingSystem_DirectorySeparator "Assets")));
+  reader.file.path = Shizu_String_concatenate(state, reader.file.path, Shizu_String_create(state, Shizu_OperatingSystem_DirectorySeparator "material1.ddl", strlen(Shizu_OperatingSystem_DirectorySeparator "material1.ddl")));
+  reader.file.contents = getFileContents(state, reader.file.path);
+  reader.ast = parse(state, reader.file.contents);
+  if (!isFile(state, &reader, reader.ast) || 1 != getNumberOfChildren(state, &reader, reader.ast)) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Object* map = getChildAt(state, &reader, reader.ast, 0);
+  Shizu_Object* object = NULL;
+  object = getChildByName(state, &reader, map, Shizu_String_create(state, "type", sizeof("type") - 1));
+  Shizu_String* typeText = getText(state, &reader, object);
+  Shizu_Value materialTypeTextValue = Shizu_Value_InitializerObject(reader.names.material);
+  if (!Shizu_Object_isEqualTo(state, (Shizu_Object*)typeText, &materialTypeTextValue)) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Object* versionNode = getChildByName(state, &reader, map, reader.names.version);
+  if (!isMap(state, &reader, versionNode)) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Value received, expected;
+  Shizu_Value_setObject(&received, (Shizu_Object*)getText(state, &reader, getChildByName(state, &reader, versionNode, reader.names.major)));
+  Shizu_Operations_toInteger32(state, &received, 1, &received);
+  Shizu_Value_setInteger32(&expected, INT32_C(1));
+  if (!Shizu_Value_isEqualTo(state, &received, &expected)) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+  Shizu_Value_setObject(&received, (Shizu_Object*)getText(state, &reader, getChildByName(state, &reader, versionNode, reader.names.minor)));
+  Shizu_Operations_toInteger32(state, &received, 1, &received);
+  Shizu_Value_setInteger32(&expected, INT32_C(0));
+  if (!Shizu_Value_isEqualTo(state, &received, &expected)) {
+    Shizu_State2_setStatus(state, Shizu_Status_ArgumentTypeInvalid);
+    Shizu_State2_jump(state);
+  }
+
+
 
   geometry = StaticGeometry_create(state, visualsContext);
   StaticGeometry_setDataFloor(state, geometry, Vector3F32_create(state, 0.f, -height / 2.f, 0.f), breadth, length);

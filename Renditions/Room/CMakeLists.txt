@@ -12,6 +12,7 @@ list(APPEND ${name}.source_files Sources/World.c)
 list(APPEND ${name}.header_files Sources/World.h)
 list(APPEND ${name}.source_files Sources/Player.c)
 list(APPEND ${name}.header_files Sources/Player.h)
+list(APPEND ${name}.header_files Sources/Loader.h)
 
 end_plugin_library()
 
